@@ -500,7 +500,7 @@ public class IpCameraHandler extends BaseThingHandler {
         if (localBootstrap != null) {
             ChannelFuture chFuture = localBootstrap
                     .connect(new InetSocketAddress(cameraConfig.getIp(), cameraConfig.getPort()));
-            if (chFuture.awaitUninterruptibly(500)) {
+            if (chFuture.awaitUninterruptibly(2000)) {
                 chFuture.channel().close();
                 return;
             }

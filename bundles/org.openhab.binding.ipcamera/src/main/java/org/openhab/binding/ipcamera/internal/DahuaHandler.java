@@ -190,6 +190,7 @@ public class DahuaHandler extends ChannelDuplexHandler {
             // Skip these so they are not logged.
             case "TimeChange":
             case "IntelliFrame":
+            case "InterVideoAccess":
             case "NTPAdjustTime":
             case "StorageChange":
             case "Reboot":
