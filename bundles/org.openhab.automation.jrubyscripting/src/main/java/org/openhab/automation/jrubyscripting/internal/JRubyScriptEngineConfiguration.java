@@ -53,7 +53,10 @@ public class JRubyScriptEngineConfiguration {
             .get(OpenHAB.getConfigFolder(), "automation", "ruby", ".gem", RUBY_ENGINE_VERSION_REPLACEMENT).toString();
     private static final String DEFAULT_RUBYLIB = Paths.get(OpenHAB.getConfigFolder(), "automation", "ruby", "lib")
             .toString();
-
+            private static final String DEFAULT_GEMS = "openhab-jrubyscripting=>= 5.0.0.rc1; < 6";
+            private static final String DEFAULT_REQUIRE = "openhab/dsl";
+        
+        
     private static final String GEM_HOME_CONFIG_KEY = "gem_home";
     private static final String RUBYLIB_CONFIG_KEY = "rubylib";
     private static final String GEMS_CONFIG_KEY = "gems";
@@ -78,9 +81,9 @@ public class JRubyScriptEngineConfiguration {
                     new OptionalConfigurationElement(OptionalConfigurationElement.Type.RUBY_ENVIRONMENT,
                             DEFAULT_RUBYLIB, "RUBYLIB")),
 
-            Map.entry(GEMS_CONFIG_KEY, new OptionalConfigurationElement("")),
+            Map.entry(GEMS_CONFIG_KEY, new OptionalConfigurationElement(OptionalConfigurationElement.Type.GEM, DEFAULT_GEMS)),
 
-            Map.entry(REQUIRE_CONFIG_KEY, new OptionalConfigurationElement("")),
+            Map.entry(REQUIRE_CONFIG_KEY, new OptionalConfigurationElement(OptionalConfigurationElement.Type.REQUIRE, DEFAULT_REQUIRE)),
 
             Map.entry(CHECK_UPDATE_CONFIG_KEY, new OptionalConfigurationElement("true")));
 
