@@ -57,15 +57,22 @@ public class JRubyScriptFileWatcher extends AbstractScriptFileWatcher {
         super(watchService, manager, readyService, startLevelService, FILE_DIRECTORY, true);
 
         this.scriptEngineFactory = (JRubyScriptEngineFactory) scriptEngineFactory;
+
+        // Get the super class to re-import after scriptEngineFactory is initialized above
+        processWatchEvent(WatchService.Kind.MODIFY, Path.of(""));
     }
 
     @Override
     protected Optional<String> getScriptType(Path scriptFilePath) {
         String path = scriptFilePath.toString();
 
-        if (scriptEngineFactory.isFileInGemHome(path) || scriptEngineFactory.isFileInLoadPath(path)) {
+        // scriptEngineFactory is null when this function gets called from inside
+        // super class's constructor, before we had a chance to initialize it.
+        if (scriptEngineFactory == null || scriptEngineFactory.isFileInGemHome(path)
+                || scriptEngineFactory.isFileInLoadPath(path)) {
             return Optional.empty();
         }
-        return super.getScriptType(scriptFilePath);
+
+        return super.getScriptType(scriptFilePath).filter(type -> scriptEngineFactory.getScriptTypes().contains(type));
     }
 }
