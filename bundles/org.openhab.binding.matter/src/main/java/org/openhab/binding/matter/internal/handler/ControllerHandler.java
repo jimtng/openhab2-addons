@@ -287,10 +287,17 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         if (!ready) {
             return CompletableFuture.completedFuture(null);
         }
-        return client.getCommissionedNodeIds(false).thenAccept(nodeIds -> {
+
+        return client.getCommissionedNodeIds(false).thenCompose(nodeIds -> {
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+
             for (BigInteger id : nodeIds) {
-                updateNode(id);
+                CompletableFuture<Void> updateFuture = updateNode(id);
+                futures.add(updateFuture);
             }
+
+            // Return a Future that completes when all updateNode futures are complete
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         }).exceptionally(e -> {
             logger.debug("Error communicating with controller", e);
             setOffline(e.getLocalizedMessage());
@@ -347,14 +354,19 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         this.reconnectFuture = scheduler.schedule(this::initialize, 30, TimeUnit.SECONDS);
     }
 
-    protected synchronized void updateNode(BigInteger id) {
+    protected CompletableFuture<Void> updateNode(BigInteger id) {
         logger.debug("updateNode BEGIN {}", id);
-        // If we are already waiting to get this node, return;
-        if (!ready || outstandingNodeRequests.contains(id)) {
-            return;
+
+        // If we are already waiting to get this node, return a completed future
+        synchronized (this) {
+            // If we are already waiting to get this node, return a completed future
+            if (!ready || outstandingNodeRequests.contains(id)) {
+                return CompletableFuture.completedFuture(null);
+            }
+            outstandingNodeRequests.add(id);
         }
-        outstandingNodeRequests.add(id);
-        client.getNode(id).thenAccept(node -> {
+
+        return client.getNode(id).thenAccept(node -> {
             updateNodeEndpoints(node);
             disconnectedNodes.remove(id);
             logger.debug("updateNode END {}", id);

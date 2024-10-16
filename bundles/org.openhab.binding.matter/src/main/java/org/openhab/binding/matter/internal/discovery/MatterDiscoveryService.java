@@ -45,7 +45,9 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
     private @Nullable ThingHandler thingHandler;
 
     public MatterDiscoveryService() throws IllegalArgumentException {
-        super(Set.of(THING_TYPE_ENDPOINT), 60, false);
+        // set a 5 min timeout, which should be plenty of time to discover devices, but stopScan will be called when the
+        // Matter client is done looking for new Nodes/Endpoints
+        super(Set.of(THING_TYPE_ENDPOINT), 60 * 5, false);
     }
 
     @Override
@@ -144,7 +146,10 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
     public void startScan(String input) {
         ThingHandler handler = this.thingHandler;
         if (handler != null && handler instanceof MatterDiscoveryHandler childDiscoveryHandler) {
-            childDiscoveryHandler.startScan(input.length() > 0 ? input : null);
+            childDiscoveryHandler.startScan(input.length() > 0 ? input : null).whenComplete((value, e) -> {
+                logger.debug("startScan complete");
+                stopScan();
+            });
         }
     }
 }
