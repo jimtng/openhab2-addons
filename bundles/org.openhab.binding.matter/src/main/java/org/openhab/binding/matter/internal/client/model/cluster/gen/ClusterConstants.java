@@ -407,20 +407,6 @@ public class ClusterConstants {
     public static final ChannelTypeUID CHANNEL_ALARMBASE_SUPPORTED = new ChannelTypeUID(
             "matter:" + CHANNEL_ID_ALARMBASE_SUPPORTED);
 
-    // Messages Cluster
-
-    public static final String CHANNEL_NAME_MESSAGES_MESSAGES = "Messages";
-    public static final String CHANNEL_LABEL_MESSAGES_MESSAGES = "messages";
-    public static final String CHANNEL_ID_MESSAGES_MESSAGES = "messages_messages";
-    public static final ChannelTypeUID CHANNEL_MESSAGES_MESSAGES = new ChannelTypeUID(
-            "matter:" + CHANNEL_ID_MESSAGES_MESSAGES);
-
-    public static final String CHANNEL_NAME_MESSAGES_ACTIVEMESSAGEIDS = "ActiveMessageIDs";
-    public static final String CHANNEL_LABEL_MESSAGES_ACTIVEMESSAGEIDS = "activeMessageIDs";
-    public static final String CHANNEL_ID_MESSAGES_ACTIVEMESSAGEIDS = "messages_activemessageids";
-    public static final ChannelTypeUID CHANNEL_MESSAGES_ACTIVEMESSAGEIDS = new ChannelTypeUID(
-            "matter:" + CHANNEL_ID_MESSAGES_ACTIVEMESSAGEIDS);
-
     // IlluminanceMeasurement Cluster
 
     public static final String CHANNEL_NAME_ILLUMINANCEMEASUREMENT_MEASUREDVALUE = "MeasuredValue";
@@ -3102,6 +3088,22 @@ public class ClusterConstants {
             "matter:" + CHANNEL_ID_BINDING_BINDING);
 
     // Label Cluster
+
+    // FixedLabel Cluster
+
+    public static final String CHANNEL_NAME_FIXEDLABEL_LABELLIST = "LabelList";
+    public static final String CHANNEL_LABEL_FIXEDLABEL_LABELLIST = "labelList";
+    public static final String CHANNEL_ID_FIXEDLABEL_LABELLIST = "fixedlabel_labellist";
+    public static final ChannelTypeUID CHANNEL_FIXEDLABEL_LABELLIST = new ChannelTypeUID(
+            "matter:" + CHANNEL_ID_FIXEDLABEL_LABELLIST);
+
+    // UserLabel Cluster
+
+    public static final String CHANNEL_NAME_USERLABEL_LABELLIST = "LabelList";
+    public static final String CHANNEL_LABEL_USERLABEL_LABELLIST = "labelList";
+    public static final String CHANNEL_ID_USERLABEL_LABELLIST = "userlabel_labellist";
+    public static final ChannelTypeUID CHANNEL_USERLABEL_LABELLIST = new ChannelTypeUID(
+            "matter:" + CHANNEL_ID_USERLABEL_LABELLIST);
 
     // AccessControl Cluster
 

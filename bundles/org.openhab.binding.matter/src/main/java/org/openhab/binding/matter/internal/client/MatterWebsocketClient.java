@@ -225,6 +225,21 @@ public class MatterWebsocketClient implements WebSocketListener {
                             }
                         }
                         break;
+                    case "eventTriggered":
+                        logger.debug("eventTriggered message {}", event.data);
+                        EventTriggeredMessage triggeredMessage = gson.fromJson(event.data, EventTriggeredMessage.class);
+                        if (triggeredMessage == null) {
+                            logger.debug("invalid EventTriggeredMessage");
+                            return;
+                        }
+                        for (MatterClientListener listener : clientListeners) {
+                            try {
+                                listener.onEvent(triggeredMessage);
+                            } catch (Exception e) {
+                                logger.debug("Error notifying listener", e);
+                            }
+                        }
+                        break;
                     case "nodeStateInformation":
                         logger.debug("nodeStateInformation message {}", event.data);
                         NodeStateMessage nodeStateMessage = gson.fromJson(event.data, NodeStateMessage.class);

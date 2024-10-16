@@ -38,40 +38,9 @@
 		</config-description>
 	</bridge-type>
 
-	<thing-type id="node">
-		<supported-bridge-type-refs>
-			<bridge-type-ref id="controller"/>
-		</supported-bridge-type-refs>
-		<label>Matter Node</label>
-		<description>The Matter Node represents a Matter device or bridge</description>
-
-		<properties>
-			<property name="path"></property>
-			<property name="deviceTypes"></property>
-			<property name="externalPairCode"></property>
-		</properties>
-
-		<representation-property>path</representation-property>
-
-		<config-description>
-			<parameter name="nodeId" type="text" required="true">
-				<label>Node Id</label>
-				<description>The Matter Node Id</description>
-			</parameter>
-			<parameter name="commissionMode" type="boolean">
-				<label>Commission Mode</label>
-				<description>Puts the device into commission mode for 3rd party systems to connect to. A temporary pairing code will
-					be generated and available in this thing's properties</description>
-				<advanced>true</advanced>
-				<default>false</default>
-			</parameter>
-		</config-description>
-	</thing-type>
-
 	<thing-type id="endpoint">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="controller"/>
-			<bridge-type-ref id="node"/>
 		</supported-bridge-type-refs>
 		<label>Matter Endpoint</label>
 		<description>The Matter Endpoint describes a logical endpoint on a Matter </description>
@@ -95,7 +64,8 @@
 			</parameter>
 			<parameter name="commissionMode" type="boolean">
 				<label>Commission Mode</label>
-				<description>Puts the device's parent node into commission mode for 3rd party systems to connect to. A temporary pairing code will
+				<description>Puts the device's parent node into commission mode for 3rd party systems to connect to. A temporary
+					pairing code will
 					be generated and available in this thing's properties</description>
 				<advanced>true</advanced>
 				<default>false</default>

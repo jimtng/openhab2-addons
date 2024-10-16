@@ -27,7 +27,9 @@ import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BaseThingHandlerFactory;
 import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The {@link MatterHandlerFactory} is responsible for creating things and thing
@@ -42,6 +44,13 @@ public class MatterHandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_CONTROLLER,
             THING_TYPE_ENDPOINT);
+
+    private final MatterStateDescriptionOptionProvider stateDescriptionProvider;
+
+    @Activate
+    public MatterHandlerFactory(@Reference MatterStateDescriptionOptionProvider stateDescriptionProvider) {
+        this.stateDescriptionProvider = stateDescriptionProvider;
+    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -61,7 +70,7 @@ public class MatterHandlerFactory extends BaseThingHandlerFactory {
         // }
 
         if (THING_TYPE_ENDPOINT.equals(thingTypeUID)) {
-            return new EndpointHandler(thing);
+            return new EndpointHandler(thing, stateDescriptionProvider);
         }
 
         return null;

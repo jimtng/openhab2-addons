@@ -23,7 +23,9 @@ import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.DescriptorCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.FixedLabelCluster;
 import org.openhab.core.config.discovery.AbstractDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
 import org.openhab.core.config.discovery.DiscoveryResultBuilder;
@@ -43,7 +45,7 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
     private @Nullable ThingHandler thingHandler;
 
     public MatterDiscoveryService() throws IllegalArgumentException {
-        super(Set.of(THING_TYPE_ENDPOINT), 5, false);
+        super(Set.of(THING_TYPE_ENDPOINT), 60, false);
     }
 
     @Override
@@ -84,6 +86,8 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
         logger.debug("discoverChildEndpointThing: {} {} {}", thingUID, bridgeUID, endpointId);
         String vendorName = "";
         String productName = "";
+        String nodeLabel = "";
+        String fixedLabel = "";
         Endpoint root = node.endpoints.get(Integer.valueOf(0));
         if (root != null) {
             BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
@@ -94,13 +98,34 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
         }
         Endpoint device = node.endpoints.get(endpointId);
         if (device != null) {
+            if (device.clusters.get(
+                    BridgedDeviceBasicInformationCluster.CLUSTER_NAME) instanceof BridgedDeviceBasicInformationCluster bridgedCluster) {
+                nodeLabel = bridgedCluster.nodeLabel;
+            }
+
+            if (device.clusters.get(FixedLabelCluster.CLUSTER_NAME) instanceof FixedLabelCluster fixedLabelCluster) {
+                fixedLabel = fixedLabelCluster.labelList.stream().map(l -> l.label + ": " + l.value)
+                        .collect(Collectors.joining(" "));
+            }
             DescriptorCluster cluster = (DescriptorCluster) device.clusters.get(DescriptorCluster.CLUSTER_NAME);
             String deviceTypeIds = cluster.deviceTypeList.stream().map(d -> d.deviceType.toString())
                     .collect(Collectors.joining(","));
             String idSting = node.id.toString();
-            String shortId = (idSting.length() > 5 ? idSting.substring(idSting.length() - 5) : idSting) + "-"
-                    + endpointId;
-            String label = "Matter Device " + shortId + " " + (vendorName + " " + productName).trim();
+            // String shortId = (idSting.length() > 5 ? idSting.substring(idSting.length() - 5) : idSting) + "-"
+            // + endpointId;
+            String label = "Matter Device";
+            if (vendorName != null && !vendorName.isEmpty()) {
+                label += " " + vendorName;
+            }
+            if (productName != null && !productName.isEmpty()) {
+                label += " " + productName;
+            }
+            if (nodeLabel != null && !nodeLabel.isEmpty()) {
+                label += " " + nodeLabel;
+            }
+            if (fixedLabel != null && !fixedLabel.isEmpty()) {
+                label += " " + fixedLabel;
+            }
             String path = idSting + ":" + endpointId;
             DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withLabel(label)
                     .withProperty("nodeId", node.id.toString()).withProperty("endpointId", endpointId)

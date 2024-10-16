@@ -78,17 +78,7 @@ export class Nodes {
         let ip: string | undefined;
         let instanceId: string | undefined;
         let ble = false
-/**
- * const QrCodeDataSchema = ByteArrayBitmapSchema({
-    version: BitField(0, 3),
-    vendorId: BitField(3, 16),
-    productId: BitField(19, 16),
-    flowType: BitFieldEnum<CommissioningFlowType>(35, 2),
-    discoveryCapabilities: BitField(37, 8),
-    discriminator: BitField(45, 12),
-    passcode: BitField(57, 27),
-});
- */
+        
         if (typeof pairingCode === "string" && pairingCode.trim().length > 0) {
             if (pairingCode.indexOf('MT:') == 0) {
                 const qrcode = QrPairingCodeCodec.decode(pairingCode)[0];

@@ -10,23 +10,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.config;
+package org.openhab.binding.matter.internal.devices.types;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.matter.internal.handler.EndpointHandler;
 
 /**
- * The {@link EndpointConfiguration} class contains fields mapping thing configuration parameters.
- *
- * @author Dan Cunningham - Initial contribution
+ * @author Dan Cunningham
+ * 
+ *         This class is a generic type of device and can be used for most Matter devices
  */
 @NonNullByDefault
-public class EndpointConfiguration {
+public class GenericType extends DeviceType {
 
-    public String nodeId = "";
-
-    public int endpointId;
-
-    public Boolean commissionMode = false;
-
-    public String deviceTypes = "";
+    public GenericType(Integer deviceType, EndpointHandler handler) {
+        super(deviceType, handler);
+    }
 }

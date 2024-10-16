@@ -12,12 +12,16 @@
  */
 package org.openhab.binding.matter.internal.discovery;
 
+import java.util.concurrent.CompletableFuture;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Dan Cunningham
  *
  */
+@NonNullByDefault
 public interface MatterDiscoveryHandler {
     /**
      * Sets a {@link MatterDiscoveryService} to call when device information is received
@@ -26,5 +30,5 @@ public interface MatterDiscoveryHandler {
      */
     void setDiscoveryService(MatterDiscoveryService service);
 
-    void startScan(@Nullable String code);
+    CompletableFuture<Void> startScan(@Nullable String code);
 }

@@ -12,18 +12,24 @@
  */
 package org.openhab.binding.matter.internal.client.model.ws;
 
-import java.math.BigInteger;
-
 /**
  * @author Dan Cunningham
  *
  */
-public class Path {
-    public BigInteger nodeId;
-    public Integer endpointId;
-    public Integer clusterId;
-    public Integer attributeId;
-    public String attributeName;
-    public Integer eventId;
-    public String eventName;
+public class EventTriggeredMessage {
+    public Path path;
+    public TriggerEvent[] events;
+
+    public EventTriggeredMessage() {
+    }
+
+    /**
+     * @param path
+     * @param version
+     * @param value
+     */
+    public EventTriggeredMessage(Path path, TriggerEvent[] events) {
+        this.path = path;
+        this.events = events;
+    }
 }

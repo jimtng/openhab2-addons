@@ -12,37 +12,40 @@
  */
 package org.openhab.binding.matter.internal.handler;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.MatterStateDescriptionOptionProvider;
 import org.openhab.binding.matter.internal.client.AttributeListener;
+import org.openhab.binding.matter.internal.client.EventTriggeredListener;
 import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.DescriptorCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.FixedLabelCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
+import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 import org.openhab.binding.matter.internal.config.EndpointConfiguration;
-import org.openhab.binding.matter.internal.mapper.DeviceType;
+import org.openhab.binding.matter.internal.devices.types.DeviceType;
+import org.openhab.binding.matter.internal.devices.types.DeviceTypeRegistry;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.config.core.validation.ConfigValidationException;
 import org.openhab.core.thing.*;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.BridgeHandler;
 import org.openhab.core.thing.binding.builder.ThingBuilder;
-import org.openhab.core.thing.type.DynamicStateDescriptionProvider;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.openhab.core.types.State;
-import org.openhab.core.types.StateDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,20 +56,18 @@ import org.slf4j.LoggerFactory;
  * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
-public class EndpointHandler extends BaseThingHandler implements AttributeListener, DynamicStateDescriptionProvider {
+public class EndpointHandler extends BaseThingHandler implements AttributeListener, EventTriggeredListener {
 
     private final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
     private BigInteger nodeId = BigInteger.valueOf(0);
     protected int endpointId;
-    private List<Integer> deviceTypes = Collections.emptyList();
-    private Map<String, DeviceType> channelIdMap = new HashMap<String, DeviceType>();
-    // private Map<Integer, DeviceTypeMapper> clusterIdMap = new HashMap<Integer, DeviceTypeMapper>();
-    private Map<Integer, DeviceType> deviceTypeMap = new HashMap<Integer, DeviceType>();
-
+    private MatterStateDescriptionOptionProvider stateDescriptionProvider;
+    private @Nullable DeviceType deviceType;
     private @Nullable MatterWebsocketClient cachedClient;
 
-    public EndpointHandler(Thing thing) {
+    public EndpointHandler(Thing thing, MatterStateDescriptionOptionProvider stateDescriptionProvider) {
         super(thing);
+        this.stateDescriptionProvider = stateDescriptionProvider;
     }
 
     @Override
@@ -84,14 +85,9 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
             }
             return;
         }
-
-        logger.debug("Looking up converter for {}", channelUID);
-        DeviceType converter = channelIdMap.get(channelUID.getId());
-        if (converter != null) {
-            logger.debug("Found converter for {} : {} ", channelUID, converter);
-            converter.handleCommand(channelUID, command);
-        } else {
-            logger.debug("No converter found for {}", channelUID);
+        DeviceType deviceType = this.deviceType;
+        if (deviceType != null) {
+            deviceType.handleCommand(channelUID, command);
         }
     }
 
@@ -100,10 +96,6 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
         EndpointConfiguration config = getConfigAs(EndpointConfiguration.class);
         nodeId = new BigInteger(config.nodeId);
         endpointId = config.endpointId;
-        String deviceTypesProp = getThing().getProperties().get("deviceTypes");
-        if (deviceTypesProp != null) {
-            deviceTypes = Arrays.stream(deviceTypesProp.split(",")).map(Integer::parseInt).collect(Collectors.toList());
-        }
         logger.debug("initialize endpoint {}", endpointId);
         ControllerHandler handler = controllerHandler();
         if (handler == null) {
@@ -187,31 +179,20 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
 
     // making this public
     @Override
-    public ThingBuilder editThing() {
-        return super.editThing();
+    public void triggerChannel(String channelID, String event) {
+        super.triggerChannel(channelID, event);
     }
 
+    // making this public
     @Override
-    public @Nullable StateDescription getStateDescription(Channel channel,
-            @Nullable StateDescription originalStateDescription, @Nullable Locale locale) {
-        for (DeviceType dt : deviceTypeMap.values()) {
-            StateDescription sd = dt.getStateDescription(channel.getUID());
-            if (sd != null) {
-                return sd;
-            }
-        }
-        return null;
+    public ThingBuilder editThing() {
+        return super.editThing();
     }
 
     public int getEndpointId() {
         return endpointId;
     }
 
-    public List<Integer> getDeviceTypes() {
-        return deviceTypes;
-    }
-
-    @SuppressWarnings({ "null", "unused" })
     public void updateEndpoint(Endpoint endpoint) {
         logger.debug("updateEndpoint {} {}", endpoint.number, nodeId);
         if (getThing().getStatus() != ThingStatus.ONLINE) {
@@ -234,40 +215,37 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
                 String label = basicInfo.nodeLabel != null && basicInfo.nodeLabel.length() > 0 ? basicInfo.nodeLabel
                         : basicInfo.productLabel;
                 updateProperty("label", label);
-
             }
         }
 
+        if (clusters.get(FixedLabelCluster.CLUSTER_NAME) instanceof FixedLabelCluster fixedLabelCluster) {
+            fixedLabelCluster.labelList
+                    .forEach(fixedLabel -> updateProperty("label-" + fixedLabel.label, fixedLabel.value));
+        }
+
         DescriptorCluster descriptorCluster = (DescriptorCluster) clusters.get(DescriptorCluster.CLUSTER_NAME);
+        DeviceType deviceType = this.deviceType;
+        if (deviceType == null) {
+            Integer dt = -1;
+            if (descriptorCluster != null && descriptorCluster.deviceTypeList.size() > 0) {
+                dt = descriptorCluster.deviceTypeList.get(0).deviceType;
+            }
+            deviceType = DeviceTypeRegistry.createDeviceType(dt, this);
+        }
 
-        descriptorCluster.deviceTypeList.forEach(dt -> {
-            DeviceType mapper = deviceTypeMap.get(dt.deviceType);
-            if (mapper == null) {
-                Class<? extends DeviceType> clazz = DeviceType.getDeviceMapper(dt.deviceType);
-                if (clazz != null) {
-                    try {
-                        Class<?>[] constructorParameterTypes = new Class<?>[] { EndpointHandler.class, Integer.class };
-                        Constructor<? extends DeviceType> constructor = clazz.getConstructor(constructorParameterTypes);
-                        final DeviceType mapperInternal = constructor.newInstance(this, dt.deviceType);
-                        deviceTypeMap.put(dt.deviceType, mapperInternal);
+        deviceType.createChannels(clusters);
+        final DeviceType dt = deviceType;
+        clusters.forEach((clusterName, cluster) -> dt.updateCluster(cluster));
+        deviceType.getStateDescriptions().forEach((channelUID, stateDescription) -> {
+            if (stateDescription != null) {
+                Optional.ofNullable(stateDescription.getOptions())
+                        .ifPresent(options -> stateDescriptionProvider.setStateOptions(channelUID, options));
 
-                        mapperInternal.createChannels(clusters).forEach(channel -> {
-                            logger.debug("Added channel {}", channel.getId());
-                            channelIdMap.put(channel.getId(), mapperInternal);
-                        });
-                    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                            | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                        logger.debug("Could not create device type mapper", e);
-                    }
-                } else {
-                    logger.debug("No mapper found for device type {}", dt.deviceType);
-                }
+                Optional.ofNullable(stateDescription.getPattern())
+                        .ifPresent(pattern -> stateDescriptionProvider.setStatePattern(channelUID, pattern));
             }
         });
-
-        clusters.forEach((clusterName, cluster) -> {
-            deviceTypeMap.forEach((id, dm) -> dm.updateCluster(cluster));
-        });
+        this.deviceType = deviceType;
     }
 
     @Override
@@ -281,11 +259,18 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
 
     @Override
     public void onEvent(AttributeChangedMessage message) {
-        deviceTypeMap.forEach((id, dm) -> {
-            if (dm.supportedClusters().contains(message.path.clusterId)) {
-                dm.onEvent(message);
-            }
-        });
+        DeviceType deviceType = this.deviceType;
+        if (deviceType != null) {
+            deviceType.onEvent(message);
+        }
+    }
+
+    @Override
+    public void onEvent(EventTriggeredMessage message) {
+        DeviceType deviceType = this.deviceType;
+        if (deviceType != null) {
+            deviceType.onEvent(message);
+        }
     }
 
     public BigInteger getNodeId() {
@@ -295,6 +280,20 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
     public void setEndpointStatus(ThingStatus status, ThingStatusDetail detail, String description) {
         logger.debug("setEndpointStatus {} {} {} {} {}", status, detail, description, endpointId, nodeId);
         updateStatus(status, detail, description);
+    }
+
+    public void sendClusterCommand(String clusterName, ClusterCommand command) {
+        MatterWebsocketClient client = getClient();
+        if (client != null) {
+            client.clusterCommand(nodeId, endpointId, clusterName, command);
+        }
+    }
+
+    public void writeAttribute(String clusterName, String attributeName, String value) {
+        MatterWebsocketClient ws = getClient();
+        if (ws != null) {
+            ws.clusterWriteAttribute(nodeId, endpointId, clusterName, attributeName, value);
+        }
     }
 
     protected @Nullable ControllerHandler controllerHandler() {

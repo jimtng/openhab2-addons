@@ -240,7 +240,7 @@ function typeMapper(mappings: Map<string, string | undefined>, dt: AnyValueEleme
 /**
  * Certain clusters have complex inheritance that we don't support yet (and don't need right now)
  */
-const skipClusters = new Set(['FixedLabel', 'UserLabel', 'Channel', 'ContentLauncher']);
+const skipClusters = new Set(['Messages', 'Channel', 'ContentLauncher']);
 
 /**
  * Global types (not in a cluster)
@@ -265,26 +265,52 @@ const clusters = Matter.children.filter(c => c.tag == 'cluster').filter(c => !sk
     const dataTypes = cluster.children?.filter(c => c.tag == 'datatype');
     const maps = cluster.children?.filter(c => c.type?.startsWith('map'));
     const enums = cluster.children?.filter(c => c.type?.startsWith('enum'));
-
-    //looks at attributes and command elements that need top level structs/enums to be declared
-    function addTypesFromMember(c: AnyElement) {
-        if (c.children) {
-            if (c.type?.startsWith('enum')) {
-                if (enums && enums.findIndex(e => e.name == c.name) < 0) {
-                    enums?.push(c as FieldElement);
-                }
-            } else if (c.type?.startsWith('map')) {
-                if (maps && maps.findIndex(e => e.name == c.name) < 0) {
-                    maps?.push(c as FieldElement);
-                }
-            } else if (c.type?.startsWith('struct')) {
-                if (structs && structs.findIndex(e => e.name == c.name) < 0) {
-                    structs?.push(c as FieldElement);
-                }
+    const structs = cluster.children?.filter(dt => dt.type == 'struct').map(dt => typeMapper(typeMapping, dt as AnyValueElement));
+    if (cluster.type) {
+        function combineArray(array1: any[] | undefined, array2: any[] | undefined) {
+            if (!array1 || !array2) {
+                return;
             }
-            (c as any).mappedType = c.name
+            array2.forEach(item => {
+                const child = array1.find( c => c.name == item.name)
+                if (!child) {
+                    array1.push(item);
+                }
+            });
+        }
+        console.log(`Cluster ${cluster.name} has parent ${cluster.type}`)
+        const parent = Matter.children.find(c => c.name == cluster.type);
+        if (parent) {
+            console.log(`Add additional types to ${cluster.name} from parent ${cluster.type}`)
+            let pDataType = parent.children?.filter(c => c.tag == 'datatype') as DatatypeElement[];
+            combineArray(dataTypes, pDataType)
+            let pMaps = parent.children?.filter(c => c.type?.startsWith('map')) as ClusterElement.Child[];
+            combineArray(maps, pMaps)
+            let pEnums = parent.children?.filter(c => c.type?.startsWith('enum')) as ClusterElement.Child[];
+            combineArray(enums, pEnums)
+            let pStructs = parent.children?.filter(dt => dt.type == 'struct').map(dt => typeMapper(typeMapping, dt as AnyValueElement)) as any[]
+            combineArray(structs, pStructs)
         }
     }
+    //looks at attributes and command elements that need top level structs/enums to be declared
+    // function addTypesFromMember(c: AnyElement) {
+    //     if (c.children) {
+    //         if (c.type?.startsWith('enum')) {
+    //             if (enums && enums.findIndex(e => e.name == c.name) < 0) {
+    //                 enums?.push(c as FieldElement);
+    //             }
+    //         } else if (c.type?.startsWith('map')) {
+    //             if (maps && maps.findIndex(e => e.name == c.name) < 0) {
+    //                 maps?.push(c as FieldElement);
+    //             }
+    //         } else if (c.type?.startsWith('struct')) {
+    //             if (structs && structs.findIndex(e => e.name == c.name) < 0) {
+    //                 structs?.push(c as FieldElement);
+    //             }
+    //         }
+    //         (c as any).mappedType = c.name
+    //     }
+    // }
 
     dataTypes?.forEach(dt => {
         if (dt.type && dt.type.indexOf('.') > 0) {
@@ -320,7 +346,7 @@ const clusters = Matter.children.filter(c => c.tag == 'cluster').filter(c => !sk
             }
         }
     });
-    const structs = cluster.children?.filter(dt => dt.type == 'struct').map(dt => typeMapper(typeMapping, dt as AnyValueElement));
+
 
     //clean up commands
     const commandsRaw = cluster.children?.filter(c => c.tag == 'command');

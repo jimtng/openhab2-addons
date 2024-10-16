@@ -10,23 +10,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.config;
+package org.openhab.binding.matter.internal.client;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 
 /**
- * The {@link EndpointConfiguration} class contains fields mapping thing configuration parameters.
+ * @author Dan Cunningham
  *
- * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
-public class EndpointConfiguration {
+public interface EventTriggeredListener {
 
-    public String nodeId = "";
-
-    public int endpointId;
-
-    public Boolean commissionMode = false;
-
-    public String deviceTypes = "";
+    public void onEvent(EventTriggeredMessage message);
 }

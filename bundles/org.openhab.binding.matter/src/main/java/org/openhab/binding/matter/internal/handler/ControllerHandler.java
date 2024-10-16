@@ -19,7 +19,7 @@ import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_T
 import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -32,13 +32,12 @@ import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
+import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
 import org.openhab.binding.matter.internal.config.ControllerConfiguration;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryHandler;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
 import org.openhab.core.OpenHAB;
-import org.openhab.core.config.core.Configuration;
-import org.openhab.core.config.core.validation.ConfigValidationException;
 import org.openhab.core.thing.*;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.thing.binding.ThingHandler;
@@ -60,8 +59,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     // The endpoints / devices associated with a node. Typically a node has 1 device endpoint, but may have more (Hue
     // bridge, complicated devices, etc..)
     private Map<BigInteger, Map<Integer, Endpoint>> nodeEndpoints = Collections.synchronizedMap(new HashMap<>());
-    // Last time the node sent an update to us
-    // private Map<BigInteger, LocalDateTime> nodesLastUpdate = new ConcurrentHashMap<>();
     // Set of nodes we are waiting to connect to
     private Set<BigInteger> outstandingNodeRequests = Collections.synchronizedSet(new HashSet<>());
     // Set of nodes we need to try reconnecting to
@@ -74,7 +71,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     private @Nullable ScheduledFuture<?> reconnectFuture;
     private boolean running = true;
     private boolean ready = false;
-    // private boolean updating = false;
     private @Nullable ScheduledFuture<?> checkFuture;
 
     public ControllerHandler(Bridge bridge) {
@@ -116,52 +112,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
                 logger.debug("Could not send command", e);
                 return null;
             });
-        }
-    }
-
-    @Override
-    public void handleConfigurationUpdate(Map<String, Object> configurationParameters)
-            throws ConfigValidationException {
-        logger.debug("handleConfigurationUpdate");
-        validateConfigurationParameters(configurationParameters);
-        Configuration configuration = editConfiguration();
-        boolean reinitialize = false;
-        String pairCode = null;
-        for (Entry<String, Object> configurationParameter : configurationParameters.entrySet()) {
-            Object value = configurationParameter.getValue();
-            logger.debug("{}: old: {} new: {}", configurationParameter.getKey(),
-                    configuration.get(configurationParameter.getKey()), configurationParameter.getValue());
-            // Ignore any configuration parameters that have not changed
-            if (Objects.equals(configurationParameter.getValue(), configuration.get(configurationParameter.getKey()))) {
-                logger.debug("Controller Configuration update ignored {} to {} ({})", configurationParameter.getKey(),
-                        value, value == null ? "null" : value.getClass().getSimpleName());
-                continue;
-            }
-            logger.debug("Controller Configuration update {} to {}", configurationParameter.getKey(), value);
-            switch (configurationParameter.getKey()) {
-                case "host":
-                case "port":
-                case "nodeId":
-                    reinitialize = true;
-                    break;
-                case "pairCode":
-                    if (!value.toString().isBlank()) {
-                        pairCode = value.toString();
-                        value = "";
-                    }
-            }
-            configuration.put(configurationParameter.getKey(), value);
-        }
-        updateConfiguration(configuration);
-        if (reinitialize) {
-            dispose();
-            initialize();
-        } else if (pairCode != null) {
-            try {
-                client.pairNode(pairCode);
-            } catch (Exception e) {
-                logger.debug("Could not pair", e);
-            }
         }
     }
 
@@ -212,7 +162,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         outstandingNodeRequests.clear();
         disconnectedNodes.clear();
         linkedNodes.clear();
-        // nodesLastUpdate.clear();
         client.disconnect();
     }
 
@@ -220,9 +169,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
         super.childHandlerInitialized(childHandler, childThing);
         logger.debug("childHandlerInitialized ready {} {}", ready, childHandler);
-        // if (!ready || updating) {
-        // return;
-        // }
         if (childHandler instanceof EndpointHandler handler) {
             BigInteger nodeId = handler.getNodeId();
             linkedNodes.add(nodeId);
@@ -249,19 +195,15 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     }
 
     @Override
-    public void startScan(@Nullable String code) {
+    public CompletableFuture<Void> startScan(@Nullable String code) {
         if (code != null) {
             if (!client.isConnected()) {
                 logger.debug("not connected");
-                return;
+                return CompletableFuture.completedFuture(null);
             }
-            try {
-                client.pairNode(code);
-            } catch (Exception e) {
-                logger.debug("Could not pair", e);
-            }
+            return client.pairNode(code);
         } else {
-            refresh();
+            return refresh();
         }
     }
 
@@ -270,9 +212,8 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         logger.debug("Node onEvent: node {} is {}", message.nodeId, message.state);
         switch (message.state) {
             case CONNECTED:
-                // if (!updating) {
+            case STRUCTURECHANGED:
                 updateNode(message.nodeId);
-                // }
                 break;
             case DECOMMISSIONED:
                 updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.GONE,
@@ -292,8 +233,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
                 updateEndpointStatuses(message.nodeId, ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY,
                         "Node " + message.state);
                 break;
-            case STRUCTURECHANGED:
-                break;
             default:
         }
     }
@@ -301,7 +240,16 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     @Override
     public void onEvent(AttributeChangedMessage message) {
         EndpointHandler handler = endpointHandler(message.path.nodeId, message.path.endpointId);
-        // modifyNodesLastUpdate(message.path.nodeId);
+        if (handler == null) {
+            logger.debug("No handler found for node {}", message.path.nodeId);
+            return;
+        }
+        handler.onEvent(message);
+    }
+
+    @Override
+    public void onEvent(EventTriggeredMessage message) {
+        EndpointHandler handler = endpointHandler(message.path.nodeId, message.path.endpointId);
         if (handler == null) {
             logger.debug("No handler found for node {}", message.path.nodeId);
             return;
@@ -327,20 +275,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     public void onReady() {
         ready = true;
         updateStatus(ThingStatus.ONLINE);
-        logger.debug("onReady obtaining lock");
-        // updating = true;
-        // client.getCommissionedNodeIds(false).thenAccept(nodeIds -> {
-        // for (BigInteger id : nodeIds) {
-        // updateNode(id);
-        // }
-        // }).exceptionally(e -> {
-        // logger.debug("Error communicating with controller", e);
-        // setOffline(e.getLocalizedMessage());
-        // return null;
-        // }).whenComplete((nodeIds, e) -> {
-        // logger.debug("onReady releasing lock");
-        // updating = false;
-        // });
         linkedNodes.forEach(nodeId -> updateNode(nodeId));
     }
 
@@ -348,17 +282,12 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         return client;
     }
 
-    private void refresh() {
+    private CompletableFuture<Void> refresh() {
         logger.debug("refresh");
-        // if (!ready || updating) {
-        // return;
-        // }
         if (!ready) {
-            return;
+            return CompletableFuture.completedFuture(null);
         }
-        logger.debug("refresh obtaining lock");
-        // updating = true;
-        client.getConnectedNodeIds().thenAccept(nodeIds -> {
+        return client.getCommissionedNodeIds(false).thenAccept(nodeIds -> {
             for (BigInteger id : nodeIds) {
                 updateNode(id);
             }
@@ -367,14 +296,12 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             setOffline(e.getLocalizedMessage());
             return null;
         }).whenComplete((nodeIds, e) -> {
-            logger.debug("refresh releasing lock");
-            // updating = false;
+            logger.debug("refresh done");
         });
     }
 
     protected void endpointRemoved(BigInteger nodeId, int endpointId, boolean isDeleted) {
         logger.debug("endpointRemoved endpoint {}:{}", nodeId, endpointId);
-
         // only remove the node from the network if all endpoints things on the node are deleted
         synchronized (nodeEndpoints) {
             boolean lastEndpoint = true;
@@ -402,7 +329,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             nodeEndpoints.remove(nodeId);
             disconnectedNodes.remove(nodeId);
             outstandingNodeRequests.remove(nodeId);
-            // nodesLastUpdate.remove(nodeId);
             // check if we remove deleted endpoint things from the actual matter network
             if (decommission && getConfigAs(ControllerConfiguration.class).decommissionNodesOnDelete) {
                 logger.debug("Decommissioning node {}", nodeId);
@@ -429,8 +355,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         }
         outstandingNodeRequests.add(id);
         client.getNode(id).thenAccept(node -> {
-            updateNode(node);
-            // modifyNodesLastUpdate(node.id);
+            updateNodeEndpoints(node);
             disconnectedNodes.remove(id);
             logger.debug("updateNode END {}", id);
         }).exceptionally(e -> {
@@ -443,7 +368,12 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         }).whenComplete((node, e) -> outstandingNodeRequests.remove(id));
     }
 
-    private void updateNode(Node node) {
+    /**
+     * Update the endpoints (devices) for a node
+     * 
+     * @param node
+     */
+    private void updateNodeEndpoints(Node node) {
         synchronized (nodeEndpoints) {
             Map<Integer, Endpoint> endpoints = new HashMap<>();
             for (Endpoint e : node.endpoints.values()) {
@@ -520,20 +450,10 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         }
     }
 
-    // private void modifyNodesLastUpdate(BigInteger nodeId) {
-    // nodesLastUpdate.put(nodeId, LocalDateTime.now());
-    // }
-
     /**
      * I'm not sure if this is necessary anymore, need to check if matter.js constantly scans for nodes for us
      */
     private void checkNodes() {
-        // LocalDateTime checkTime = LocalDateTime.now().minusMinutes(5);
-        // nodesLastUpdate.forEach((nodeId, lastUpdate) -> {
-        // if (lastUpdate.isBefore(checkTime)) {
-        // updateNode(nodeId);
-        // }
-        // });
         if (disconnectedNodes.size() > 0) {
             client.getCommissionedNodeIds(false).thenAccept(nodeIds -> {
                 // check to make sure a disconnected node is actually known by the controller.

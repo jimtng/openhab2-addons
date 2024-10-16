@@ -47,6 +47,108 @@ public class BridgedDeviceBasicInformationCluster extends BaseCluster {
     public String reachable; // 17
     public String uniqueId; // 18
     public String productAppearance; // 20
+    // Structs
+
+    /**
+     * This structure provides a description of the product’s appearance.
+     */
+    public class ProductAppearanceStruct {
+        /**
+         * This field shall indicate the visible finish of the product.
+         */
+        public ProductFinishEnum finish; // ProductFinishEnum
+        /**
+         * This field indicates the representative color of the visible parts of the product. If the product has no
+         * representative color, the field shall be null.
+         */
+        public ColorEnum primaryColor; // ColorEnum
+
+        public ProductAppearanceStruct(ProductFinishEnum finish, ColorEnum primaryColor) {
+            this.finish = finish;
+            this.primaryColor = primaryColor;
+        }
+    }
+
+    /**
+     * This structure provides constant values related to overall global capabilities of this Node, that are not
+     * cluster-specific.
+     */
+    public class CapabilityMinimaStruct {
+        /**
+         * This field shall indicate the actual minimum number of concurrent CASE sessions that are supported per
+         * fabric.
+         * This value shall NOT be smaller than the required minimum indicated in Section 4.14.2.8, “Minimal Number of
+         * CASE Sessions”.
+         */
+        public Integer caseSessionsPerFabric; // uint16
+        /**
+         * This field shall indicate the actual minimum number of concurrent subscriptions supported per fabric.
+         * This value shall NOT be smaller than the required minimum indicated in Section 8.5.1, “Subscribe
+         * Transaction”.
+         */
+        public Integer subscriptionsPerFabric; // uint16
+
+        public CapabilityMinimaStruct(Integer caseSessionsPerFabric, Integer subscriptionsPerFabric) {
+            this.caseSessionsPerFabric = caseSessionsPerFabric;
+            this.subscriptionsPerFabric = subscriptionsPerFabric;
+        }
+    }
+
+    // Enums
+    /**
+     * The data type of ProductFinishEnum is derived from enum8.
+     */
+    public enum ProductFinishEnum {
+        OTHER(0, "Other"),
+        MATTE(1, "Matte"),
+        SATIN(2, "Satin"),
+        POLISHED(3, "Polished"),
+        RUGGED(4, "Rugged"),
+        FABRIC(5, "Fabric");
+
+        public final Integer value;
+        public final String label;
+
+        private ProductFinishEnum(Integer value, String label) {
+            this.value = value;
+            this.label = label;
+        }
+    }
+
+    /**
+     * The data type of ColorEnum is derived from enum8.
+     */
+    public enum ColorEnum {
+        BLACK(0, "Black"),
+        NAVY(1, "Navy"),
+        GREEN(2, "Green"),
+        TEAL(3, "Teal"),
+        MAROON(4, "Maroon"),
+        PURPLE(5, "Purple"),
+        OLIVE(6, "Olive"),
+        GRAY(7, "Gray"),
+        BLUE(8, "Blue"),
+        LIME(9, "Lime"),
+        AQUA(10, "Aqua"),
+        RED(11, "Red"),
+        FUCHSIA(12, "Fuchsia"),
+        YELLOW(13, "Yellow"),
+        WHITE(14, "White"),
+        NICKEL(15, "Nickel"),
+        CHROME(16, "Chrome"),
+        BRASS(17, "Brass"),
+        COPPER(18, "Copper"),
+        SILVER(19, "Silver"),
+        GOLD(20, "Gold");
+
+        public final Integer value;
+        public final String label;
+
+        private ColorEnum(Integer value, String label) {
+            this.value = value;
+            this.label = label;
+        }
+    }
 
     public BridgedDeviceBasicInformationCluster(BigInteger nodeId, int endpointId) {
         super(nodeId, endpointId, 57, "BridgedDeviceBasicInformation");

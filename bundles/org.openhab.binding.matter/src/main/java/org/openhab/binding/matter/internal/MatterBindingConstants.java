@@ -12,8 +12,6 @@
  */
 package org.openhab.binding.matter.internal;
 
-import static org.openhab.core.thing.DefaultSystemChannelTypeProvider.SYSTEM_COLOR_TEMPERATURE;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.type.ChannelTypeUID;
@@ -55,7 +53,8 @@ public class MatterBindingConstants {
 
     public static final String CHANNEL_NAME_COLOR_TEMPERATURE = "colortemperature";
     public static final String CHANNEL_LABEL_COLOR_TEMPERATURE = "Color Temperature";
-    public static final ChannelTypeUID CHANNEL_COLOR_TEMPERATURE = SYSTEM_COLOR_TEMPERATURE.getUID();
+    public static final ChannelTypeUID CHANNEL_COLOR_TEMPERATURE = new ChannelTypeUID(
+            "matter:colorcontrol-temperature");
 
     public static final String CHANNEL_NAME_POWER_BATTERYPERCENT = "batterylevel";
     public static final String CHANNEL_LABEL_POWER_BATTERYPERCENT = "Battery Level";
@@ -126,6 +125,23 @@ public class MatterBindingConstants {
     public static final String CHANNEL_NAME_WINDOWCOVERING_LIFT = "windowcoveringlift";
     public static final String CHANNEL_LABEL_WINDOWCOVERING_LIFT = "Window Covering Lift";
     public static final ChannelTypeUID CHANNEL_WINDOWCOVERING_LIFT = new ChannelTypeUID("matter:windowcovering-lift");
+
+    public static final String CHANNEL_NAME_MODESELECT_MODE = "MODESELECT_MODE";
+    public static final ChannelTypeUID CHANNEL_MODESELECT_MODE = new ChannelTypeUID("matter:modeselect-mode");
+
+    public static final String CHANNEL_NAME_SWITCH_SWITCH = "SWITCH_SWITCH";
+    public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
+    public static final ChannelTypeUID CHANNEL_SWITCH_SWITCH = new ChannelTypeUID("matter:switch-switch");
+    public static final ChannelTypeUID CHANNEL_SWITCH_SWITCHLATECHED = new ChannelTypeUID(
+            "matter:switch-switchlatched");
+    public static final ChannelTypeUID CHANNEL_SWITCH_INITIALPRESS = new ChannelTypeUID("matter:switch-initialpress");
+    public static final ChannelTypeUID CHANNEL_SWITCH_LONGPRESS = new ChannelTypeUID("matter:switch-longpress");
+    public static final ChannelTypeUID CHANNEL_SWITCH_SHORTRELEASE = new ChannelTypeUID("matter:switch-shortrelease");
+    public static final ChannelTypeUID CHANNEL_SWITCH_LONGRELEASE = new ChannelTypeUID("matter:switch-longrelease");
+    public static final ChannelTypeUID CHANNEL_SWITCH_MULTIPRESSONGOING = new ChannelTypeUID(
+            "matter:switch-multipressongoing");
+    public static final ChannelTypeUID CHANNEL_SWITCH_MULTIPRESSCOMPLETE = new ChannelTypeUID(
+            "matter:switch-multipresscomplete");
 
     public static final String ITEM_TYPE_COLOR = "Color";
     public static final String ITEM_TYPE_CONTACT = "Contact";
