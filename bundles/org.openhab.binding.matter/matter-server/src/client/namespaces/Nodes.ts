@@ -14,8 +14,7 @@ export class Nodes {
     constructor(private theNode: MatterNode, private nodeListener: Partial<CommissioningControllerNodeOptions>) {
     }
 
-    async listNodes(connectedOnly = false) {
-        console.log("listNodes");
+    async listNodes() {
         if (this.theNode.commissioningController === undefined) {
             throw new Error("CommissioningController not initialized");
         }
@@ -43,13 +42,13 @@ export class Nodes {
         node.getDevices().forEach(endpoint => allEndpoints(endpoint, endpoints));
         data.endpoints = {};
         for (const endpoint of endpoints) {
-            if (endpoint.number === undefined) return;
+            if (endpoint === undefined || endpoint.number === undefined) continue;
             const endpointNumber = endpoint.number.toString();
             data.endpoints[endpointNumber] = {};
             data.endpoints[endpointNumber].number = endpoint.number;
             data.endpoints[endpointNumber].clusters = {};
             for (const cluster of endpoint.getAllClusterClients()) {
-                if (cluster.id === undefined) return;
+                if (cluster.id === undefined) continue;
                 data.endpoints[endpointNumber].clusters[cluster.name] = {};
                 data.endpoints[endpointNumber].clusters[cluster.name].id = cluster.id
                 data.endpoints[endpointNumber].clusters[cluster.name].name = cluster.name
@@ -124,8 +123,6 @@ export class Nodes {
             regulatoryCountryCode: "XX"
         };
 
-        console.log(Logger.toJSON(options));
-
         if (this.theNode.Store.has("WiFiSsid") && this.theNode.Store.has("WiFiPassword")) {
             options.commissioning.wifiNetwork = {
                 wifiSsid: await this.theNode.Store.get<string>("WiFiSsid", ""),
@@ -149,30 +146,7 @@ export class Nodes {
             await this.theNode.commissioningController.commissionNode(options);
 
         console.log("Commissioned Node:", commissionedNodeId);
-
         const node = await this.theNode.getNode(commissionedNodeId, this.nodeListener);
-       
-        // Important: This is a temporary API to proof the methods working and this will change soon and is NOT stable!
-        // It is provided to proof the concept
-
-        // Example to initialize a ClusterClient and access concrete fields as API methods
-        const descriptor = node.getRootClusterClient(DescriptorCluster);
-        if (descriptor !== undefined) {
-            console.log(await descriptor.attributes.deviceTypeList.get()); // you can call that way
-            console.log(await descriptor.getServerListAttribute()); // or more convenient that way
-        } else {
-            console.log("No Descriptor Cluster found. This should never happen!");
-        }
-
-        // Example to subscribe to a field and get the value
-        const info = node.getRootClusterClient(BasicInformationCluster);
-        if (info !== undefined) {
-            console.log(await info.getProductNameAttribute()); // This call is executed remotely
-            //console.log(await info.subscribeProductNameAttribute(value => console.log("productName", value), 5, 30));
-            //console.log(await info.getProductNameAttribute()); // This call is resolved locally because we have subscribed to the value!
-        } else {
-            console.log("No BasicInformation Cluster found. This should never happen!");
-        }
         return node.nodeId;
     }
 
