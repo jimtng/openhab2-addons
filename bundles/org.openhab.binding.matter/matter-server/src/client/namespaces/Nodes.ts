@@ -1,12 +1,11 @@
-import { NodeId } from "@project-chip/matter.js/datatype";
 import { MatterError } from "@project-chip/matter.js/common";
 import { CommissioningControllerNodeOptions, PairedNode } from "@project-chip/matter.js/device";
-import { EndpointInterface } from "@project-chip/matter.js/endpoint";
+import { EndpointInterface } from "@matter/protocol";
 import { NodeCommissioningOptions } from "@project-chip/matter.js";
-import { BasicInformationCluster, DescriptorCluster, GeneralCommissioning } from "@project-chip/matter.js/cluster";
-import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode } from "@project-chip/matter.js/schema";
+import { BasicInformationCluster, DescriptorCluster, GeneralCommissioning } from "@matter/main/clusters";
+import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode, NodeId } from "@matter/types";
 
-import { Logger } from "@project-chip/matter.js/log";
+import { Logger } from "@matter/main";
 import { MatterNode } from "../MatterNode";
 const logger = Logger.get("matter");
 
@@ -20,11 +19,7 @@ export class Nodes {
         if (this.theNode.commissioningController === undefined) {
             throw new Error("CommissioningController not initialized");
         }
-        let nodeIds = this.theNode.commissioningController.getCommissionedNodes();
-        if (connectedOnly) {
-            nodeIds = nodeIds.filter(nodeId => !!this.theNode.commissioningController?.getConnectedNode(nodeId));
-        }
-        return nodeIds;
+        return this.theNode.getCommissionedNodes();
     }
 
     async getNode(nodeId: string | number) {
@@ -155,13 +150,8 @@ export class Nodes {
 
         console.log("Commissioned Node:", commissionedNodeId);
 
-        const node = this.theNode.commissioningController.getConnectedNode(commissionedNodeId);
-        if (node === undefined) {
-            // Should not happen
-            throw new MatterError("Node not found after commissioning.");
-        }
-
-
+        const node = await this.theNode.getNode(commissionedNodeId, this.nodeListener);
+       
         // Important: This is a temporary API to proof the methods working and this will change soon and is NOT stable!
         // It is provided to proof the concept
 
@@ -192,23 +182,11 @@ export class Nodes {
             return;
         }
 
-        let nodeIds = this.theNode.commissioningController.getCommissionedNodes();
-        if (nodeId !== "all") {
-            const cmdNodeId = NodeId(BigInt(nodeId));
-            nodeIds = nodeIds.filter(nodeId => nodeId === cmdNodeId);
-            if (!nodeIds.length) {
-                throw new Error(`Node ${nodeId} not commissioned`);
-            }
+        const node = await this.theNode.getNode(nodeId, this.nodeListener);
+        if (node === undefined) {
+          throw new Error(`Node ${nodeId} not found`);
         }
-
-        for (const nodeIdToProcess of nodeIds) {
-            const node = this.theNode.commissioningController.getConnectedNode(nodeIdToProcess);
-            if (node === undefined) {
-                console.log(`Node ${nodeIdToProcess} not connected`);
-                continue;
-            }
-            await node.disconnect();
-        }
+        await node.disconnect();
     }
 
     async removeNode(nodeId: number | string) {

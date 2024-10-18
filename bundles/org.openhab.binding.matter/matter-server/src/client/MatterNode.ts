@@ -1,12 +1,12 @@
 // Include this first to auto-register Crypto, Network and Time Node.js implementations
 import { CommissioningController, MatterServer } from "@project-chip/matter.js";
 
-import { NodeId } from "@matter.js/types";
+import { NodeId } from "@matter/types";
 import { PairedNode, CommissioningControllerNodeOptions } from "@project-chip/matter.js/device";
 import { EndpointInterface } from "@project-chip/matter.js/endpoint";
 import { Logger } from "@project-chip/matter.js/log";
 import { StorageContext, StorageManager } from "@project-chip/matter.js/storage";
-import { StorageBackendJsonFile } from "@matter.js/nodejs";
+import { StorageBackendJsonFile } from "@matter/nodejs";
 
 const logger = Logger.get("MatterNode");
 
@@ -83,7 +83,7 @@ export class MatterNode {
         await this.matterController.start();
     }
 
-    async getNode(nodeId: number | string, connectOptions?: CommissioningControllerNodeOptions) {
+    async getNode(nodeId: number | string | NodeId, connectOptions?: CommissioningControllerNodeOptions) {
         if (this.commissioningController === undefined) {
             throw new Error("CommissioningController not initialized");
         }
@@ -93,6 +93,10 @@ export class MatterNode {
             throw new Error(`Node ${nodeId} not connected`);
         }
         return node;
+    }
+
+    async getCommissionedNodes() {  
+        return this.commissioningController?.getCommissionedNodes();
     }
 
     /**

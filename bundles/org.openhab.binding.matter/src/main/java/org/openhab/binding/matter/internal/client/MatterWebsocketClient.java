@@ -290,24 +290,14 @@ public class MatterWebsocketClient implements WebSocketListener {
     }
 
     /**
-     * Get all nodes that are currently connected
-     * 
-     * @return
-     * @throws Exception
-     */
-    public CompletableFuture<List<BigInteger>> getConnectedNodeIds() {
-        return getCommissionedNodeIds(true);
-    }
-
-    /**
      * Get all nodes the are commissioned / paired to this controller
      * 
      * @param onlyConnected filter to nodes that are currently connected
      * @return
      * @throws Exception
      */
-    public CompletableFuture<List<BigInteger>> getCommissionedNodeIds(boolean onlyConnected) {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "listNodes", new Object[] { onlyConnected });
+    public CompletableFuture<List<BigInteger>> getCommissionedNodeIds() {
+        CompletableFuture<JsonElement> future = sendMessage("nodes", "listNodes", new Object[0]);
         return future.thenApply(obj -> {
             List<BigInteger> nodes = gson.fromJson(obj, new TypeToken<List<BigInteger>>() {
             }.getType());

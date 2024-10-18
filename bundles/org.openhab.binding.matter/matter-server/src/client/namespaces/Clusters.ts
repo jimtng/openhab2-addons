@@ -1,10 +1,10 @@
-import { Logger } from "@project-chip/matter.js/log";
+import { Logger } from "@matter/main";
 import { MatterNode } from "../MatterNode";
 import { convertJsonDataWithModel } from "../../util/Json";
-import { ValidationError } from "@project-chip/matter.js/common";
+import { ValidationError } from "@matter/main/types";
 import * as MatterClusters from "@project-chip/matter.js/cluster";
-import { SupportedAttributeClient } from "@matter.js/protocol"
-import { MatterModel, ValueModel } from "@matter.js/model";
+import { SupportedAttributeClient } from "@matter/protocol"
+import { MatterModel, ValueModel } from "@matter/model";
 
 const logger = Logger.get("Clusters");
 

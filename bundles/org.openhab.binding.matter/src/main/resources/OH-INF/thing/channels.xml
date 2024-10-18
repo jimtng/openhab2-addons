@@ -116,49 +116,49 @@
 	<channel-type id="switch-switchlatched">
 		<kind>trigger</kind>
 		<label>Switched Latched Trigger</label>
-		<description>This trigger shall indicate the new value of the CurrentPosition attribute, i.e. after the move.</description>
+		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. after the move.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-initialpress">
 		<kind>trigger</kind>
 		<label>Initial Press Trigger</label>
-		<description>This trigger shall indicate the new value of the CurrentPosition attribute, i.e. while pressed.</description>
+		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while pressed.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-longpress">
 		<kind>trigger</kind>
 		<label>Long Press Trigger</label>
-		<description>This trigger shall indicate the new value of the CurrentPosition attribute, i.e. while pressed.</description>
+		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while pressed.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-shortrelease">
 		<kind>trigger</kind>
 		<label>Short Release Trigger</label>
-		<description>This trigger shall indicate the previous value of the CurrentPosition attribute, i.e. just prior to release.</description>
+		<description>This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e. just prior to release.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-longrelease">
 		<kind>trigger</kind>
 		<label>Long Release Trigger</label>
-		<description>This trigger shall indicate the previous value of the CurrentPosition attribute, i.e. just prior to release.</description>
+		<description>This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e. just prior to release.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-multipressongoing">
 		<kind>trigger</kind>
 		<label>Multi-Press Ongoing Trigger</label>
-		<description>This trigger shall indicate 2 numeric fields concatenated with a ":" character.  The first is the new value of the CurrentPosition attribute, i.e. while pressed.  The second is the multi press code with a value of N when the Nth press of a multi-press sequence has been detected. </description>
+		<description>This trigger shall indicate 2 numeric fields as a JSON object.  The first is the new value of the CurrentPosition attribute, i.e. while pressed.  The second is the multi press code with a value of N when the Nth press of a multi-press sequence has been detected. </description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-multipresscomplete">
 		<kind>trigger</kind>
 		<label>Multi-Press Complete Trigger</label>
-		<description>This trigger shall indicate 2 numeric fields concatenated with a ":" character.  The first is the new value of the CurrentPosition attribute, i.e. while pressed.  The second is how many times the momentary switch has been pressed in a multi-press sequence. </description>
+		<description>This trigger shall indicate 2 numeric fields as a JSON object.  The first is the new value of the CurrentPosition attribute, i.e. while pressed.  The second is how many times the momentary switch has been pressed in a multi-press sequence. </description>
 		<event/>
 	</channel-type>
 

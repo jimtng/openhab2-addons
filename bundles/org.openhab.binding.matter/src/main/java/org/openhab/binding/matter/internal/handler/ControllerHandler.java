@@ -13,7 +13,6 @@
 package org.openhab.binding.matter.internal.handler;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COMMAND;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_PAIR_CODE;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_ENDPOINT;
 
 import java.io.File;
@@ -38,6 +37,7 @@ import org.openhab.binding.matter.internal.config.ControllerConfiguration;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryHandler;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
 import org.openhab.core.OpenHAB;
+import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.*;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.thing.binding.ThingHandler;
@@ -91,14 +91,8 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             logger.debug("not connected");
             return;
         }
-        if (CHANNEL_PAIR_CODE.equals(channelUID.getId())) {
-            try {
-                client.pairNode(command.toString());
-            } catch (Exception e) {
-                logger.debug("Could not pair", e);
-            }
-        }
-        if (CHANNEL_COMMAND.equals(channelUID.getId())) {
+
+        if (CHANNEL_COMMAND.equals(channelUID.getId()) && command instanceof StringType) {
             String[] args = command.toString().split(" ");
             if (args.length < 2) {
                 logger.debug("Commands require at least 2 segments");
@@ -288,7 +282,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             return CompletableFuture.completedFuture(null);
         }
 
-        return client.getCommissionedNodeIds(false).thenCompose(nodeIds -> {
+        return client.getCommissionedNodeIds().thenCompose(nodeIds -> {
             List<CompletableFuture<Void>> futures = new ArrayList<>();
 
             for (BigInteger id : nodeIds) {
@@ -467,7 +461,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
      */
     private void checkNodes() {
         if (disconnectedNodes.size() > 0) {
-            client.getCommissionedNodeIds(false).thenAccept(nodeIds -> {
+            client.getCommissionedNodeIds().thenAccept(nodeIds -> {
                 // check to make sure a disconnected node is actually known by the controller.
                 // if its not, then we can never connect to it again.
                 Set<BigInteger> disconnectedNodesCopy = Set.copyOf(disconnectedNodes);

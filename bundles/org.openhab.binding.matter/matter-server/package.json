@@ -23,8 +23,13 @@
         "webpack": "^5.88.2",
         "webpack-cli": "^5.1.4"
     },
+    "imports": {
+        "#general": "@matter/general",
+        "#types": "@matter/types"
+    },
     "dependencies": {
-        "@matter.js/main": "0.11.0-alpha.0-20240928-08865c2ce",
+        "@matter/main": "0.11.0-alpha.0-20241018-34fe42e99",
+        "@project-chip/matter.js" : "0.11.0-alpha.0-20241018-34fe42e99",
         "uuid": "^9.0.1",
         "ws": "^8.18.0",
         "yargs": "^17.7.2"
