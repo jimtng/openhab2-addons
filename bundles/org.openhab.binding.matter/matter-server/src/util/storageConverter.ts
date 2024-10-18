@@ -63,6 +63,3 @@ function renameOriginalFile(filePath: string) {
   fs.renameSync(filePath, newFilePath);
   console.log(`Original file renamed to: ${newFilePath}`);
 }
-
-const jsonFilePath = process.argv[2];
-convertJsonFile(jsonFilePath);
