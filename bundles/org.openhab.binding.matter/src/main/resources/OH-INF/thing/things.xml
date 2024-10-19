@@ -14,7 +14,7 @@
 		</channels>
 
 		<config-description>
-			<parameter name="nodeId" type="integer" required="true">
+			<parameter name="nodeId" type="text" required="true">
 				<label>Node ID</label>
 				<description>The Matter Node ID / Number of the Controller bridge.</description>
 				<default>0</default>
@@ -54,7 +54,7 @@
 		<representation-property>path</representation-property>
 
 		<config-description>
-			<parameter name="nodeId" type="integer" required="true">
+			<parameter name="nodeId" type="text" required="true">
 				<label>Node Id</label>
 				<description>The Matter Node Id</description>
 			</parameter>

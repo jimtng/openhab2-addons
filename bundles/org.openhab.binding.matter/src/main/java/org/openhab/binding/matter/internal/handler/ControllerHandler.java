@@ -125,7 +125,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
         scheduler.execute(() -> {
             try {
-                BigInteger nodeId = config.nodeId.toBigInteger();
+                BigInteger nodeId = new BigInteger(config.nodeId);
                 if (!config.host.isBlank() && config.port > 0) {
                     logger.debug("Connecting to custom host {} and port {}", config.host, config.port);
                     client.connect(config.host, config.port, nodeId, storagePath, controllerName);
