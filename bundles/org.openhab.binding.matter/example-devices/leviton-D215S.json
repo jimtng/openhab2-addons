@@ -714,64 +714,6 @@
                             ],
                             "generatedCommandList": []
                         },
-                        "OperationalCredentials": {
-                            "id": 62,
-                            "name": "OperationalCredentials",
-                            "nocs": [
-                                {
-                                    "noc": "153001010124020137032414001826042023582c2605a059054137062415012711bc78ac874ec96dcb18240701240801300941048f13ef5dd0fd22fea2d659841be70178f58cc9c73539b6bfa99df24cf5652d03a859f3d10c75bd3d98f2bd1e5314506ee398b9757c5fdcc160660a0d284f1acf370a35012801182402013603040204011830041418e657b8c29206f288cfb657edeb669b709c91ff300514e495b8fd782e5b14131ce0eb262e7e393411377518300b40576d195221b707269416ae73e2f7c54885bcb7bc50cf0a8886628a76b828d55c771c713978bf5981d01f074f5e498440e43b63df0a8d33c7e10afc25b94b056718",
-                                    "icac": null,
-                                    "fabricIndex": 1
-                                }
-                            ],
-                            "fabrics": [
-                                {
-                                    "rootPublicKey": "0479d547edded4a75b4cde6c316a6e8f0baf065e683a0c805ba6e8b7b0771f96fa7c60759e557f8112c7cbb9178251b618eaec181d7c0962c995ba2fd5a58e2002",
-                                    "vendorId": 65521,
-                                    "fabricId": "1",
-                                    "nodeId": "14658593701281691836",
-                                    "label": "",
-                                    "fabricIndex": 1
-                                }
-                            ],
-                            "supportedFabrics": 5,
-                            "commissionedFabrics": 1,
-                            "trustedRootCertificates": [
-                                "1530010100240201370324140018260483be4e2c260503f5fb403706241400182407012408013009410479d547edded4a75b4cde6c316a6e8f0baf065e683a0c805ba6e8b7b0771f96fa7c60759e557f8112c7cbb9178251b618eaec181d7c0962c995ba2fd5a58e2002370a3501290118240260300414e495b8fd782e5b14131ce0eb262e7e3934113775300514e495b8fd782e5b14131ce0eb262e7e393411377518300b401f8043dfc662bd21f5e09332a3959677ee1e19c0a190fab56de5397cc3ee1461f92e7433a574400b1f152bbbf20d783492f7a56e7acc2be1f6574d0c8bc4fd2218"
-                            ],
-                            "currentFabricIndex": 1,
-                            "clusterRevision": 1,
-                            "featureMap": {},
-                            "attributeList": [
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                65533
-                            ],
-                            "acceptedCommandList": [
-                                0,
-                                2,
-                                4,
-                                6,
-                                7,
-                                9,
-                                10,
-                                11
-                            ],
-                            "generatedCommandList": [
-                                1,
-                                3,
-                                5,
-                                8
-                            ]
-                        },
                         "GroupKeyManagement": {
                             "id": 63,
                             "name": "GroupKeyManagement",

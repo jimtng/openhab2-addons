@@ -543,67 +543,6 @@
                             ],
                             "generatedCommandList": []
                         },
-                        "OperationalCredentials": {
-                            "id": 62,
-                            "name": "OperationalCredentials",
-                            "nocs": [
-                                {
-                                    "noc": "15300101022402013703241400182604ef08a62c26056f3f5341370624150127118ca538808765f5ef1824070124080130094104192249eb217e5fcc3ddba8b2a44646a732a8cace0b0e07ae567b873b073e88e46e7566c056f7516dda2660a46a7148cf6f750f2d01152b55e6ab76fab7a21add370a35012801182402013603040204011830041436866cf0d20fa1a9a6c0595605b9fab5752cc8703005145c3e353c0a00801e0a6a995286e80a2772845ddd18300b40f665a29032c4afdff7c2893e2bb4c9fdf339b86ed2f7a1bd893c48d25a1b70af3a7131d2459f0e9470427d03174f581d3cfa225c39893b53da967058dbb1a1c718",
-                                    "icac": null,
-                                    "fabricIndex": 4
-                                }
-                            ],
-                            "fabrics": [
-                                {
-                                    "rootPublicKey": "04c84fc7a8d2aecc19aa5b3ba06d8245c876a04de75aecd99802d15b4e708daf00470d2aa5ff38dd6d48bb1196c213ea0e9e7089d4159e04e9b3d11ad4eb2cd1d2",
-                                    "vendorId": 65521,
-                                    "fabricId": "1",
-                                    "nodeId": "17290837977005073804",
-                                    "label": "",
-                                    "fabricIndex": 4
-                                }
-                            ],
-                            "supportedFabrics": 16,
-                            "commissionedFabrics": 4,
-                            "trustedRootCertificates": [
-                                "153001010124020137032c840255532c0706476f6f676c652c010b4d617474657220526f6f74271401000000feffffff1826047fd2432926057f945be537062c840255532c0706476f6f676c652c010b4d617474657220526f6f74271401000000feffffff18240701240801300941045b37df6549c20dc8d722a6b8acb660a8a764ce7baf6c6c224f7ee84349684ad7d809ff650033d1527dcf1fbaac6a9c3ad8b41edac909f7b5c760fd542c892375370a350129012402011824026030041472c201f7571913b348ca00ca7b45f4774668c97e30051472c201f7571913b348ca00ca7b45f4774668c97e18300b4065164b166adff18c15610a8ce91bd703e9c1f677b711ce133505152df0da15111675ac5591cee786851cdd9efdad296674bebcb2a3a3209bcde7b309db552c6f18",
-                                "1530010101240201370324140118260480228127260580254d3a37062414011824070124080130094104fa0e5b1fd4cb087f6281e270643674d7b032265e91249cdc936b4fb47ef06f75d3180d03e7d4616a4aac33b739ea553a33dc99ba3ac9596ffabc3a8ace18cfce370a35012901182402603004145d85dd32e29625f5e53b78bc6b99b08e7ecb7c0e3005145d85dd32e29625f5e53b78bc6b99b08e7ecb7c0e18300b4079b3489627de4533ff88c2ec784d0388709b9cbbbc293cad59bb9afd36e5d54a649eea4b4d531cbda86eab647b79a2a979bc5d0827706af0113d596bbf46195818",
-                                "153001090105e7cf71156d64372402013703271401000000cacacaca182604a83a872b2605a8401f513706271401000000cacacaca1824070124080130094104c7bb3c96d6a7f880dd06dceb2f277f363c8d3eea00006995677d3ee35f746be5d58f04d5eb72c04f0e3bd6e34af2cec4e02fac540628bef142caa5942dd0e771370a3501290118240260300414be6006585857a0690983b0b6e3e3f5d79637309e300514be6006585857a0690983b0b6e3e3f5d79637309e18300b402ec6a169f92e64c42366d711f608b908ab6cdfb74443139db1188d99fe20ebed192b0be71cc1f5dac86a395bcea8aeb589aab6b15ad66f11ea31366cfd29f4ce18",
-                                "153001010024020137032414001826043fa8a52c2605bfde524137062414001824070124080130094104c84fc7a8d2aecc19aa5b3ba06d8245c876a04de75aecd99802d15b4e708daf00470d2aa5ff38dd6d48bb1196c213ea0e9e7089d4159e04e9b3d11ad4eb2cd1d2370a35012901182402603004145c3e353c0a00801e0a6a995286e80a2772845ddd3005145c3e353c0a00801e0a6a995286e80a2772845ddd18300b40313424a88c239cbe0b65c692d9defa120cb8c316f33ea72afeb777a49f429e3990021cade9aba71de2ddc093ee94af10a87c9686e827446ad6b5d66e6c329c1c18"
-                            ],
-                            "currentFabricIndex": 4,
-                            "clusterRevision": 1,
-                            "featureMap": {},
-                            "attributeList": [
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                65533
-                            ],
-                            "acceptedCommandList": [
-                                0,
-                                2,
-                                4,
-                                6,
-                                7,
-                                9,
-                                10,
-                                11
-                            ],
-                            "generatedCommandList": [
-                                1,
-                                3,
-                                5,
-                                8
-                            ]
-                        },
                         "GroupKeyManagement": {
                             "id": 63,
                             "name": "GroupKeyManagement",

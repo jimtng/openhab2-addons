@@ -2,9 +2,9 @@
     "type": "response",
     "message": {
         "type": "resultSuccess",
-        "id": "290bc768-b694-4472-867e-4ce707259224",
+        "id": "10091775-6255-45c8-b7cf-004fad72c6b9",
         "result": {
-            "id": "2636670398344440199",
+            "id": "7295849862824570778",
             "endpoints": {
                 "0": {
                     "number": 0,
@@ -22,14 +22,13 @@
                                 29,
                                 31,
                                 40,
+                                42,
                                 48,
                                 49,
                                 51,
                                 60,
                                 62,
-                                63,
-                                53,
-                                42
+                                63
                             ],
                             "clientList": [
                                 41
@@ -37,7 +36,7 @@
                             "partsList": [
                                 1
                             ],
-                            "clusterRevision": 2,
+                            "clusterRevision": 1,
                             "featureMap": {
                                 "tagList": false
                             },
@@ -63,12 +62,13 @@
                                     "privilege": 5,
                                     "authMode": 2,
                                     "subjects": [
-                                        "18098693022946290589"
+                                        "3010948235760136790"
                                     ],
                                     "targets": null,
                                     "fabricIndex": 2
                                 }
                             ],
+                            "extension": [],
                             "subjectsPerAccessControlEntry": 4,
                             "targetsPerAccessControlEntry": 3,
                             "accessControlEntriesPerFabric": 4,
@@ -76,9 +76,10 @@
                             "featureMap": {},
                             "attributeList": [
                                 0,
+                                1,
                                 2,
-                                4,
                                 3,
+                                4,
                                 65528,
                                 65529,
                                 65531,
@@ -91,47 +92,72 @@
                         "BasicInformation": {
                             "id": 40,
                             "name": "BasicInformation",
-                            "dataModelRevision": 17,
-                            "vendorName": "Onvis",
-                            "vendorId": 5181,
-                            "productName": "S4",
-                            "productId": 4097,
-                            "nodeLabel": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+                            "dataModelRevision": 1,
+                            "vendorName": "Tapo",
+                            "vendorId": 5010,
+                            "productName": "Smart Multicolor Bulb",
+                            "productId": 769,
+                            "nodeLabel": "",
                             "location": "XX",
-                            "hardwareVersion": 1,
-                            "hardwareVersionString": "1",
-                            "softwareVersion": 10010011,
-                            "softwareVersionString": "1.1.11-c85ba1e-dirty",
-                            "serialNumber": "189da3a6ec2b4a23b0b8f51906000ea7",
-                            "uniqueId": "7CDC678D0FD61FEC",
+                            "hardwareVersion": 3,
+                            "hardwareVersionString": "3.0",
+                            "softwareVersion": 65536,
+                            "softwareVersionString": "1.0.0",
+                            "serialNumber": "D8448905C044",
+                            "uniqueId": "671E79886B1F8ABD",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
                             },
-                            "clusterRevision": 2,
+                            "clusterRevision": 1,
                             "featureMap": {},
                             "attributeList": [
-                                65528,
-                                65529,
-                                65531,
-                                65532,
                                 0,
-                                6,
                                 1,
                                 2,
                                 3,
                                 4,
+                                5,
+                                6,
                                 7,
                                 8,
                                 9,
                                 10,
-                                19,
-                                65533,
-                                5,
+                                15,
                                 18,
-                                15
+                                19,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
                             ],
                             "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        },
+                        "OtaSoftwareUpdateRequestor": {
+                            "id": 42,
+                            "name": "OtaSoftwareUpdateRequestor",
+                            "defaultOtaProviders": [],
+                            "updatePossible": true,
+                            "updateState": 0,
+                            "updateStateProgress": 0,
+                            "clusterRevision": 1,
+                            "featureMap": {},
+                            "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0
+                            ],
                             "generatedCommandList": []
                         },
                         "GeneralCommissioning": {
@@ -142,22 +168,22 @@
                                 "failSafeExpiryLengthSeconds": 60,
                                 "maxCumulativeFailsafeSeconds": 900
                             },
-                            "regulatoryConfig": 0,
-                            "locationCapability": 0,
+                            "regulatoryConfig": 1,
+                            "locationCapability": 2,
                             "supportsConcurrentConnection": true,
                             "clusterRevision": 1,
                             "featureMap": {},
                             "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
                                 65528,
                                 65529,
                                 65531,
                                 65532,
-                                2,
-                                3,
-                                1,
-                                4,
-                                65533,
-                                0
+                                65533
                             ],
                             "acceptedCommandList": [
                                 0,
@@ -176,20 +202,20 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "1111111122222222",
-                                    "connected": true
+                                    "networkId": "576966695f53616c6f6e00000000000000000000000000000000000000000000",
+                                    "connected": false
                                 }
                             ],
                             "interfaceEnabled": true,
-                            "lastNetworkingStatus": 0,
-                            "lastNetworkId": "1111111122222222",
+                            "lastNetworkingStatus": null,
+                            "lastNetworkId": null,
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
                             "clusterRevision": 1,
                             "featureMap": {
-                                "wiFiNetworkInterface": false,
-                                "threadNetworkInterface": true,
+                                "wiFiNetworkInterface": true,
+                                "threadNetworkInterface": false,
                                 "ethernetNetworkInterface": false
                             },
                             "attributeList": [
@@ -209,7 +235,7 @@
                             ],
                             "acceptedCommandList": [
                                 0,
-                                3,
+                                2,
                                 4,
                                 6,
                                 8
@@ -225,23 +251,23 @@
                             "name": "GeneralDiagnostics",
                             "networkInterfaces": [
                                 {
-                                    "name": "OT_DEF",
+                                    "name": "r0",
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "000000000000",
+                                    "hardwareAddress": "d8448905c044",
                                     "iPv4Addresses": [
-                                        "00000000"
+                                        "c0a80125"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe80000000000000701ee1c311a9c57d",
-                                        "fd396f1810a407d969da17d77d38121c",
-                                        "fd04e621ef1f0001b937a3067895a890"
+                                        "fe80000000000000da4489fffe05c044"
                                     ],
-                                    "type": 4
+                                    "type": 1
                                 }
                             ],
-                            "rebootCount": 1,
+                            "rebootCount": 9,
+                            "upTime": 2191,
+                            "bootReason": 0,
                             "testEventTriggersEnabled": false,
                             "clusterRevision": 1,
                             "featureMap": {
@@ -250,6 +276,8 @@
                             "attributeList": [
                                 0,
                                 1,
+                                2,
+                                4,
                                 8,
                                 65528,
                                 65529,
@@ -270,16 +298,16 @@
                             "adminVendorId": null,
                             "clusterRevision": 1,
                             "featureMap": {
-                                "basic": false
+                                "basic": true
                             },
                             "attributeList": [
+                                0,
+                                1,
+                                2,
                                 65528,
                                 65529,
                                 65531,
                                 65532,
-                                0,
-                                1,
-                                2,
                                 65533
                             ],
                             "acceptedCommandList": [
@@ -296,20 +324,20 @@
                             "groupTable": [],
                             "maxGroupsPerFabric": 4,
                             "maxGroupKeysPerFabric": 3,
-                            "clusterRevision": 2,
+                            "clusterRevision": 1,
                             "featureMap": {
                                 "cacheAndSync": false
                             },
                             "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
                                 65528,
                                 65529,
                                 65531,
                                 65532,
-                                65533,
-                                0,
-                                1,
-                                2,
-                                3
+                                65533
                             ],
                             "acceptedCommandList": [
                                 0,
@@ -321,173 +349,12 @@
                                 2,
                                 5
                             ]
-                        },
-                        "ThreadNetworkDiagnostics": {
-                            "id": 53,
-                            "name": "ThreadNetworkDiagnostics",
-                            "channel": 15,
-                            "routingRole": 4,
-                            "networkName": "OpenThread-ESP32",
-                            "panId": 4660,
-                            "extendedPanId": "1229782938533634594",
-                            "meshLocalPrefix": "40fd396f1810a407d9",
-                            "neighborTable": [],
-                            "routeTable": [
-                                {
-                                    "extAddress": 0,
-                                    "rloc16": 0,
-                                    "routerId": 0,
-                                    "nextHop": 63,
-                                    "pathCost": 0,
-                                    "lqiIn": 0,
-                                    "lqiOut": 0,
-                                    "age": 41,
-                                    "allocated": true,
-                                    "linkEstablished": false
-                                },
-                                {
-                                    "extAddress": 0,
-                                    "rloc16": 9216,
-                                    "routerId": 9,
-                                    "nextHop": 0,
-                                    "pathCost": 1,
-                                    "lqiIn": 0,
-                                    "lqiOut": 0,
-                                    "age": 41,
-                                    "allocated": true,
-                                    "linkEstablished": false
-                                }
-                            ],
-                            "partitionId": 1045115743,
-                            "weighting": 65,
-                            "dataVersion": 12,
-                            "stableDataVersion": 98,
-                            "leaderRouterId": 0,
-                            "securityPolicy": {
-                                "rotationTime": 672,
-                                "flags": 143
-                            },
-                            "channelPage0Mask": "001fffe0",
-                            "operationalDatasetComponents": {
-                                "activeTimestampPresent": true,
-                                "pendingTimestampPresent": false,
-                                "masterKeyPresent": true,
-                                "networkNamePresent": true,
-                                "extendedPanIdPresent": true,
-                                "meshLocalPrefixPresent": true,
-                                "delayPresent": false,
-                                "panIdPresent": true,
-                                "channelPresent": true,
-                                "pskcPresent": true,
-                                "securityPolicyPresent": true,
-                                "channelMaskPresent": true
-                            },
-                            "activeNetworkFaultsList": [
-                                0,
-                                0,
-                                0,
-                                0
-                            ],
-                            "clusterRevision": 1,
-                            "featureMap": {
-                                "packetCounts": false,
-                                "errorCounts": false,
-                                "mleCounts": false,
-                                "macCounts": false
-                            },
-                            "attributeList": [
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                7,
-                                8,
-                                9,
-                                10,
-                                11,
-                                12,
-                                13,
-                                59,
-                                60,
-                                61,
-                                62,
-                                65533
-                            ],
-                            "acceptedCommandList": [],
-                            "generatedCommandList": []
-                        },
-                        "OtaSoftwareUpdateRequestor": {
-                            "id": 42,
-                            "name": "OtaSoftwareUpdateRequestor",
-                            "defaultOtaProviders": [],
-                            "updatePossible": true,
-                            "updateState": 1,
-                            "updateStateProgress": null,
-                            "clusterRevision": 1,
-                            "featureMap": {},
-                            "attributeList": [
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                0,
-                                65533,
-                                1,
-                                2,
-                                3
-                            ],
-                            "acceptedCommandList": [
-                                0
-                            ],
-                            "generatedCommandList": []
                         }
                     }
                 },
                 "1": {
                     "number": 1,
                     "clusters": {
-                        "Descriptor": {
-                            "id": 29,
-                            "name": "Descriptor",
-                            "deviceTypeList": [
-                                {
-                                    "deviceType": 266,
-                                    "revision": 2
-                                }
-                            ],
-                            "serverList": [
-                                29,
-                                3,
-                                4,
-                                5,
-                                6
-                            ],
-                            "clientList": [],
-                            "partsList": [],
-                            "clusterRevision": 2,
-                            "featureMap": {
-                                "tagList": false
-                            },
-                            "attributeList": [
-                                0,
-                                1,
-                                2,
-                                3,
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                65533
-                            ],
-                            "acceptedCommandList": [],
-                            "generatedCommandList": []
-                        },
                         "Identify": {
                             "id": 3,
                             "name": "Identify",
@@ -496,13 +363,13 @@
                             "clusterRevision": 4,
                             "featureMap": {},
                             "attributeList": [
+                                0,
+                                1,
                                 65528,
                                 65529,
                                 65531,
                                 65532,
-                                65533,
-                                0,
-                                1
+                                65533
                             ],
                             "acceptedCommandList": [
                                 0,
@@ -521,12 +388,12 @@
                                 "groupNames": true
                             },
                             "attributeList": [
+                                0,
                                 65528,
                                 65529,
                                 65531,
                                 65532,
-                                65533,
-                                0
+                                65533
                             ],
                             "acceptedCommandList": [
                                 0,
@@ -546,20 +413,19 @@
                         "Unknown cluster 0x5": {
                             "id": 5,
                             "name": "Unknown cluster 0x5",
-                            "clusterRevision": 5,
+                            "clusterRevision": 4,
                             "featureMap": {},
                             "attributeList": [
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                65533,
                                 0,
                                 1,
                                 2,
                                 3,
                                 4,
-                                6
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
                             ],
                             "acceptedCommandList": [
                                 0,
@@ -582,30 +448,29 @@
                             "unknownAttribute_0x1": 0,
                             "unknownAttribute_0x2": 0,
                             "unknownAttribute_0x3": false,
-                            "unknownAttribute_0x4": 0,
-                            "unknownAttribute_0x6": 0
+                            "unknownAttribute_0x4": 0
                         },
                         "OnOff": {
                             "id": 6,
                             "name": "OnOff",
                             "onOff": false,
-                            "clusterRevision": 5,
+                            "clusterRevision": 4,
                             "featureMap": {
                                 "lighting": true,
                                 "deadFrontBehavior": false,
                                 "offOnly": false
                             },
                             "attributeList": [
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                65533,
                                 0,
                                 16384,
                                 16385,
                                 16386,
-                                16387
+                                16387,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
                             ],
                             "acceptedCommandList": [
                                 0,
@@ -620,6 +485,163 @@
                             "onTime": 0,
                             "offWaitTime": 0,
                             "startUpOnOff": null
+                        },
+                        "LevelControl": {
+                            "id": 8,
+                            "name": "LevelControl",
+                            "currentLevel": 254,
+                            "options": {
+                                "executeIfOff": false,
+                                "coupleColorTempToLevel": false
+                            },
+                            "onLevel": null,
+                            "onTransitionTime": 1,
+                            "offTransitionTime": 1,
+                            "clusterRevision": 5,
+                            "featureMap": {
+                                "onOff": true,
+                                "lighting": true,
+                                "frequency": false
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                15,
+                                17,
+                                18,
+                                19,
+                                16384,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7
+                            ],
+                            "generatedCommandList": [],
+                            "remainingTime": 0,
+                            "startUpCurrentLevel": null
+                        },
+                        "Descriptor": {
+                            "id": 29,
+                            "name": "Descriptor",
+                            "deviceTypeList": [
+                                {
+                                    "deviceType": 269,
+                                    "revision": 1
+                                }
+                            ],
+                            "serverList": [
+                                3,
+                                4,
+                                5,
+                                6,
+                                8,
+                                29,
+                                768
+                            ],
+                            "clientList": [],
+                            "partsList": [],
+                            "clusterRevision": 1,
+                            "featureMap": {
+                                "tagList": false
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        },
+                        "ColorControl": {
+                            "id": 768,
+                            "name": "ColorControl",
+                            "remainingTime": 0,
+                            "colorMode": 0,
+                            "options": {
+                                "executeIfOff": false
+                            },
+                            "numberOfPrimaries": null,
+                            "enhancedColorMode": 0,
+                            "colorCapabilities": {
+                                "hueSaturation": true,
+                                "enhancedHue": false,
+                                "colorLoop": false,
+                                "xy": true,
+                                "colorTemperature": true
+                            },
+                            "clusterRevision": 5,
+                            "featureMap": {
+                                "hueSaturation": true,
+                                "enhancedHue": false,
+                                "colorLoop": false,
+                                "xy": true,
+                                "colorTemperature": true
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                7,
+                                8,
+                                15,
+                                16,
+                                16385,
+                                16394,
+                                16395,
+                                16396,
+                                16397,
+                                16400,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7,
+                                8,
+                                9,
+                                10,
+                                71,
+                                75,
+                                76
+                            ],
+                            "generatedCommandList": [],
+                            "currentHue": 0,
+                            "currentSaturation": 0,
+                            "currentX": 24939,
+                            "currentY": 24701,
+                            "colorTemperatureMireds": 0,
+                            "colorTempPhysicalMinMireds": 153,
+                            "colorTempPhysicalMaxMireds": 400,
+                            "coupleColorTempToLevelMinMireds": 0,
+                            "startUpColorTemperatureMireds": null
                         }
                     }
                 }

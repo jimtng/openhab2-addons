@@ -411,67 +411,7 @@
                             ],
                             "generatedCommandList": []
                         },
-                        "OperationalCredentials": {
-                            "id": 62,
-                            "name": "OperationalCredentials",
-                            "nocs": [
-                                {
-                                    "noc": "15300101022402013703241400182604e4f39d2c2605642a4b41370624150127111f771932b85edcf0182407012408013009410415a1820f9035688676bab0a6ab2c542ca81eae8e22191f3d17f96049b65c6f27a4770950a32ca1f858e2ae8f3e6d8e903b5b744a2d7efb00496e42e29b9d17aa370a3501280118240201360304020401183004143b1ca9f5a6e6c46cf6fa763be5abfb9b7f8aa3873005142b44223099576f4289a52ed821751d108db37a0f18300b40652250c8f5920e7b2d41262596ad6509c91a5a061f506924fbbf6fb2f81437d70a983a74db033bd64f4a35eda42eae847367c703cfa8c5f2b1e43ca12894956418",
-                                    "icac": null,
-                                    "fabricIndex": 7
-                                }
-                            ],
-                            "fabrics": [
-                                {
-                                    "rootPublicKey": "048325a254a3eaa246e7f0f4d9a1f2861c9da931da9a86cf7bbd45f3109fc1a2aa78c6dfa7b685474a2cc194ff147bd474581454284313eab42addcf8c3b92ef7d",
-                                    "vendorId": 65521,
-                                    "fabricId": "1",
-                                    "nodeId": "17355851209186572063",
-                                    "label": "",
-                                    "fabricIndex": 7
-                                }
-                            ],
-                            "supportedFabrics": 10,
-                            "commissionedFabrics": 4,
-                            "trustedRootCertificates": [
-                                "153001010124020137032714100cadd10ad413a51826048070b42d260580764c5337062714100cadd10ad413a5182407012408013009410485d448aac2cfa930b72bce3e83251fe8fddae1eae263fd5deb14daa692feacce06f20bbad46d21090565928bbb9ba3088c675c836582a98c92e98e3589b6fa05370a350129011824026030041453e56aa3f3e95d22afc3d04c9f1da67c7c19390d30051453e56aa3f3e95d22afc3d04c9f1da67c7c19390d18300b40978f09936471f5fd4c11556045d027c26f0be1516af4eaf119be2efa6b50311261c4527e3a300c2b259b1cc7dd082810595a5f9c7ba050123458ffbdf4df818918",
-                                "1530010101240201370324140118260480228127260580254d3a370624140118240701240801300941045f3430e3c8da32701ac169ae184e4f1d9bed4ef0b4b99c258482b3a16f44cf70b470e2e8bcd647d373cdc02c13d5188aec707b7e2a728dd2c77eaea8756d8f67370a350129011824026030041486bd0fe523018ccbcc395886b08b41e1e1a1a34730051486bd0fe523018ccbcc395886b08b41e1e1a1a34718300b40f517e6759a6a25f22f2735c2eae187957cad052e2388f8c677467887e3936b9893e382b3ef5f2dc65c00b7de61f01e4d025c018fd450d39c059d555687d96a4d18",
-                                "1530010100240201370324140018260476539a2c2605f689474137062414001824070124080130094104f618fcf99c61521f3abf53570da39892d64f8c213640c6de17ca61164df889e5fdf68ebfdf79fea09f7ef56f937836e7d4ab4fdae3f9a02f75fe2db3858cb662370a3501290118240260300414e9c0c1353cf89c451e71603467b47e28e966d987300514e9c0c1353cf89c451e71603467b47e28e966d98718300b40d0443f07a13d5a4fc43eb45b23a8444050424d4ed1fd8b33bcacfe1942e62b3a947a685d7a463a4704e2b85f1ee6d578a1baeb1004cc38940dd13b4a9c10123718",
-                                "15300101002402013703241400182604c7159d2c2605474c4a41370624140018240701240801300941048325a254a3eaa246e7f0f4d9a1f2861c9da931da9a86cf7bbd45f3109fc1a2aa78c6dfa7b685474a2cc194ff147bd474581454284313eab42addcf8c3b92ef7d370a35012901182402603004142b44223099576f4289a52ed821751d108db37a0f3005142b44223099576f4289a52ed821751d108db37a0f18300b403a7b190bf003122cd98c22cbcf14fd716a32767c140b433f85cdac6a309152fbb64009237e8619e1c68d48a2c4b851b1454a8a3512cf2694fe27401656f3e1aa18"
-                            ],
-                            "currentFabricIndex": 7,
-                            "clusterRevision": 1,
-                            "featureMap": {},
-                            "attributeList": [
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                65528,
-                                65529,
-                                65531,
-                                65532,
-                                65533
-                            ],
-                            "acceptedCommandList": [
-                                0,
-                                2,
-                                4,
-                                6,
-                                7,
-                                9,
-                                10,
-                                11
-                            ],
-                            "generatedCommandList": [
-                                1,
-                                3,
-                                5,
-                                8
-                            ]
-                        },
+
                         "GroupKeyManagement": {
                             "id": 63,
                             "name": "GroupKeyManagement",
