@@ -3,10 +3,10 @@ import * as path from 'path';
 
 
 //convert file and return the name and directory where the files the new files are stored
-export function convertJsonFile(inputFile: string) {
+export function convertJsonFile(inputFile: string, nodeNum: number) {
   const parsedPath = path.parse(inputFile);
   const outputDir = parsedPath.dir
-  const id = parsedPath.name
+  const id = `${parsedPath.name}-${nodeNum}`;
   const filesDir = path.join(outputDir, id)
 
   if (fs.existsSync(inputFile) && parsedPath.ext === '.json') {
@@ -20,6 +20,7 @@ export function convertJsonFile(inputFile: string) {
     splitJson(jsonData, filesDir);
     renameOriginalFile(inputFile);
   }
+  
   return {
     outputDir: outputDir,
     id: id

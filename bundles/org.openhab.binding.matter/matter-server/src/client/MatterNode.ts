@@ -44,7 +44,7 @@ export class MatterNode {
     }
 
     async initialize() {
-        const {outputDir, id } = convertJsonFile(this.storageLocation);
+        const {outputDir, id } = convertJsonFile(this.storageLocation, this.nodeNum);
         logger.info(`Storage location: ${outputDir} (Directory)`);
         this.#environment.vars.set('storage.path', outputDir)
         if (this.netInterface !== undefined) {
