@@ -54,11 +54,11 @@
 		<representation-property>path</representation-property>
 
 		<config-description>
-			<parameter name="nodeId" type="text" required="true">
+			<parameter name="nodeId" type="integer" required="true">
 				<label>Node Id</label>
 				<description>The Matter Node Id</description>
 			</parameter>
-			<parameter name="endpointId" type="decimal" required="true">
+			<parameter name="endpointId" type="integer" required="true">
 				<label>Endpoint Id</label>
 				<description>The Matter Endpoint Id</description>
 			</parameter>

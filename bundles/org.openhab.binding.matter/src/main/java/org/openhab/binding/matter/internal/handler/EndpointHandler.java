@@ -94,7 +94,7 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
     @Override
     public void initialize() {
         EndpointConfiguration config = getConfigAs(EndpointConfiguration.class);
-        nodeId = new BigInteger(config.nodeId);
+        nodeId = config.nodeId.toBigInteger();
         endpointId = config.endpointId;
         logger.debug("initialize endpoint {}", endpointId);
         ControllerHandler handler = controllerHandler();

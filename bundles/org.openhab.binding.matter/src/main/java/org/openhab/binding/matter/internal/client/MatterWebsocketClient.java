@@ -12,12 +12,14 @@
  */
 package org.openhab.binding.matter.internal.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,11 +73,30 @@ public class MatterWebsocketClient implements WebSocketListener {
     @Nullable
     private NodeRunner nodeRunner;
 
-    public void connect(String host, int port, String storagePath) throws Exception {
-        connectWebsocket(host, port, storagePath);
+    /**
+     * Connect to an external Matter controller Websocket Server not running on this host, mainly used for testing
+     * 
+     * @param host
+     * @param port
+     * @param nodeId
+     * @param storagePath
+     * @param controllerName
+     * @throws Exception
+     */
+    public void connect(String host, int port, BigInteger nodeId, String storagePath, String controllerName)
+            throws Exception {
+        connectWebsocket(host, port, nodeId, storagePath, controllerName);
     }
 
-    public void connect(String storagePath) throws Exception {
+    /**
+     * Connect to a local Matter controller running on this host in openHAB, primarily use case
+     * 
+     * @param nodeId
+     * @param storagePath
+     * @param controllerName
+     * @throws Exception
+     */
+    public void connect(BigInteger nodeId, String storagePath, String controllerName) throws Exception {
         disconnect();
         NodeManager nodeManager = new NodeManager();
         String nodePath = nodeManager.getNodePath();
@@ -92,7 +113,7 @@ public class MatterWebsocketClient implements WebSocketListener {
             @Override
             public void onNodeReady(int port) {
                 try {
-                    connectWebsocket("localhost", port, storagePath);
+                    connectWebsocket("localhost", port, nodeId, storagePath, controllerName);
                 } catch (Exception e) {
                     disconnect();
                     logger.error("Could not connect", e);
@@ -107,9 +128,17 @@ public class MatterWebsocketClient implements WebSocketListener {
         this.nodeRunner = nodeRunner;
     }
 
-    private void connectWebsocket(String host, int port, String storagePath) throws Exception {
-        logger.debug("Connecting {}:{} ", host, port);
-        String dest = "ws://" + host + ":" + port + "?nodeId=0&storagePath=" + storagePath;
+    private void connectWebsocket(String host, int port, BigInteger nodeId, String storagePath, String controllerName)
+            throws Exception {
+        String dest = "ws://" + host + ":" + port + "?nodeId=" + nodeId + "&storagePath=" + storagePath;
+
+        // TODO remove this check and helper function after a few releases of beta testing
+        if (!isLegacyStorage(storagePath, controllerName)) {
+            dest += "&controllerName=" + controllerName;
+        } else {
+            dest += File.separator + controllerName + ".json";
+        }
+        logger.debug("Connecting {}", dest);
         WebSocketClient client = new WebSocketClient();
         client.setMaxIdleTimeout(Long.MAX_VALUE);
         client.start();
@@ -388,6 +417,12 @@ public class MatterWebsocketClient implements WebSocketListener {
             ActiveSessionInformation[] sessions = gson.fromJson(obj, ActiveSessionInformation[].class);
             return sessions == null ? new ActiveSessionInformation[0] : sessions;
         });
+    }
+
+    private boolean isLegacyStorage(String storagePath, String controllerName) {
+        java.nio.file.Path path = java.nio.file.Paths.get(storagePath + File.separator + controllerName + ".json");
+        logger.debug("Checking for legacy storage {}", path);
+        return Files.exists(path);
     }
 
     class NodeDeserializer implements JsonDeserializer<Node> {

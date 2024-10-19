@@ -117,19 +117,21 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        String storagePath = folder.getAbsolutePath() + File.separator + "controller-" + getThing().getUID().getId()
-                + ".json";
+        String storagePath = folder.getAbsolutePath();
+        String controllerName = "controller-" + getThing().getUID().getId();
+
         logger.debug("matter config: {}", storagePath);
         final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
         checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
         scheduler.execute(() -> {
             try {
+                BigInteger nodeId = config.nodeId.toBigInteger();
                 if (!config.host.isBlank() && config.port > 0) {
                     logger.debug("Connecting to custom host {} and port {}", config.host, config.port);
-                    client.connect(config.host, config.port, storagePath);
+                    client.connect(config.host, config.port, nodeId, storagePath, controllerName);
                 } else {
                     logger.debug("Connecting to embedded service");
-                    client.connect(storagePath);
+                    client.connect(nodeId, storagePath, controllerName);
                 }
                 running = true;
             } catch (Exception e) {

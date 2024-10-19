@@ -143,7 +143,7 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
             storagePath = outputDir;
             controllerName = name;
         }
-        ws.controller = await initController(ws, storagePath, controllerName || 'unknown', nodeId);
+        ws.controller = await initController(ws, storagePath, controllerName, nodeId);
     } catch (error: any) {
         console.log("returning error", error.message)
         ws.close(1002, error.message);

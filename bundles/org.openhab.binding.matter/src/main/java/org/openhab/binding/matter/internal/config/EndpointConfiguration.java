@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.matter.internal.config;
 
+import java.math.BigDecimal;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
@@ -22,7 +24,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class EndpointConfiguration {
 
-    public String nodeId = "";
+    public BigDecimal nodeId = new BigDecimal(0);
 
     public int endpointId;
 
