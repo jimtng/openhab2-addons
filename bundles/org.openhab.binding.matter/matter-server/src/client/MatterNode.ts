@@ -5,9 +5,6 @@ import { PairedNode, CommissioningControllerNodeOptions } from "@project-chip/ma
 import { EndpointInterface } from "@project-chip/matter.js/endpoint";
 import { Environment, Logger, StorageContext, StorageService } from "@matter/general";
 import { ControllerStore } from "@matter/node";
-import { convertJsonFile } from "../util/storageConverter"
-
-
 
 const logger = Logger.get("MatterNode");
 
@@ -15,10 +12,7 @@ const logger = Logger.get("MatterNode");
  * This class contains all the core Matter functionality uses by "Cluster", "Nodes", etc... 
  */
 export class MatterNode {
-    // private storage?: StorageBackendJsonFile;
-    // private storageManager?: StorageManager;
-    // private storageContext?: StorageContext;
-
+    
     private storageContext?: StorageContext;
 
     #environment: Environment = Environment.default;
@@ -27,7 +21,8 @@ export class MatterNode {
     private matterController?: MatterServer;
 
     constructor(
-        private storageLocation: string,
+        private readonly storageLocation: string,
+        private readonly controllerName: string,
         private readonly nodeNum: number,
         private readonly netInterface?: string
     ) { }
@@ -44,7 +39,9 @@ export class MatterNode {
     }
 
     async initialize() {
-        const {outputDir, id } = convertJsonFile(this.storageLocation, this.nodeNum);
+        const outputDir = this.storageLocation;
+        const id =  `${this.controllerName}-${this.nodeNum}`
+        
         logger.info(`Storage location: ${outputDir} (Directory)`);
         this.#environment.vars.set('storage.path', outputDir)
         if (this.netInterface !== undefined) {

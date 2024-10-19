@@ -6,7 +6,9 @@ import { Controller } from './Controller';
 import { MatterNode } from "./client/MatterNode";
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import {Request, Response, Message, MessageType } from './MessageTypes';
+import { Request, Response, Message, MessageType } from './MessageTypes';
+import { convertJsonFile } from "./util/storageConverter"
+import * as path from 'path';
 const argv: any = yargs(hideBin(process.argv)).argv
 
 const logger = Logger.get("matter");
@@ -118,32 +120,41 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
 
     if (!req.url) {
         logger.error('No URL in the request');
-        ws.close(500, 'No URL in the request');
+        ws.close(1002, 'No URL in the request');
         return;
     }
 
     const params = new URLSearchParams(req.url.slice(req.url.indexOf('?')));
-    const id = params.get('nodeId');
-    const storagePath = params.get('storagePath');
+    const stringId = params.get('nodeId');
+    const nodeId = stringId != null ? parseInt(stringId) : null;
+    let storagePath = params.get('storagePath');
+    let controllerName = params.get('controllerName');
 
-    if (!id || !storagePath) {
-        ws.close(500, 'No nodeId or storagePath parameters in the request');
+    if (nodeId === null || storagePath === null) {
+        ws.close(1002, 'No nodeId or storagePath parameters in the request');
         return;
     }
 
     try {
-        ws.controller = await initController(ws, storagePath, parseInt(id));
+        //migrate legacy json files
+        if (controllerName === null) {
+            const parsedPath = path.parse(storagePath);
+            const { outputDir, name } = convertJsonFile(storagePath, nodeId);
+            storagePath = outputDir;
+            controllerName = name;
+        }
+        ws.controller = await initController(ws, storagePath, controllerName || 'unknown', nodeId);
     } catch (error: any) {
         console.log("returning error", error.message)
-        ws.close(500, error.message);
+        ws.close(1002, error.message);
         return;
     }
 
     ws.sendEvent('ready', 'Controller initialized');
 });
 
-async function initController(ws: WebSocketSession, storagePath: string, nodeNum: number, factoryReset = false) {
-    const theNode = new MatterNode(storagePath, nodeNum);
+async function initController(ws: WebSocketSession, storagePath: string, controllerName: string, nodeNum: number, factoryReset = false) {
+    const theNode = new MatterNode(storagePath, controllerName, nodeNum);
     await theNode.initialize();
     logger.info(`Started Node #${nodeNum}`);
     let controller = new ClientController(ws, theNode);

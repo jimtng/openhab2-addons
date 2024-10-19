@@ -20,9 +20,10 @@ export function convertJsonFile(inputFile: string, nodeNum: number) {
     splitJson(jsonData, filesDir);
     renameOriginalFile(inputFile);
   }
-  
+
   return {
     outputDir: outputDir,
+    name: parsedPath.name,
     id: id
   }
 }
