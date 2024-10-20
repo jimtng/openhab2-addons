@@ -85,10 +85,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         map.put(ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_COLOR_COLOR.getId()), ITEM_TYPE_COLOR)
                 .withType(CHANNEL_COLOR_COLOR).withLabel(CHANNEL_LABEL_COLOR_COLOR).build(), null);
 
-        // see Matter spec 3.2.6.1. I'm not sure if this is the right way to do this, but Inovelli Dimmers has
-        // colorTemperature true, but does not support directly changing it (and not coupled to levelcontrol).
-        if (cluster.featureMap.colorTemperature && cluster.colorTempPhysicalMaxMireds != null
-                && cluster.colorTempPhysicalMaxMireds > 0) {
+        // see Matter spec 3.2.6.1. For more information on color temperature
+        if (cluster.featureMap.colorTemperature) {
             map.put(ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_COLOR_TEMPERATURE.getId()), ITEM_TYPE_DIMMER)
                     .withType(CHANNEL_COLOR_TEMPERATURE).withLabel(CHANNEL_LABEL_COLOR_TEMPERATURE).build(), null);
         }
@@ -256,7 +254,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                 ColorControlCluster.moveToColor(x, y, 0, optionsMask, optionsMask));
     }
 
-    public PercentType miredsToPercenType(Integer mireds) {
+    private PercentType miredsToPercenType(Integer mireds) {
         if (mireds == 0 || colorTempPhysicalMaxMireds - colorTempPhysicalMinMireds == 0) {
             return new PercentType(0);
         }
@@ -264,7 +262,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                 / (colorTempPhysicalMaxMireds - colorTempPhysicalMinMireds)) * 100));
     }
 
-    public Integer percentTypeToMireds(PercentType percent) {
+    private Integer percentTypeToMireds(PercentType percent) {
         return (int) ((percent.doubleValue() / 100) * (colorTempPhysicalMaxMireds - colorTempPhysicalMinMireds))
                 + colorTempPhysicalMinMireds;
     }

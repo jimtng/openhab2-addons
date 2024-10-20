@@ -19,7 +19,7 @@ process.on('uncaughtException', function (err) {
 });
 
 process.on("SIGINT", () => {
-    console.log("Received SIGINT. Closing WebSocket connections...");
+   logger.info("Received SIGINT. Closing WebSocket connections...");
 
     const closePromises: Promise<void>[] = [];
 
@@ -42,11 +42,11 @@ process.on("SIGINT", () => {
 
     Promise.all(closePromises)
         .then(() => {
-            console.log("All WebSocket connections closed.");
+           logger.info("All WebSocket connections closed.");
             return new Promise<void>((resolve) => wss.close(() => resolve()));
         })
         .then(() => {
-            console.log("WebSocket server closed.");
+           logger.info("WebSocket server closed.");
             process.exit(0);
         })
         .catch((err) => {
@@ -145,7 +145,7 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
         }
         ws.controller = await initController(ws, storagePath, controllerName, nodeId);
     } catch (error: any) {
-        console.log("returning error", error.message)
+       logger.error("returning error", error.message)
         ws.close(1002, error.message);
         return;
     }

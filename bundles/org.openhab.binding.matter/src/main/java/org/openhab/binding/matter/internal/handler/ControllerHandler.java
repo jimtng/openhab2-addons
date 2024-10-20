@@ -274,7 +274,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         linkedNodes.forEach(nodeId -> updateNode(nodeId));
     }
 
-    protected MatterWebsocketClient getClient() {
+    public MatterWebsocketClient getClient() {
         return client;
     }
 

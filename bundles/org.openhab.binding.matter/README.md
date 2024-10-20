@@ -12,7 +12,7 @@ Below is a high-level overview of the Matter ecosystem as well as common termino
 
 ## Matter and IPv6
 
-Matter **requires** IPv6 to be enabled and be routable between openHAB and the Matter device.  This means IPv6 needs to be enabled on the host openHAB is running, and the network must be able route IPv6 unicast and multicast messages.  Docker, VLANs, subnets and other configurations can prohibit Matter from working if not configured correctly.  If devices are not able to be discovered with openHAB, this will often be the root issue.   
+Matter **requires** IPv6 to be enabled and be routable between openHAB and the Matter device.  This means IPv6 needs to be enabled on the host openHAB is running, and the network must be able route IPv6 unicast and multicast messages.  Docker, VLANs, subnets and other configurations can prohibit Matter from working if not configured correctly. See the [IPv6 Requirements](#IPv6-Requirements) section for more information.
 
 ## Matter Devices
 
@@ -63,6 +63,49 @@ For Matter devices to function correctly, **IPv6 must be enabled** and supported
 
 **Note that environments like Docker require special configurations to enable IPv6**
 
+### Enabling IPv6 Thread Connectivity on Linux Hosts
+It is important to make sure that Route Announcements (RA) and Route Information Options (RIO) are enabled on your host so that Thread boarder routers can announce routes to the Thread network. 
+This is done by setting the following sysctl options:
+
+1. `net.ipv6.conf.wlan0.accept_ra` should be at least `1` if ip forwarding is not enabled, and `2` otherwise.
+2. `net.ipv6.conf.wlan0.accept_ra_rt_info_max_plen` should not be smaller than `64`.
+
+the `accept_ra` is defaulted to `1` for most distributions. 
+
+There may be other network daemons which will override this option (for example, dhcpcd on Raspberry Pi will override accept_ra to 0). 
+
+You can check the accept_ra value with:
+```
+$ sudo sysctl -n net.ipv6.conf.wlan0.accept_ra
+0
+```
+
+And set the value to 1 (or 2 in case IP forwarding is enabled) with:
+```
+$ sudo sysctl -w net.ipv6.conf.wlan0.accept_ra=1
+Net.ipv6.conf.wlan0.accept_ra = 1
+```
+
+The accept_ra_rt_info_max_plen option on most Linux distributions is default to 0, set it to 64 with:
+```
+$ sudo sysctl -w net.ipv6.conf.wlan0.accept_ra_rt_info_max_plen=64
+net.ipv6.conf.wlan0.accept_ra_rt_info_max_plen = 64
+```
+
+To make these changes permanent, add the following lines to `/etc/sysctl.conf`:
+```
+net.ipv6.conf.eth0.accept_ra=1
+net.ipv6.conf.eth0.accept_ra_rt_info_max_plen=64
+```
+
+Raspberry Pi users may need to add the following lines to `/etc/dhcpcd.conf` to prevent dhcpcd from overriding the accept_ra value:
+```
+noipv6
+noipv6rs
+```
+
+***NOTE:  Please ensure you use the right interface name for your network interface.*** The above examples use `wlan0` and `eth0` as examples.  You can find the correct interface name by running `ip a` and looking for the interface that has an IPv6 address assigned to it. 
+
 ## Matter Commissioning and Pairing Codes
 
 Commissioning a Matter device involves securely adding it to the network using a **pairing code**. This process ensures that only authorized devices can join the network.
@@ -84,22 +127,6 @@ The Matter Binding supports the following types of things:
 
 - `controller`: The main controller that interfaces with Matter devices. It requires configuration parameters such as `port`, `host`, and `portId`.
 - `endpoint`: Represents an individual endpoint within the Matter network. Configuration parameters include `nodeId` and `endpointId`.
-
-The Following Matter Device types (endpoints) are currently supported:
-
-| Device Type                    | Description                                                                 | Associated Clusters                               |
-|---------------------------------|-----------------------------------------------------------------------------|---------------------------------------------------|
-| OnOffLight                     | A simple light device that can be turned on or off                          | On/Off                                            |
-| OnOffLightSwitch               | A switch to control On/Off lights                                            | On/Off                                            |
-| OnOffPlugInUnit                | A plug-in unit that can be turned on or off                                  | On/Off                                            |
-| DimmableLight                  | A light device that supports dimming in addition to on/off                   | On/Off, Level Control                             |
-| DimmablePlugInUnit             | A plug-in unit that supports dimming and on/off control                      | On/Off, Level Control                             |
-| DimmerSwitch                   | A switch to control dimmable lights                                          | On/Off, Level Control                             |
-| ColorDimmerSwitch              | A switch to control both dimming and color of lights                         | On/Off, Level Control, Color Control              |
-| ExtendedColorLight             | A light that supports extended color control (e.g., RGB) and dimming         | On/Off, Level Control, Color Control              |
-| ColorTemperatureLight          | A light that supports color temperature control and dimming                 | On/Off, Level Control, Color Control (Temperature)|
-| Thermostat                     | A device that controls temperature in an environment                        | Thermostat, Temperature Measurement               |
-| WindowCovering                 | A device that controls window coverings such as blinds or curtains           | Window Covering                                   |
 
 ## Discovery
 
@@ -146,11 +173,7 @@ Endpoints are discovered automatically (see [Discovery](#Discovery) for more inf
 ## Channels
 
 ### Controller Channels
-The Matter Binding provides various channels for controlling and monitoring Matter devices. Here are some of the available channels:
-
-| Channel  | Type   | Read/Write | Description                   |
-|----------|--------|------------|-------------------------------|
-| pairCode  | String | RW         | 11 digit pairing code (with out without dashes), QR pairing code,  or short code and key (separated by a space)       |
+Controller have no channels.
 
 ### Endpoint Channels
 Endpoint channels are dynamically added based on the endpoint type and matter cluster supported.
@@ -158,23 +181,37 @@ Possible channels include:
 
 ## Endpoint Channels
 
-| Channel ID                   | Item Type                | Label                       | Description                                                  | Category   | ReadOnly | Pattern     |
-|------------------------------|--------------------------|-----------------------------|--------------------------------------------------------------|------------|----------|-------------|
-| battery-voltage              | Number:ElectricPotential | Battery Voltage             | The current battery voltage                                  | Energy     | yes      | %.1f %unit% |
-| battery-alarm                | String                   | Battery Alarm               | The battery alarm state                                      | Energy     | yes      |             |
-| colorcontrol-color           | Color                    | Color                       | Control the color of a light                                 | ColorLight | no       |             |
-| door-state                   | Switch                   | Door Lock State             | Locks and unlocks the door                                   | Door       | no       |             |
-| onoffcontrol-onoff           | Switch                   | Switch                      | Switches the power on and off                                | Light      | no       |             |
-| levelcontrol-level           | Dimmer                   | Dimmer                      | Sets the level of the light                                  | Light      | no       |             |
-| thermostat-localtemp         | Number:Temperature       | Local Temperature           | Indicates the local temperature provided by the thermostat   | HVAC       | yes      | %.1f %unit% |
-| thermostat-outdoortemp       | Number:Temperature       | Outdoor Temperature         | Indicates the outdoor temperature provided by the thermostat | HVAC       | yes      | %.1f %unit% |
-| thermostat-occupiedheating   | Number:Temperature       | Occupied Heating Setpoint   | Set the heating temperature when the room is occupied        | HVAC       | no       | %.1f %unit% |
-| thermostat-occupiedcooling   | Number:Temperature       | Occupied Cooling Setpoint   | Set the cooling temperature when the room is occupied        | HVAC       | no       | %.1f %unit% |
-| thermostat-unoccupiedheating | Number:Temperature       | Unoccupied Heating Setpoint | Set the heating temperature when the room is unoccupied      | HVAC       | no       | %.1f %unit% |
-| thermostat-unoccupiedcooling | Number:Temperature       | Unoccupied Cooling Setpoint | Set the cooling temperature when the room is unoccupied      | HVAC       | no       | %.1f %unit% |
-| thermostat-systemmode        | Number                   | System Mode                 | Set the system mode of the thermostat                        | HVAC       | no       |             |
-| thermostat-runningmode       | Number                   | Running Mode                | The running mode of the thermostat                           | HVAC       | yes      |             |
-| windowcovering-lift          | Rollershutter            | Window Covering Lift        | Sets the window covering level                               | Blinds     | no       |             |
+| Channel ID                    | Type                     | Label                        | Description                                                                                                                                                                                                                                                          | Category   | ReadOnly | Pattern     |
+|-------------------------------|--------------------------|------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|----------|-------------|
+| battery-voltage               | Number:ElectricPotential | Battery Voltage              | The current battery voltage                                                                                                                                                                                                                                          | Energy     | true     | %.1f %unit% |
+| battery-alarm                 | String                   | Battery Alarm                | The battery alarm state                                                                                                                                                                                                                                              | Energy     | true     |             |
+| colorcontrol-color            | Color                    | Color                        | The color channel allows to control the color of a light. It is also possible to dim values and switch the light on and off.                                                                                                                                         | ColorLight |          |             |
+| colorcontrol-temperature      | Dimmer                   | Color Temperature            | Sets the color temperature of the light                                                                                                                                                                                                                              | ColorLight |          |             |
+| door-state                    | Switch                   | Door Lock State              | Locks and unlocks the door and maintains the lock state                                                                                                                                                                                                              | Door       |          |             |
+| fancontrol-fanmode            | Number                   | Fan Mode                     | Set the fan mode                                                                                                                                                                                                                                                     | HVAC       |          |             |
+| onoffcontrol-onoff            | Switch                   | Switch                       | Switches the power on and off                                                                                                                                                                                                                                        | Light      |          |             |
+| levelcontrol-level            | Dimmer                   | Dimmer                       | Sets the level of the light                                                                                                                                                                                                                                          | Light      |          |             |
+| modeselect-mode               | Number                   | Mode Select                  | Selection of 1 or more states                                                                                                                                                                                                                                        |            | false    | %d          |
+| switch-switch                 | Number                   | Switch                       | Indication of a switch or remote being activated                                                                                                                                                                                                                     |            | true     | %d          |
+| switch-switchlatched          | Trigger                  | Switched Latched Trigger     | This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. after the move.                                                                                                                                                    |            |          |             |
+| switch-initialpress           | Trigger                  | Initial Press Trigger        | This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while pressed.                                                                                                                                                     |            |          |             |
+| switch-longpress              | Trigger                  | Long Press Trigger           | This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while pressed.                                                                                                                                                     |            |          |             |
+| switch-shortrelease           | Trigger                  | Short Release Trigger        | This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e. just prior to release.                                                                                                                                        |            |          |             |
+| switch-longrelease            | Trigger                  | Long Release Trigger         | This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e. just prior to release.                                                                                                                                        |            |          |             |
+| switch-multipressongoing      | Trigger                  | Multi-Press Ongoing Trigger  | This trigger shall indicate 2 numeric fields as a JSON object. The first is the new value of the CurrentPosition attribute, i.e. while pressed. The second is the multi press code with a value of N when the Nth press of a multi-press sequence has been detected. |            |          |             |
+| switch-multipresscomplete     | Trigger                  | Multi-Press Complete Trigger | This trigger shall indicate 2 numeric fields as a JSON object. The first is the new value of the CurrentPosition attribute, i.e. while pressed. The second is how many times the momentary switch has been pressed in a multi-press sequence.                        |            |          |             |
+| thermostat-localtemperature   | Number:Temperature       | Local Temperature            | Indicates the local temperature provided by the thermostat                                                                                                                                                                                                           | HVAC       | true     | %.1f %unit% |
+| thermostat-outdoortemperature | Number:Temperature       | Outdoor Temperature          | Indicates the outdoor temperature provided by the thermostat                                                                                                                                                                                                         | HVAC       | true     | %.1f %unit% |
+| thermostat-occupiedheating    | Number:Temperature       | Occupied Heating Setpoint    | Set the heating temperature when the room is occupied                                                                                                                                                                                                                | HVAC       |          | %.1f %unit% |
+| thermostat-occupiedcooling    | Number:Temperature       | Occupied Cooling Setpoint    | Set the cooling temperature when the room is occupied                                                                                                                                                                                                                | HVAC       |          | %.1f %unit% |
+| thermostat-unoccupiedheating  | Number:Temperature       | Unoccupied Heating Setpoint  | Set the heating temperature when the room is unoccupied                                                                                                                                                                                                              | HVAC       |          | %.1f %unit% |
+| thermostat-unoccupiedcooling  | Number:Temperature       | Unoccupied Cooling Setpoint  | Set the cooling temperature when the room is unoccupied                                                                                                                                                                                                              | HVAC       |          | %.1f %unit% |
+| thermostat-systemmode         | Number                   | System Mode                  | Set the system mode of the thermostat                                                                                                                                                                                                                                | HVAC       |          |             |
+| thermostat-runningmode        | Number                   | Running Mode                 | The running mode of the thermostat                                                                                                                                                                                                                                   | HVAC       | true     |             |
+| thermostat-heatingdemand      | Number:Dimensionless     | Heating Demand               | The level of heating currently demanded by the thermostat                                                                                                                                                                                                            | HVAC       | true     | %.0f %%     |
+| thermostat-coolingdemand      | Number:Dimensionless     | Cooling Demand               | The level of cooling currently demanded by the thermostat                                                                                                                                                                                                            | HVAC       | true     | %.0f %%     |
+| windowcovering-lift           | Rollershutter            | Window Covering Lift         | Sets the window covering level - supporting open/close and up/down type commands                                                                                                                                                                                     | Blinds     |          |             |
+
 
 ## Full Example
 

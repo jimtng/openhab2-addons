@@ -14,14 +14,13 @@ package org.openhab.binding.matter.internal.handler;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.MatterStateDescriptionOptionProvider;
+import org.openhab.binding.matter.internal.actions.MatterEndpointActions;
 import org.openhab.binding.matter.internal.client.AttributeListener;
 import org.openhab.binding.matter.internal.client.EventTriggeredListener;
 import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
@@ -42,6 +41,7 @@ import org.openhab.core.config.core.validation.ConfigValidationException;
 import org.openhab.core.thing.*;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.BridgeHandler;
+import org.openhab.core.thing.binding.ThingHandlerService;
 import org.openhab.core.thing.binding.builder.ThingBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
@@ -68,6 +68,11 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
     public EndpointHandler(Thing thing, MatterStateDescriptionOptionProvider stateDescriptionProvider) {
         super(thing);
         this.stateDescriptionProvider = stateDescriptionProvider;
+    }
+
+    @Override
+    public Collection<Class<? extends ThingHandlerService>> getServices() {
+        return Set.of(MatterEndpointActions.class);
     }
 
     @Override
