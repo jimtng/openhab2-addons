@@ -42,6 +42,7 @@ import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
+import org.openhab.core.types.UnDefType;
 import org.openhab.core.util.ColorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +68,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     private boolean xChanged = false;
     private boolean yChanged = false;
     private HSBType lastHSB = new HSBType("0,0,0");
-    private Integer colorTempPhysicalMinMireds = 1;
-    private Integer colorTempPhysicalMaxMireds = 10;
+    private Integer colorTempPhysicalMinMireds = 0;
+    private Integer colorTempPhysicalMaxMireds = 0;
     private Options optionsMask = new Options(true);
     private OptionsBitmap optionsBitmap = new OptionsBitmap(true, true);
     private ScheduledExecutorService colorUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
@@ -86,8 +87,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
 
         // see Matter spec 3.2.6.1. I'm not sure if this is the right way to do this, but Inovelli Dimmers has
         // colorTemperature true, but does not support directly changing it (and not coupled to levelcontrol).
-        if (cluster.featureMap.colorTemperature && cluster.startUpColorTemperatureMireds != null
-                && cluster.startUpColorTemperatureMireds > 0) {
+        if (cluster.featureMap.colorTemperature && cluster.colorTempPhysicalMaxMireds != null
+                && cluster.colorTempPhysicalMaxMireds > 0) {
             map.put(ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_COLOR_TEMPERATURE.getId()), ITEM_TYPE_DIMMER)
                     .withType(CHANNEL_COLOR_TEMPERATURE).withLabel(CHANNEL_LABEL_COLOR_TEMPERATURE).build(), null);
         }
@@ -150,7 +151,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                 saturationChanged = true;
                 break;
             case "colorTemperatureMireds":
-                updateState(CHANNEL_COLOR_TEMPERATURE, miredsToPercenType(numberValue));
+                updateState(CHANNEL_COLOR_TEMPERATURE,
+                        numberValue == 0 ? UnDefType.UNDEF : miredsToPercenType(numberValue));
                 break;
             case "enhancedCurrentHue":
                 break;
@@ -189,7 +191,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             updateColorXY();
         }
         if (cluster.colorTemperatureMireds != null) {
-            updateState(CHANNEL_COLOR_TEMPERATURE, miredsToPercenType(cluster.colorTemperatureMireds));
+            updateState(CHANNEL_COLOR_TEMPERATURE, cluster.colorTemperatureMireds == 0 ? UnDefType.UNDEF
+                    : miredsToPercenType(cluster.colorTemperatureMireds));
         }
     }
 
