@@ -50,8 +50,8 @@ public class MatterEndpointActions implements ThingActions {
         return handler;
     }
 
-    @RuleAction(label = "generate new pairing codes for device", description = "Generates a new manual and QR pairing code to be used to pair the device with an external Matter controller")
-    public @ActionOutput(name = "result", label = "New manual and QR pairing codes", type = "java.util.Map") Map<String, String> generateNewPairingCode() {
+    @RuleAction(label = "generate a new pairing code for a Matter device", description = "Generates a new manual and QR pairing code to be used to pair the Matter device with an external Matter controller")
+    public @Nullable @ActionOutput(name = "manualPairingCode", label = "manual pairing code", type = "java.lang.String") @ActionOutput(name = "qrPairingCode", label = "QR pairing code", type = "java.lang.String") Map<String, String> generateNewPairingCode() {
         EndpointHandler handler = this.handler;
         if (handler != null) {
             MatterWebsocketClient client = handler.getClient();
@@ -64,6 +64,6 @@ public class MatterEndpointActions implements ThingActions {
                 }
             }
         }
-        return Map.of();
+        return null;
     }
 }
