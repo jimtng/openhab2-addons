@@ -40,6 +40,7 @@ public class ConverterRegistry {
         ConverterRegistry.registerConverter(SwitchCluster.CLUSTER_ID, SwitchConverter.class);
         ConverterRegistry.registerConverter(ThermostatCluster.CLUSTER_ID, ThermostatConverter.class);
         ConverterRegistry.registerConverter(WindowCoveringCluster.CLUSTER_ID, WindowCoveringConverter.class);
+        ConverterRegistry.registerConverter(PowerSourceCluster.CLUSTER_ID, PowerSourceConverter.class);
     }
 
     public static void registerConverter(Integer clusterId,

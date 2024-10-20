@@ -56,17 +56,15 @@ public class MatterBindingConstants {
     public static final ChannelTypeUID CHANNEL_COLOR_TEMPERATURE = new ChannelTypeUID(
             "matter:colorcontrol-temperature");
 
-    public static final String CHANNEL_NAME_POWER_BATTERYPERCENT = "batterylevel";
-    public static final String CHANNEL_LABEL_POWER_BATTERYPERCENT = "Battery Level";
-    public static final ChannelTypeUID CHANNEL_POWER_BATTERYPERCENT = new ChannelTypeUID("system:battery-level");
+    public static final String CHANNEL_NAME_POWER_BATTERYPERCENT = "powersourcebatpercentremaining";
+    public static final String CHANNEL_LABEL_POWER_BATTERYPERCENT = "Battery Percent Remaining";
+    public static final ChannelTypeUID CHANNEL_POWER_BATTERYPERCENT = new ChannelTypeUID(
+            "matter:powersource-batpercentremaining");
 
-    public static final String CHANNEL_NAME_POWER_BATTERYVOLTAGE = "batteryvoltage";
-    public static final String CHANNEL_LABEL_POWER_BATTERYVOLTAGE = "Battery Voltage";
-    public static final ChannelTypeUID CHANNEL_POWER_BATTERYVOLTAGE = new ChannelTypeUID("matter:battery-voltage");
-
-    public static final String CHANNEL_NAME_POWER_BATTERYALARM = "batteryalarm";
-    public static final String CHANNEL_LABEL_POWER_BATTERYALARM = "Battery Alarm";
-    public static final ChannelTypeUID CHANNEL_POWER_BATTERYALARM = new ChannelTypeUID("matter:battery-alarm");
+    public static final String CHANNEL_NAME_POWER_CHARGELEVEL = "powersourcechargelevel";
+    public static final String CHANNEL_LABEL_POWER_CHARGELEVEL = "Battery Charge Level";
+    public static final ChannelTypeUID CHANNEL_POWER_CHARGELEVEL = new ChannelTypeUID(
+            "matter:powersource-batchargelevel");
 
     public static final String CHANNEL_NAME_THERMOSTAT_LOCALTEMPERATURE = "thermostatlocaltemperature";
     public static final String CHANNEL_LABEL_THERMOSTAT_LOCALTEMPERATURE = "Local Temperature";

@@ -232,7 +232,7 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
         DeviceType deviceType = this.deviceType;
         if (deviceType == null) {
             Integer dt = -1;
-            if (descriptorCluster != null && descriptorCluster.deviceTypeList.size() > 0) {
+            if (descriptorCluster != null && !descriptorCluster.deviceTypeList.isEmpty()) {
                 dt = descriptorCluster.deviceTypeList.get(0).deviceType;
             }
             deviceType = DeviceTypeRegistry.createDeviceType(dt, this);

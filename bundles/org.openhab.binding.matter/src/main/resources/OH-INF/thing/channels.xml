@@ -30,6 +30,50 @@
 		</state>
 	</channel-type>
 
+		<!-- Power Source -->
+	 <!-- 
+	
+	             * "batPercentRemaining": 122,
+             * "batChargeLevel": 0,
+
+  OK(0, "Ok"),
+        WARNING(1, "Warning"),
+        CRITICAL(2, "Critical");
+
+
+             * "batReplacementNeeded": false,
+             * "batReplaceability": 2
+             */
+	 -->
+	 <channel-type id="powersource-batpercentremaining">
+		<item-type>Number</item-type>
+		<label>Battery Percent Remaining</label>
+		<description>Indicates the estimated percentage of battery charge remaining until the battery will no longer be able to provide power to the Node</description>
+		<category>Energy</category>
+			<tags>
+				<tag>Measurement</tag>
+				<tag>Energy</tag>
+			</tags>
+		<state readOnly="true" pattern="%d %%"/>	
+	 </channel-type>
+
+	 <channel-type id="powersource-batchargelevel">
+		<item-type>Number</item-type>
+		<label>Battery Charge Level</label>
+		<description>Indicates a coarse ranking of the charge level of the battery, used to indicate when intervention is required</description>
+		<category>Energy</category>
+			<tags>
+				<tag>Energy</tag>
+			</tags>
+			<state readOnly="true">
+				<options>
+					<option value="0">Ok</option>
+					<option value="1">Warning</option>
+					<option value="2">Critical</option>
+				</options>
+			</state>
+	 </channel-type>
+
 	<!-- Color Channel -->
 	<channel-type id="colorcontrol-color">
 		<item-type>Color</item-type>

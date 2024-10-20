@@ -462,7 +462,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
      * I'm not sure if this is necessary anymore, need to check if matter.js constantly scans for nodes for us
      */
     private void checkNodes() {
-        if (disconnectedNodes.size() > 0) {
+        if (!disconnectedNodes.isEmpty()) {
             client.getCommissionedNodeIds().thenAccept(nodeIds -> {
                 // check to make sure a disconnected node is actually known by the controller.
                 // if its not, then we can never connect to it again.

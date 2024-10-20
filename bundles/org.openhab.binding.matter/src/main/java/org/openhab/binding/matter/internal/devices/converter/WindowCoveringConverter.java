@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class WindowCoveringConverter extends GenericConverter<WindowCoveringCluster> {
 
-    private final Logger logger = LoggerFactory.getLogger(ModeSelectConverter.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public WindowCoveringConverter(WindowCoveringCluster cluster, EndpointHandler handler) {
         super(cluster, handler);
