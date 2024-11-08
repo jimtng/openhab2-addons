@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.MatterControllerClient;
 import org.openhab.binding.matter.internal.MatterStateDescriptionOptionProvider;
 import org.openhab.binding.matter.internal.actions.MatterEndpointActions;
 import org.openhab.binding.matter.internal.client.AttributeListener;
@@ -63,7 +64,7 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
     protected int endpointId;
     private MatterStateDescriptionOptionProvider stateDescriptionProvider;
     private @Nullable DeviceType deviceType;
-    private @Nullable MatterWebsocketClient cachedClient;
+    private @Nullable MatterControllerClient cachedClient;
 
     public EndpointHandler(Thing thing, MatterStateDescriptionOptionProvider stateDescriptionProvider) {
         super(thing);
@@ -151,7 +152,7 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
             dispose();
             initialize();
         } else if (commission) {
-            MatterWebsocketClient client = getClient();
+            MatterControllerClient client = getClient();
             if (client != null) {
                 client.enhancedCommissioningWindow(nodeId).thenAccept(pairingCodes -> {
                     getThing().setProperty("externalPairCode", pairingCodes.manualPairingCode);
@@ -288,14 +289,14 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
     }
 
     public void sendClusterCommand(String clusterName, ClusterCommand command) {
-        MatterWebsocketClient client = getClient();
+        MatterControllerClient client = getClient();
         if (client != null) {
             client.clusterCommand(nodeId, endpointId, clusterName, command);
         }
     }
 
     public void writeAttribute(String clusterName, String attributeName, String value) {
-        MatterWebsocketClient ws = getClient();
+        MatterControllerClient ws = getClient();
         if (ws != null) {
             ws.clusterWriteAttribute(nodeId, endpointId, clusterName, attributeName, value);
         }
@@ -315,7 +316,7 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
         return null;
     }
 
-    public @Nullable MatterWebsocketClient getClient() {
+    public @Nullable MatterControllerClient getClient() {
         if (cachedClient == null) {
             ControllerHandler c = controllerHandler();
             if (c != null) {

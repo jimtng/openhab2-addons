@@ -17,6 +17,13 @@ export interface Event {
     data?: any;
 }
 
+export enum EventType {
+    AttributeChanged = "attributeChanged",
+    EventTriggered = "eventTriggered",
+    NodeStateInformation = "nodeStateInformation",
+    BridgeEvent = "bridgeEvent"
+}
+
 export interface Message {
     type: string;
     message: any;
@@ -26,4 +33,11 @@ export enum MessageType {
     Result = "result",
     ResultError = "resultError",
     ResultSuccess = "resultSuccess",
+}
+
+export interface BridgeEvent {
+    endpointId: string;
+    clusterName: string;
+    attributeName: string;
+    data: any;
 }

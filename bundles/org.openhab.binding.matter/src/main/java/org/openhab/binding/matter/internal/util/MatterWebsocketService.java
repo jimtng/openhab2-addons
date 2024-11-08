@@ -31,44 +31,91 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openhab.core.common.ThreadPoolManager;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Dan Cunningham - Initial contribution
  */
-public class NodeRunner {
-    private static final Logger logger = LoggerFactory.getLogger(NodeRunner.class);
+@Component(service = MatterWebsocketService.class, scope = ServiceScope.SINGLETON)
+public class MatterWebsocketService {
+    private static final Logger logger = LoggerFactory.getLogger(MatterWebsocketService.class);
     private static final Pattern LOG_PATTERN = Pattern
             .compile("^\\S+\\s+\\S+\\s+(TRACE|DEBUG|INFO|WARN|ERROR)\\s+(\\S+)\\s+(.*)$");
+    private static final String MATTER_JS_PATH = "/matter-server/matter.js";
 
     private final String nodePath;
     private Process nodeProcess;
     private boolean ready;
+    private boolean shuttingDown;
     private int port;
     private final List<NodeProcessListener> processListeners = new ArrayList<>();
-    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
-    private final ScheduledExecutorService scheduler = ThreadPoolManager.getScheduledPool("matter.NodeRunner");
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final ScheduledExecutorService scheduler = ThreadPoolManager
+            .getScheduledPool("matter.MatterWebsocketService");
 
-    public NodeRunner(String nodePath) {
+    @Activate
+    public MatterWebsocketService() throws IOException {
+        NodeManager nodeManager = new NodeManager();
+        String nodePath = nodeManager.getNodePath();
         this.nodePath = nodePath;
+        restart();
     }
 
-    public interface NodeProcessListener {
-        void onNodeExit(int exitCode);
+    @Deactivate
+    public void deactivate() {
+        stopNode();
+        executorService.shutdown();
+    }
 
-        void onNodeReady(int port);
+    public void restart() throws IOException {
+        stopNode();
+        port = runNodeWithResource(MATTER_JS_PATH);
     }
 
     public void addProcessListener(NodeProcessListener listener) {
         processListeners.add(listener);
+        if (ready) {
+            listener.onNodeReady(port);
+        }
     }
 
     public void removeProcessListener(NodeProcessListener listener) {
         processListeners.remove(listener);
     }
 
-    public int runNodeWithResource(String resourcePath, String... additionalArgs) throws IOException {
+    public void stopNode() {
+        logger.debug("stopNode");
+        shuttingDown = true;
+        if (nodeProcess != null && nodeProcess.isAlive()) {
+            nodeProcess.destroy();
+            try {
+                // Wait for the process to terminate
+                if (!nodeProcess.waitFor(20, java.util.concurrent.TimeUnit.SECONDS)) {
+                    nodeProcess.destroyForcibly();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.debug("Interrupted while waiting for Node process to stop", e);
+            }
+        }
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    private int runNodeWithResource(String resourcePath, String... additionalArgs) throws IOException {
+        shuttingDown = false;
+        ready = false;
         Path scriptPath = extractResourceToTempFile(resourcePath);
 
         port = findAvailablePort();
@@ -104,6 +151,16 @@ public class NodeRunner {
                 } catch (IOException e) {
                     logger.debug("Failed to delete temporary script file", e);
                 }
+                ready = false;
+                if (!shuttingDown) {
+                    scheduler.schedule(() -> {
+                        try {
+                            restart();
+                        } catch (IOException e) {
+                            logger.error("Failed to restart Node process", e);
+                        }
+                    }, 5, TimeUnit.SECONDS);
+                }
             }
         });
         return port;
@@ -138,7 +195,9 @@ public class NodeRunner {
                 }
             }
         } catch (IOException e) {
-            logger.debug("{}", errorMessage, e);
+            if (!shuttingDown) {
+                logger.debug("{}", errorMessage, e);
+            }
         }
     }
 
@@ -169,24 +228,6 @@ public class NodeRunner {
         }
     }
 
-    public void stopNode() {
-        logger.debug("stopNode");
-        if (nodeProcess != null && nodeProcess.isAlive()) {
-            nodeProcess.destroy();
-            try {
-                // Wait for the process to terminate
-                if (!nodeProcess.waitFor(3, java.util.concurrent.TimeUnit.SECONDS)) {
-                    // Force terminate if it doesn't exit within 3 seconds
-                    nodeProcess.destroyForcibly();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.debug("Interrupted while waiting for Node process to stop", e);
-            }
-        }
-        executorService.shutdownNow();
-    }
-
     private Path extractResourceToTempFile(String resourcePath) throws IOException {
         Path tempFile = Files.createTempFile("node-script-", ".js");
         try (InputStream in = getClass().getResourceAsStream(resourcePath)) {
@@ -213,5 +254,11 @@ public class NodeRunner {
                 }
             }
         }
+    }
+
+    public interface NodeProcessListener {
+        void onNodeExit(int exitCode);
+
+        void onNodeReady(int port);
     }
 }

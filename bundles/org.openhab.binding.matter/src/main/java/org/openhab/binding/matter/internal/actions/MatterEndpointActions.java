@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
+import org.openhab.binding.matter.internal.MatterControllerClient;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.handler.EndpointHandler;
 import org.openhab.core.automation.annotation.ActionOutput;
@@ -54,7 +54,7 @@ public class MatterEndpointActions implements ThingActions {
     public @Nullable @ActionOutput(name = "manualPairingCode", label = "manual pairing code", type = "java.lang.String") @ActionOutput(name = "qrPairingCode", label = "QR pairing code", type = "java.lang.String") Map<String, String> generateNewPairingCode() {
         EndpointHandler handler = this.handler;
         if (handler != null) {
-            MatterWebsocketClient client = handler.getClient();
+            MatterControllerClient client = handler.getClient();
             if (client != null) {
                 try {
                     PairingCodes code = client.enhancedCommissioningWindow(handler.getNodeId()).get();

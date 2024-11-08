@@ -17,11 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -32,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Dan Cunningham - Initial contribution
  */
-public class NodeManager {
+class NodeManager {
     private static final Logger logger = LoggerFactory.getLogger(NodeManager.class);
 
     private static final String NODE_VERSION = "v22.0.0";

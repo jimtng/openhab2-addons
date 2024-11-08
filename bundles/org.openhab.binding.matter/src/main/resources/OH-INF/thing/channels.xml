@@ -30,49 +30,37 @@
 		</state>
 	</channel-type>
 
-		<!-- Power Source -->
-	 <!-- 
-	
-	             * "batPercentRemaining": 122,
-             * "batChargeLevel": 0,
-
-  OK(0, "Ok"),
-        WARNING(1, "Warning"),
-        CRITICAL(2, "Critical");
-
-
-             * "batReplacementNeeded": false,
-             * "batReplaceability": 2
-             */
-	 -->
-	 <channel-type id="powersource-batpercentremaining">
+	<!-- Power Source -->
+	<channel-type id="powersource-batpercentremaining">
 		<item-type>Number</item-type>
 		<label>Battery Percent Remaining</label>
-		<description>Indicates the estimated percentage of battery charge remaining until the battery will no longer be able to provide power to the Node</description>
+		<description>Indicates the estimated percentage of battery charge remaining until the battery will no longer be able
+			to provide power to the Node</description>
 		<category>Energy</category>
-			<tags>
-				<tag>Measurement</tag>
-				<tag>Energy</tag>
-			</tags>
-		<state readOnly="true" pattern="%d %%"/>	
-	 </channel-type>
+		<tags>
+			<tag>Measurement</tag>
+			<tag>Energy</tag>
+		</tags>
+		<state readOnly="true" pattern="%d %%"/>
+	</channel-type>
 
-	 <channel-type id="powersource-batchargelevel">
+	<channel-type id="powersource-batchargelevel">
 		<item-type>Number</item-type>
 		<label>Battery Charge Level</label>
-		<description>Indicates a coarse ranking of the charge level of the battery, used to indicate when intervention is required</description>
+		<description>Indicates a coarse ranking of the charge level of the battery, used to indicate when intervention is
+			required</description>
 		<category>Energy</category>
-			<tags>
-				<tag>Energy</tag>
-			</tags>
-			<state readOnly="true">
-				<options>
-					<option value="0">Ok</option>
-					<option value="1">Warning</option>
-					<option value="2">Critical</option>
-				</options>
-			</state>
-	 </channel-type>
+		<tags>
+			<tag>Energy</tag>
+		</tags>
+		<state readOnly="true">
+			<options>
+				<option value="0">Ok</option>
+				<option value="1">Warning</option>
+				<option value="2">Critical</option>
+			</options>
+		</state>
+	</channel-type>
 
 	<!-- Color Channel -->
 	<channel-type id="colorcontrol-color">
@@ -160,49 +148,60 @@
 	<channel-type id="switch-switchlatched">
 		<kind>trigger</kind>
 		<label>Switched Latched Trigger</label>
-		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. after the move.</description>
+		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. after
+			the move.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-initialpress">
 		<kind>trigger</kind>
 		<label>Initial Press Trigger</label>
-		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while pressed.</description>
+		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while
+			pressed.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-longpress">
 		<kind>trigger</kind>
 		<label>Long Press Trigger</label>
-		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while pressed.</description>
+		<description>This trigger shall indicate the new value of the CurrentPosition attribute as a JSON object, i.e. while
+			pressed.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-shortrelease">
 		<kind>trigger</kind>
 		<label>Short Release Trigger</label>
-		<description>This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e. just prior to release.</description>
+		<description>This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e.
+			just prior to release.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-longrelease">
 		<kind>trigger</kind>
 		<label>Long Release Trigger</label>
-		<description>This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e. just prior to release.</description>
+		<description>This trigger shall indicate the previous value of the CurrentPosition attribute as a JSON object, i.e.
+			just prior to release.</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-multipressongoing">
 		<kind>trigger</kind>
 		<label>Multi-Press Ongoing Trigger</label>
-		<description>This trigger shall indicate 2 numeric fields as a JSON object.  The first is the new value of the CurrentPosition attribute, i.e. while pressed.  The second is the multi press code with a value of N when the Nth press of a multi-press sequence has been detected. </description>
+		<description>This trigger shall indicate 2 numeric fields as a JSON object. The first is the new value of the
+			CurrentPosition attribute, i.e. while pressed. The second is the multi press code with a value of N when the Nth
+			press of a multi-press sequence has been detected.
+		</description>
 		<event/>
 	</channel-type>
 
 	<channel-type id="switch-multipresscomplete">
 		<kind>trigger</kind>
 		<label>Multi-Press Complete Trigger</label>
-		<description>This trigger shall indicate 2 numeric fields as a JSON object.  The first is the new value of the CurrentPosition attribute, i.e. while pressed.  The second is how many times the momentary switch has been pressed in a multi-press sequence. </description>
+		<description>This trigger shall indicate 2 numeric fields as a JSON object. The first is the new value of the
+			CurrentPosition attribute, i.e. while pressed. The second is how many times the momentary switch has been pressed in
+			a multi-press sequence.
+		</description>
 		<event/>
 	</channel-type>
 
@@ -326,6 +325,48 @@
 		<description>Sets the window covering level - supporting open/close and up/down type commands
 		</description>
 		<category>Blinds</category>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
+	</channel-type>
+
+	<channel-type id="fancontrol-percent">
+		<item-type>Dimmer</item-type>
+		<label>Fan Speed</label>
+		<description>The current fan speed percentage </description>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
+	</channel-type>
+
+	<channel-type id="fancontrol-mode">
+		<item-type>Number</item-type>
+		<label>Fan Mode</label>
+		<description>The fan mode</description>
+		<state>
+			<options>
+				<option value="0">Off</option>
+				<option value="1">Low</option>
+				<option value="2">Medium</option>
+				<option value="3">High</option>
+				<option value="4">On</option>
+				<option value="5">Auto</option>
+				<option value="6">Smart</option>
+			</options>
+		</state>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
+	</channel-type>
+
+	<channel-type id="temperaturemeasurement-measuredvalue">
+		<item-type>Number:Temperature</item-type>
+		<label>Temperature</label>
+		<description>Indicates the temperature reading</description>
+		<category>Temperature</category>
+		<state pattern="%.1f %unit%" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="occupancysensing-occupied">
+		<item-type>Switch</item-type>
+		<label>Occupancy</label>
+		<description>Indicates if an occupancy sensor is triggered</description>
+		<category>Motion</category>
+		<state readOnly="true"></state>
 	</channel-type>
 
 </thing:thing-descriptions>

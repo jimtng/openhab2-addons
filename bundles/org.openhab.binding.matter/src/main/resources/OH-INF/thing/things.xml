@@ -27,16 +27,6 @@
 				<default>false</default>
 				<advanced>true</advanced>
 			</parameter>
-			<parameter name="host" type="text" required="false">
-				<label>Matter Service Host</label>
-				<description>Connect to an external Matter service host. Leave blank to use the embedded service.</description>
-				<advanced>true</advanced>
-			</parameter>
-			<parameter name="port" type="integer" required="false" min="1" max="65535">
-				<label>Matter Service Port</label>
-				<description>Connect to an external Matter service port. Leave blank to use the embedded service.</description>
-				<advanced>true</advanced>
-			</parameter>
 		</config-description>
 	</bridge-type>
 

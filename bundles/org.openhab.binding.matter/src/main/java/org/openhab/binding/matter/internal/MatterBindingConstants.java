@@ -124,6 +124,24 @@ public class MatterBindingConstants {
     public static final String CHANNEL_LABEL_WINDOWCOVERING_LIFT = "Window Covering Lift";
     public static final ChannelTypeUID CHANNEL_WINDOWCOVERING_LIFT = new ChannelTypeUID("matter:windowcovering-lift");
 
+    public static final String CHANNEL_NAME_FANCONTROL_PERCENT = "fancontrolpercent";
+    public static final String CHANNEL_LABEL_FANCONTROL_PERCENT = "Fan Control Percent";
+    public static final ChannelTypeUID CHANNEL_FANCONTROL_PERCENT = new ChannelTypeUID("matter:fancontrol-percent");
+
+    public static final String CHANNEL_NAME_FANCONTROL_MODE = "fancontrolmode";
+    public static final String CHANNEL_LABEL_FANCONTROL_MODE = "Fan Control Mode";
+    public static final ChannelTypeUID CHANNEL_FANCONTROL_MODE = new ChannelTypeUID("matter:fancontrol-mode");
+
+    public static final String CHANNEL_NAME_TEMPERATUREMEASURMENT_MEASUREDVALUE = "temperaturemeasurementmeasuredvalue";
+    public static final String CHANNEL_LABEL_TEMPERATUREMEASURMENT_MEASUREDVALUE = "Temperature";
+    public static final ChannelTypeUID CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE = new ChannelTypeUID(
+            "matter:temperaturemeasurement-measuredvalue");
+
+    public static final String CHANNEL_NAME_OCCUPANCYSENSING_OCCUPIED = "occupancysensingoccupied";
+    public static final String CHANNEL_LABEL_OCCUPANCYSENSING_OCCUPIED = "Occupied";
+    public static final ChannelTypeUID CHANNEL_OCCUPANCYSENSING_OCCUPIED = new ChannelTypeUID(
+            "matter:occupancysensing-occupied");
+
     public static final String CHANNEL_NAME_MODESELECT_MODE = "MODESELECT_MODE";
     public static final ChannelTypeUID CHANNEL_MODESELECT_MODE = new ChannelTypeUID("matter:modeselect-mode");
 

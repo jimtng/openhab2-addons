@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.handler.ControllerHandler;
 import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
@@ -46,9 +47,12 @@ public class MatterHandlerFactory extends BaseThingHandlerFactory {
             THING_TYPE_ENDPOINT);
 
     private final MatterStateDescriptionOptionProvider stateDescriptionProvider;
+    private final MatterWebsocketService websocketService;
 
     @Activate
-    public MatterHandlerFactory(@Reference MatterStateDescriptionOptionProvider stateDescriptionProvider) {
+    public MatterHandlerFactory(@Reference MatterWebsocketService websocketService,
+            @Reference MatterStateDescriptionOptionProvider stateDescriptionProvider) {
+        this.websocketService = websocketService;
         this.stateDescriptionProvider = stateDescriptionProvider;
     }
 
@@ -62,7 +66,7 @@ public class MatterHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (THING_TYPE_CONTROLLER.equals(thingTypeUID)) {
-            return new ControllerHandler((Bridge) thing);
+            return new ControllerHandler((Bridge) thing, websocketService);
         }
 
         // if (THING_TYPE_NODE.equals(thingTypeUID)) {

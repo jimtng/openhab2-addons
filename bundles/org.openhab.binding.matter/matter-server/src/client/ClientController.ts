@@ -4,33 +4,59 @@ import { MatterNode } from "./MatterNode";
 import { Nodes } from "./namespaces/Nodes";
 import { Clusters } from "./namespaces/Clusters";
 import { WebSocketSession } from "../app";
-import { Request, MessageType } from '../MessageTypes';
+import { Request, MessageType, EventType } from '../MessageTypes';
 import { Controller } from "../Controller";
+import { convertJsonFile } from "../util/storageConverter"
 
-const logger = Logger.get("Controller");
+import * as path from 'path';
+
+const logger = Logger.get("ClientController");
 
 /**
  * This class exists to expose the "nodes" and "clusters" namespaces to websocket clients
  */
 export class ClientController extends Controller {
     
-    nodes: Nodes;
-    clusters: Clusters;
+    nodes?: Nodes;
+    clusters?: Clusters;
+    theNode: MatterNode;
     
-    constructor(override ws: WebSocketSession, private theNode: MatterNode) {
-        super(ws);
+    constructor(override ws: WebSocketSession, override params: URLSearchParams) {
+        super(ws, params);
+        const stringId = this.params.get('nodeId');
+        const nodeId = stringId != null ? parseInt(stringId) : null;
+        let storagePath = this.params.get('storagePath');
+        let controllerName = this.params.get('controllerName');
+
+        if (nodeId === null || storagePath === null) {
+            throw new Error('No nodeId or storagePath parameters in the request');
+        }
+
+        //migrate legacy json files
+        if (controllerName === null) {
+            const { outputDir, name } = convertJsonFile(storagePath, nodeId);
+            storagePath = outputDir;
+            controllerName = name;
+        }
+        this.theNode = new MatterNode(storagePath, controllerName, nodeId);
+    }
+
+    async init() {
+        await this.theNode.initialize();
+        logger.info(`Started Node`);
+       
         //set up listeners to send events back to the client
-        this.nodes = new Nodes(theNode, {
+        this.nodes = new Nodes(this.theNode, {
             autoSubscribe: true,
             attributeChangedCallback: (peerNodeId, data) => {
                 logger.debug(`attributeChangedCallback ${peerNodeId} ${Logger.toJSON(data)}`);
                 data.path.nodeId = peerNodeId;
-                ws.sendEvent("attributeChanged", data)
+                this.ws.sendEvent(EventType.AttributeChanged, data)
             },
             eventTriggeredCallback: (peerNodeId, data) => {
                 logger.debug(`eventTriggeredCallback ${peerNodeId} ${Logger.toJSON(data)}`);
                 data.path.nodeId = peerNodeId;
-                ws.sendEvent("eventTriggered", data)
+                this.ws.sendEvent(EventType.EventTriggered, data)
             },
             stateInformationCallback: (peerNodeId, info) => {
                 logger.debug(`stateInformationCallback ${peerNodeId} ${Logger.toJSON(info)}`);
@@ -38,42 +64,16 @@ export class ClientController extends Controller {
                     nodeId: peerNodeId,
                     state: NodeStateInformation[info]
                 };
-                ws.sendEvent("nodeStateInformation", data)
+                this.ws.sendEvent(EventType.NodeStateInformation, data)
             }
         });
-        this.clusters = new Clusters(theNode);
+        this.clusters = new Clusters(this.theNode);
     }
 
     async close() {
-        await this.theNode.close();
+        return this.theNode?.close();
     }
 
-    async handleRequest(request: Request): Promise<void> {
-        const { id, namespace, function: functionName, args } = request;
-        logger.debug(`Received request: ${Logger.toJSON(request)}`);
-        try {
-            const result = this.executeCommand(namespace, functionName, args || []);
-            if (result instanceof Promise) {
-                result.then((asyncResult) => {
-                    this.ws.sendResponse(MessageType.ResultSuccess, id, asyncResult);
-                }).catch((error) => {
-                    this.printError(error, functionName);
-                    this.ws.sendResponse(MessageType.ResultError, id, undefined, error.message);
-                });
-            } else {
-                this.ws.sendResponse(MessageType.ResultSuccess, id, result);
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                this.printError(error, functionName);
-                this.ws.sendResponse(MessageType.ResultError, id, undefined, error.message);
-            } else {
-                logger.error(`Unexpected error executing function ${functionName}: ${error}`);
-                this.ws.sendResponse(MessageType.ResultError, id, undefined, String(error));
-            }
-        }
-    }
-    
      executeCommand(namespace: string, functionName: string, args: any[]): any | Promise<any> {
         const controllerAny: any = this;
         let baseObject: any;
@@ -91,21 +91,4 @@ export class ClientController extends Controller {
          
         return baseObject[functionName](...args);
      }
-    
-    printError(error: Error, functionName: String) {
-
-        logger.error(`Error executing function ${functionName}: ${error.message}`);
-        logger.error(`Stack trace: ${error.stack}`);
-
-        // Log additional error properties if available
-        if ('code' in error) {
-            logger.error(`Error code: ${(error as any).code}`);
-        }
-        if ('name' in error) {
-            logger.error(`Error name: ${(error as any).name}`);
-        }
-
-        // Fallback: log the entire error object in case there are other useful details
-        logger.error(`Full error object: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`)
-    }
 }

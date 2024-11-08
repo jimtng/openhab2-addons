@@ -1,8 +1,8 @@
-import { Logger } from "@matter/main";
+import { Logger } from "@matter/general";
 import { MatterNode } from "../MatterNode";
 import { convertJsonDataWithModel } from "../../util/Json";
 import { ValidationError } from "@matter/main/types";
-import * as MatterClusters from "@project-chip/matter.js/cluster";
+import * as MatterClusters from "@matter/types/clusters";
 import { SupportedAttributeClient } from "@matter/protocol"
 import { MatterModel, ValueModel } from "@matter/model";
 

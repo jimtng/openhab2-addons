@@ -10,7 +10,7 @@
     "incremental": true,
 
     // We should probably boost this at least to ES 2017
-    "target": "es2020",
+    "target": "es2022",
 
     // Generate modules as ES2020 or CommonJS
     "module": "node16",

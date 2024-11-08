@@ -24,18 +24,20 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.MatterControllerClient;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
-import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
 import org.openhab.binding.matter.internal.config.ControllerConfiguration;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryHandler;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
+import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.*;
@@ -67,16 +69,18 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     private Set<BigInteger> linkedNodes = Collections.synchronizedSet(new HashSet<>());
 
     private @Nullable MatterDiscoveryService discoveryService;
-    private MatterWebsocketClient client;
+    private MatterControllerClient client;
     private @Nullable ScheduledFuture<?> reconnectFuture;
     private boolean running = true;
     private boolean ready = false;
     private @Nullable ScheduledFuture<?> checkFuture;
+    private final MatterWebsocketService websocketService;
 
-    public ControllerHandler(Bridge bridge) {
+    public ControllerHandler(Bridge bridge, MatterWebsocketService websocketService) {
         super(bridge);
-        client = new MatterWebsocketClient();
+        client = new MatterControllerClient();
         client.addListener(this);
+        this.websocketService = websocketService;
     }
 
     @Override
@@ -124,20 +128,8 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
         checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
         scheduler.execute(() -> {
-            try {
-                BigInteger nodeId = new BigInteger(config.nodeId);
-                if (!config.host.isBlank() && config.port > 0) {
-                    logger.debug("Connecting to custom host {} and port {}", config.host, config.port);
-                    client.connect(config.host, config.port, nodeId, storagePath, controllerName);
-                } else {
-                    logger.debug("Connecting to embedded service");
-                    client.connect(nodeId, storagePath, controllerName);
-                }
-                running = true;
-            } catch (Exception e) {
-                logger.debug("Could not init", e);
-                setOffline(e.getLocalizedMessage());
-            }
+            client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
+            running = true;
         });
     }
 
@@ -254,6 +246,10 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     }
 
     @Override
+    public void onEvent(BridgeEventMessage message) {
+    }
+
+    @Override
     public void onConnect() {
         logger.debug("Websocket connected");
     }
@@ -274,7 +270,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         linkedNodes.forEach(nodeId -> updateNode(nodeId));
     }
 
-    public MatterWebsocketClient getClient() {
+    public MatterControllerClient getClient() {
         return client;
     }
 

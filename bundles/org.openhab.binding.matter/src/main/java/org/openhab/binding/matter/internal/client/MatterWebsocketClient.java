@@ -12,19 +12,20 @@
  */
 package org.openhab.binding.matter.internal.client;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.URI;
-import java.nio.file.Files;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -35,13 +36,9 @@ import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
-import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.ws.*;
-import org.openhab.binding.matter.internal.util.NodeManager;
-import org.openhab.binding.matter.internal.util.NodeRunner;
-import org.openhab.binding.matter.internal.util.NodeRunner.NodeProcessListener;
+import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.common.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,23 +52,25 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 @NonNullByDefault
-public class MatterWebsocketClient implements WebSocketListener {
+public class MatterWebsocketClient implements WebSocketListener, MatterWebsocketService.NodeProcessListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MatterWebsocketClient.class);
-    private static final String MATTER_JS_PATH = "/matter-server/matter.js";
+
     private static final int BUFFER_SIZE = 1048576 * 2; // 2 Mb
     private final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool("matter.MatterWebsocketClient");
-    private final Gson gson = new GsonBuilder().registerTypeAdapter(Node.class, new NodeDeserializer())
+    protected final Gson gson = new GsonBuilder().registerTypeAdapter(Node.class, new NodeDeserializer())
             .registerTypeAdapter(BigInteger.class, new BigIntegerSerializer()).create();
     private final WebSocketClient client = new WebSocketClient();
     private final ConcurrentHashMap<String, CompletableFuture<JsonElement>> pendingRequests = new ConcurrentHashMap<>();
     private final CopyOnWriteArrayList<MatterClientListener> clientListeners = new CopyOnWriteArrayList<>();
-
     @Nullable
     private Session session;
     @Nullable
-    private NodeRunner nodeRunner;
+    Map<String, String> connectionParameters;
+
+    @Nullable
+    private MatterWebsocketService wss;
 
     /**
      * Connect to an external Matter controller Websocket Server not running on this host, mainly used for testing
@@ -83,9 +82,9 @@ public class MatterWebsocketClient implements WebSocketListener {
      * @param controllerName
      * @throws Exception
      */
-    public void connect(String host, int port, BigInteger nodeId, String storagePath, String controllerName)
-            throws Exception {
-        connectWebsocket(host, port, nodeId, storagePath, controllerName);
+    public void connect(String host, int port, Map<String, String> connectionParameters) throws Exception {
+        this.connectionParameters = connectionParameters;
+        connectWebsocket(host, port);
     }
 
     /**
@@ -96,48 +95,40 @@ public class MatterWebsocketClient implements WebSocketListener {
      * @param controllerName
      * @throws Exception
      */
-    public void connect(BigInteger nodeId, String storagePath, String controllerName) throws Exception {
-        disconnect();
-        NodeManager nodeManager = new NodeManager();
-        String nodePath = nodeManager.getNodePath();
-        NodeRunner nodeRunner = new NodeRunner(nodePath);
-        nodeRunner.addProcessListener(new NodeProcessListener() {
-            @Override
-            public void onNodeExit(int exitCode) {
-                disconnect();
-                for (MatterClientListener listener : clientListeners) {
-                    listener.onDisconnect("Exit code " + exitCode);
-                }
-            }
-
-            @Override
-            public void onNodeReady(int port) {
-                try {
-                    connectWebsocket("localhost", port, nodeId, storagePath, controllerName);
-                } catch (Exception e) {
-                    disconnect();
-                    logger.error("Could not connect", e);
-                    for (MatterClientListener listener : clientListeners) {
-                        String msg = e.getLocalizedMessage();
-                        listener.onDisconnect(msg != null ? msg : "Exception connecting");
-                    }
-                }
-            }
-        });
-        nodeRunner.runNodeWithResource(MATTER_JS_PATH);
-        this.nodeRunner = nodeRunner;
+    public void connect(MatterWebsocketService wss, Map<String, String> connectionParameters) {
+        this.connectionParameters = connectionParameters;
+        this.wss = wss;
+        wss.addProcessListener(this);
     }
 
-    private void connectWebsocket(String host, int port, BigInteger nodeId, String storagePath, String controllerName)
-            throws Exception {
-        String dest = "ws://" + host + ":" + port + "?nodeId=" + nodeId + "&storagePath=" + storagePath;
+    @Override
+    public void onNodeExit(int exitCode) {
+    }
 
-        // TODO remove this check and helper function after a few releases of beta testing
-        if (!isLegacyStorage(storagePath, controllerName)) {
-            dest += "&controllerName=" + controllerName;
-        } else {
-            dest += File.separator + controllerName + ".json";
+    @Override
+    public void onNodeReady(int port) {
+        try {
+            connectWebsocket("localhost", port);
+        } catch (Exception e) {
+            disconnect();
+            logger.error("Could not connect", e);
+            for (MatterClientListener listener : clientListeners) {
+                String msg = e.getLocalizedMessage();
+                listener.onDisconnect(msg != null ? msg : "Exception connecting");
+            }
         }
+    }
+
+    private void connectWebsocket(String host, int port) throws Exception {
+        String dest = "ws://" + host + ":" + port;
+        Map<String, String> connectionParameters = this.connectionParameters;
+        if (connectionParameters != null) {
+            dest += "?" + connectionParameters.entrySet().stream()
+                    .map((Map.Entry<String, String> entry) -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)
+                            + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+                    .collect(Collectors.joining("&"));
+        }
+
         logger.debug("Connecting {}", dest);
         WebSocketClient client = new WebSocketClient();
         client.setMaxIdleTimeout(Long.MAX_VALUE);
@@ -162,10 +153,10 @@ public class MatterWebsocketClient implements WebSocketListener {
             } catch (Exception e) {
                 logger.debug("Error closing Web Socket", e);
             }
-        }
-        NodeRunner nodeRunner = this.nodeRunner;
-        if (nodeRunner != null) {
-            nodeRunner.stopNode();
+            MatterWebsocketService wss = this.wss;
+            if (wss != null) {
+                wss.removeProcessListener(this);
+            }
         }
     }
 
@@ -284,6 +275,21 @@ public class MatterWebsocketClient implements WebSocketListener {
                             }
                         }
                         break;
+                    case "bridgeEvent":
+                        logger.debug("bridgeEvent message {}", event.data);
+                        BridgeEventMessage bridgeEventMessage = gson.fromJson(event.data, BridgeEventMessage.class);
+                        if (bridgeEventMessage == null) {
+                            logger.debug("invalid bridgeEvent");
+                            return;
+                        }
+                        for (MatterClientListener listener : clientListeners) {
+                            try {
+                                listener.onEvent(bridgeEventMessage);
+                            } catch (Exception e) {
+                                logger.debug("Error notifying listener", e);
+                            }
+                        }
+                        break;
                     case "ready":
                         for (MatterClientListener listener : clientListeners) {
                             listener.onReady();
@@ -318,111 +324,11 @@ public class MatterWebsocketClient implements WebSocketListener {
         return session != null && session.isOpen();
     }
 
-    /**
-     * Get all nodes the are commissioned / paired to this controller
-     * 
-     * @param onlyConnected filter to nodes that are currently connected
-     * @return
-     * @throws Exception
-     */
-    public CompletableFuture<List<BigInteger>> getCommissionedNodeIds() {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "listNodes", new Object[0]);
-        return future.thenApply(obj -> {
-            List<BigInteger> nodes = gson.fromJson(obj, new TypeToken<List<BigInteger>>() {
-            }.getType());
-            return nodes != null ? nodes : Collections.emptyList();
-        });
-    }
-
     public CompletableFuture<String> genericCommand(String namespace, String functionName,
             @Nullable Object... objects) {
         CompletableFuture<JsonElement> future = sendMessage(namespace, functionName,
                 objects == null ? new Object[0] : objects);
         return future.thenApply(obj -> obj == null ? "" : obj.toString());
-    }
-
-    public CompletableFuture<Node> getNode(BigInteger id) {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "getNode", new Object[] { id });
-        return future.thenApply(obj -> {
-            Node node = gson.fromJson(obj, Node.class);
-            if (node == null) {
-                throw new IllegalStateException("Could not deserialize node");
-            }
-            return node;
-        });
-    }
-
-    public CompletableFuture<Void> pairNode(String code) {
-        String[] parts = code.trim().split(" ");
-        CompletableFuture<JsonElement> future = null;
-        if (parts.length == 2) {
-            future = sendMessage("nodes", "pairNode", new Object[] { "", parts[0], parts[1] });
-        } else {
-            // MT is a matter QR code, other wise remove any dashes in a manual pairing code
-            String pairCode = parts[0].indexOf("MT:") == 0 ? parts[0] : parts[0].replaceAll("-", "");
-            future = sendMessage("nodes", "pairNode", new Object[] { pairCode });
-        }
-        return future.thenAccept(obj -> {
-            // Do nothing, just to complete the future
-        });
-    }
-
-    public CompletableFuture<Void> removeNode(BigInteger nodeId) {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "removeNode", new Object[] { nodeId });
-        return future.thenAccept(obj -> {
-            // Do nothing, just to complete the future
-        });
-    }
-
-    public CompletableFuture<PairingCodes> enhancedCommissioningWindow(BigInteger id) {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "enhancedCommissioningWindow",
-                new Object[] { id });
-        return future.thenApply(obj -> {
-            PairingCodes codes = gson.fromJson(obj, PairingCodes.class);
-            if (codes == null) {
-                throw new IllegalStateException("Could not deserialize pairing codes");
-            }
-            return codes;
-        });
-    }
-
-    public CompletableFuture<Void> disconnectNode(BigInteger nodeId) {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "disconnectNode", new Object[] { nodeId });
-        return future.thenAccept(obj -> {
-            // Do nothing, just to complete the future
-        });
-    } // enhancedCommissioningWindow
-
-    public CompletableFuture<Void> clusterCommand(BigInteger nodeId, Integer endpointId, String clusterName,
-            ClusterCommand command) {
-        Object[] clusterArgs = { String.valueOf(nodeId), endpointId, clusterName, command.commandName, command.args };
-        CompletableFuture<JsonElement> future = sendMessage("clusters", "command", clusterArgs);
-        return future.thenAccept(obj -> {
-            // Do nothing, just to complete the future
-        });
-    }
-
-    public CompletableFuture<Void> clusterWriteAttribute(BigInteger nodeId, Integer endpointId, String clusterName,
-            String attributeName, String value) {
-        Object[] clusterArgs = { String.valueOf(nodeId), endpointId, clusterName, attributeName, value };
-        CompletableFuture<JsonElement> future = sendMessage("clusters", "writeAttribute", clusterArgs);
-        return future.thenAccept(obj -> {
-            // Do nothing, just to complete the future
-        });
-    }
-
-    public CompletableFuture<ActiveSessionInformation[]> getSessionInformation() {
-        CompletableFuture<JsonElement> future = sendMessage("nodes", "sessionInformation", new Object[0]);
-        return future.thenApply(obj -> {
-            ActiveSessionInformation[] sessions = gson.fromJson(obj, ActiveSessionInformation[].class);
-            return sessions == null ? new ActiveSessionInformation[0] : sessions;
-        });
-    }
-
-    private boolean isLegacyStorage(String storagePath, String controllerName) {
-        java.nio.file.Path path = java.nio.file.Paths.get(storagePath + File.separator + controllerName + ".json");
-        logger.debug("Checking for legacy storage {}", path);
-        return Files.exists(path);
     }
 
     class NodeDeserializer implements JsonDeserializer<Node> {

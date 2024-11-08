@@ -41,6 +41,10 @@ public class ConverterRegistry {
         ConverterRegistry.registerConverter(ThermostatCluster.CLUSTER_ID, ThermostatConverter.class);
         ConverterRegistry.registerConverter(WindowCoveringCluster.CLUSTER_ID, WindowCoveringConverter.class);
         ConverterRegistry.registerConverter(PowerSourceCluster.CLUSTER_ID, PowerSourceConverter.class);
+        ConverterRegistry.registerConverter(FanControlCluster.CLUSTER_ID, FanControlConverter.class);
+        ConverterRegistry.registerConverter(TemperatureMeasurementCluster.CLUSTER_ID,
+                TemperatureMeasurementConverter.class);
+        ConverterRegistry.registerConverter(OccupancySensingCluster.CLUSTER_ID, OccupancySensingConverter.class);
     }
 
     public static void registerConverter(Integer clusterId,

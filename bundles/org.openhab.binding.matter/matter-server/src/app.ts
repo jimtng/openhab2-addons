@@ -9,6 +9,7 @@ import { hideBin } from 'yargs/helpers'
 import { Request, Response, Message, MessageType } from './MessageTypes';
 import { convertJsonFile } from "./util/storageConverter"
 import * as path from 'path';
+import { BridgeController } from './bridge/BridgeController';
 const argv: any = yargs(hideBin(process.argv)).argv
 
 const logger = Logger.get("matter");
@@ -17,9 +18,11 @@ Logger.defaultLogLevel = Level.DEBUG;
 process.on('uncaughtException', function (err) {
     logger.error(`Caught exception: ${err} ${err.stack}`);
 });
+process.on("SIGINT", () => shutdownHandler("SIGINT"));
+process.on("SIGTERM", () => shutdownHandler("SIGTERM"));
 
-process.on("SIGINT", () => {
-   logger.info("Received SIGINT. Closing WebSocket connections...");
+const shutdownHandler = async (signal: string) => {
+   logger.info(`Received ${signal}. Closing WebSocket connections...`);
 
     const closePromises: Promise<void>[] = [];
 
@@ -40,7 +43,7 @@ process.on("SIGINT", () => {
         }
     });
 
-    Promise.all(closePromises)
+    await Promise.all(closePromises)
         .then(() => {
            logger.info("All WebSocket connections closed.");
             return new Promise<void>((resolve) => wss.close(() => resolve()));
@@ -53,7 +56,7 @@ process.on("SIGINT", () => {
             console.error("Error during shutdown:", err);
             process.exit(1);
         });
-});
+}
 
 export interface WebSocketSession extends WebSocket {
     controller?: Controller;
@@ -107,10 +110,10 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
         }
     });
 
-    ws.on('close', () => {
+    ws.on('close', async () => {
         logger.info('WebSocket closed');
         if (ws.controller) {
-            ws.controller.close();
+            await ws.controller.close();
         }
     });
 
@@ -125,40 +128,28 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
     }
 
     const params = new URLSearchParams(req.url.slice(req.url.indexOf('?')));
-    const stringId = params.get('nodeId');
-    const nodeId = stringId != null ? parseInt(stringId) : null;
-    let storagePath = params.get('storagePath');
-    let controllerName = params.get('controllerName');
+    const service = params.get('service') === 'bridge' ? 'bridge' : 'client'
 
-    if (nodeId === null || storagePath === null) {
-        ws.close(1002, 'No nodeId or storagePath parameters in the request');
-        return;
-    }
-
-    try {
-        //migrate legacy json files
-        if (controllerName === null) {
-            const parsedPath = path.parse(storagePath);
-            const { outputDir, name } = convertJsonFile(storagePath, nodeId);
-            storagePath = outputDir;
-            controllerName = name;
+    if (service === 'client') {
+        try {
+            ws.controller = new ClientController(ws, params);
+            await ws.controller.init();
+        } catch (error: any) {
+            logger.error("returning error", error.message)
+            ws.close(1002, error.message);
+            return;
         }
-        ws.controller = await initController(ws, storagePath, controllerName, nodeId);
-    } catch (error: any) {
-       logger.error("returning error", error.message)
-        ws.close(1002, error.message);
-        return;
+    } else {
+        try {
+            ws.controller = new BridgeController(ws, params);
+            await ws.controller.init();
+        } catch (error: any) {
+            logger.error("returning error", error.message)
+            ws.close(1002, error.message);
+            return;
+        }
     }
-
     ws.sendEvent('ready', 'Controller initialized');
 });
-
-async function initController(ws: WebSocketSession, storagePath: string, controllerName: string, nodeNum: number, factoryReset = false) {
-    const theNode = new MatterNode(storagePath, controllerName, nodeNum);
-    await theNode.initialize();
-    logger.info(`Started Node #${nodeNum}`);
-    let controller = new ClientController(ws, theNode);
-    return controller;
-}
 
 logger.info(`CHIP Controller Server listening on port ${socketPort}`);
