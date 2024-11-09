@@ -4,6 +4,21 @@ The Matter Binding for openHAB allows seamless integration with Matter-compatibl
 
 **Please note this binding requires openHAB 4.3 snapshot builds or later that support discovery codes when searching for devices.** 
 
+## Supported modes
+
+This binding supports 2 different types of matter functionality.
+
+- A Matter client
+  - This allows openHAB to discover and control other Matter devices like lights, thermostats, window coverings, locks, etc...
+  - See [Matter Binding Configuration](#matter-binding-configuration) for configuring a matter controller.
+- A Matter Bridge
+  - This allows openHAB to expose items as Matter devices to other Matter clients.  This allows local control of openHAB devices from other ecosystems like Apple Home, Amazon, and Google Home.
+  - This is considered experimental and is still a work in progress.
+  - See [Matter Bridge](#matter-bridge) for information on configuring a bridge.
+
+
+Please read the following readme in its entirety as Matter is a complex protocol with very specific requirements.
+
 # General Matter Ecosystem Overview
 
 Matter is an open-source connectivity standard for smart home devices, allowing seamless communication between a wide range of devices, controllers, and ecosystems. 
@@ -123,6 +138,8 @@ If a device has already been commissioned and you want to add it to another Matt
 
 # Matter Binding Configuration
 
+This describes the Matter controller functionality for discovering and controller other Matter devices.
+
 ## Supported Things
 
 The Matter Binding supports the following types of things:
@@ -139,6 +156,8 @@ Matter controllers must be added manually.  Endpoint (devices) will be discovere
 In order to pair a device, you must have an 11 digit manual pairing code (eg 123-4567-8901 or 12345678901) or a QR Code (eg MT:ABCDEF1234567890123).  If the device has not been paired before, use the code provided by the manufacturer and **ensure the device is in pairing mode**, refer to your devices instructions for pairing for more information.
 
 If the device is paired with another Matter ecosystem (Apple, Google, Amazon, etc..) use that ecosystem to generate a pairing code and search for devices.  The pairing code and device will only be available for commissioning for a limited time.  Refer to the ecosystem that generated the code for the exact duration (typically 1-15 minutes).
+
+When using the discovery feature of openHAB use the provided code in the text entry box before pushing "scan"
 
 ### Device Pairing: Thread Devices
 
@@ -273,14 +292,15 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 
 ### Thermostat member tags
 
-| Item                  | Tag               | Options
-|-----------------------|-------------------|
-| Current Temperature   | localTemperature  |
-| Outdoor Temperature   | outdoorTemperature|
-| Heating Setpoint      | occupiedHeatingSetpoint   |
-| Cooling Setpoint      | occupiedCoolingSetpoint   |
-| System Mode           | systemMode        | [OFF=0,AUTO=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9]
-| Running Mode          | runningMode       |
+| Item                | Tag                     | Options                                                                             |
+|---------------------|-------------------------|-------------------------------------------------------------------------------------|
+| Current Temperature | localTemperature        |                                                                                     |
+| Outdoor Temperature | outdoorTemperature      |                                                                                     |
+| Heating Setpoint    | occupiedHeatingSetpoint |                                                                                     |
+| Cooling Setpoint    | occupiedCoolingSetpoint |                                                                                     |
+| System Mode         | systemMode              | [OFF=0,AUTO=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
+| Running Mode        | runningMode             |                                                                                     |
+
 
 ### Example
 
