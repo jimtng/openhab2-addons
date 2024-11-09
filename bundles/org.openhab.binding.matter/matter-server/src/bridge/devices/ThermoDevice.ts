@@ -10,24 +10,13 @@ import { Logger } from"@matter/general";
 const logger = Logger.get("ThermoDevice");
 
 export class ThermoDevice extends GenericDevice {
-
-    // how do i define this without creating a new instance?
-    #endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer, ThermostatServer.with(
-        Thermostat.Feature.AutoMode,
-        Thermostat.Feature.Heating,
-        Thermostat.Feature.Cooling
-    )), {
-        thermostat: {}
-    });
     
-    constructor(bridgeController: BridgeController, attributeMap: { [key: string]: any }, endpointId: string, nodeLabel: string, productName: string, productLabel: string, serialNumber: string) {
-        super(bridgeController, attributeMap);
-
+    override createEndpoint() {
         const features: Thermostat.Feature[] = [];
-        if (attributeMap.occupiedHeatingSetpoint != undefined) {
+        if (this.attributeMap.occupiedHeatingSetpoint != undefined) {
             features.push(Thermostat.Feature.Heating);
         }
-        if (attributeMap.occupiedCoolingSetpoint != undefined) {
+        if (this.attributeMap.occupiedCoolingSetpoint != undefined) {
             features.push(Thermostat.Feature.Cooling);
         }
         if (features.indexOf(Thermostat.Feature.Heating) != -1 && features.indexOf(Thermostat.Feature.Cooling) != -1) {
@@ -51,19 +40,19 @@ export class ThermoDevice extends GenericDevice {
             minSetpointDeadBand: 0
         }
 
-        const finalMap = { ...defaultParams, ...attributeMap }
+        const finalMap = { ...defaultParams, ...this.attributeMap }
         
-        logger.info(`ThermoDevice attributeMap: ${JSON.stringify(finalMap, null, 2)} features: ${features}`);
+        logger.debug(`ThermoDevice attributeMap: ${JSON.stringify(finalMap, null, 2)} features: ${features}`);
         
-        this.#endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer, ThermostatServer.with(
+        const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer, ThermostatServer.with(
             ...features
         )), {
-            id: endpointId,
+            id: this.endpointId,
             bridgedDeviceBasicInformation: {
-                nodeLabel: nodeLabel,
-                productName: productName,
-                productLabel: productLabel,
-                serialNumber: serialNumber,
+                nodeLabel: this.nodeLabel,
+                productName: this.productName,
+                productLabel: this.productLabel,
+                serialNumber: this.serialNumber,
                 reachable: true,
             },
             thermostat: {
@@ -71,34 +60,24 @@ export class ThermoDevice extends GenericDevice {
             }
 
         });
-        this.#endpoint.events.thermostat.localTemperature$Changed.on((value) => {
-            logger.info(`localTemperature value changed to ${value}`);
+        endpoint.events.thermostat.localTemperature$Changed.on((value) => {
             this.sendBridgeEvent('thermostat','localTemperature', value);
         });
-        this.#endpoint.events.thermostat.outdoorTemperature$Changed?.on((value) => {
-            logger.info(`outdoorTemperature value changed to ${value}`);
+        endpoint.events.thermostat.outdoorTemperature$Changed?.on((value) => {
             this.sendBridgeEvent('thermostat','outdoorTemperature', value);
         });
-        this.#endpoint.events.thermostat.occupiedHeatingSetpoint$Changed?.on((value) => {
-            logger.info(`occupiedHeatingSetpoint value changed to ${value}`);
+        endpoint.events.thermostat.occupiedHeatingSetpoint$Changed?.on((value) => {
             this.sendBridgeEvent('thermostat','occupiedHeatingSetpoint', value);
         });
-        this.#endpoint.events.thermostat.occupiedCoolingSetpoint$Changed?.on((value) => {
-            logger.info(`occupiedCoolingSetpoint value changed to ${value}`);
+        endpoint.events.thermostat.occupiedCoolingSetpoint$Changed?.on((value) => {
             this.sendBridgeEvent('thermostat','occupiedCoolingSetpoint', value);
         });
-        this.#endpoint.events.thermostat.systemMode$Changed.on((value) => {
-            logger.info(`systemMode value changed to ${value}`);
+        endpoint.events.thermostat.systemMode$Changed.on((value) => {
             this.sendBridgeEvent('thermostat','systemMode', value);
         });
-        this.#endpoint.events.thermostat.thermostatRunningMode$Changed?.on((value) => {
-            logger.info(`thermostatRunningMode value changed to ${value}`);
+        endpoint.events.thermostat.thermostatRunningMode$Changed?.on((value) => {
             this.sendBridgeEvent('thermostat','thermostatRunningMode', value);
         });
-
-    }
-
-    get endpoint() {
-        return this.#endpoint;
+        return endpoint;
     }
 }

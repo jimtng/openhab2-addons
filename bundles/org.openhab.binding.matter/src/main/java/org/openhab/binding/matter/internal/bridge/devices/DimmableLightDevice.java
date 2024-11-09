@@ -13,6 +13,7 @@
 package org.openhab.binding.matter.internal.bridge.devices;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
@@ -47,7 +48,8 @@ public class DimmableLightDevice extends GenericDevice {
     public Map<String, Object> setupDevice() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of();
+        return Map.of("currentLevel", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
+                .orElseGet(() -> new PercentType(0)).intValue());
     }
 
     @Override

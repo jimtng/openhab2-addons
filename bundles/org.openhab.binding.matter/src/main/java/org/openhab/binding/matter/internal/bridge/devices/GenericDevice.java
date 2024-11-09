@@ -77,8 +77,8 @@ public abstract class GenericDevice implements StateChangeListener {
     }
 
     public CompletableFuture<String> registerDevice() {
-        return client.addEndpoint(deviceType(), primaryItem.getName(), primaryItem.getLabel(), "Product Name",
-                "Product Label", "0000001", setupDevice());
+        return client.addEndpoint(deviceType(), primaryItem.getName(), primaryItem.getLabel(), "openHAB Device",
+                "An openHAB Device", "0000001", setupDevice());
     }
 
     public String getName() {
@@ -86,7 +86,7 @@ public abstract class GenericDevice implements StateChangeListener {
     }
 
     protected void setEndpointState(String clusterName, String attributeName, Object state) {
-        client.genericCommand("foo", "setEndpointState", primaryItem.getName(), clusterName, attributeName, state);
+        client.genericCommand("bridge", "setEndpointState", primaryItem.getName(), clusterName, attributeName, state);
     }
 
     // TODO Move all of the following into a shared UTIL class, copied from cluster converters

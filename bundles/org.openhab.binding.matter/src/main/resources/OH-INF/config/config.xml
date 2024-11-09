@@ -6,52 +6,41 @@
 		https://openhab.org/schemas/config-description-1.0.0.xsd">
 
 	<config-description uri="io:matter">
-		<parameter-group name="core">
-			<label>Core Configuration.</label>
+		<parameter-group name="bridge">
+			<label>Matter Bridge Configuration.</label>
 			<advanced>false</advanced>
 		</parameter-group>
-		<parameter-group name="thermostat">
-			<label>Thermostat Settings</label>
-			<description>Advanced thermostat settings.</description>
-			<advanced>true</advanced>
-		</parameter-group>
-		<parameter-group name="network">
-			<label>Network Settings</label>
-			<description>Advanced network settings.</description>
-			<advanced>true</advanced>
-		</parameter-group>
-		<parameter name="name" type="text" required="false" groupName="core">
+		<parameter name="bridgeName" type="text" required="false" groupName="bridge">
 			<label>Bridge name</label>
-			<description>Name of the Matter bridge.</description>
-			<default>openHAB</default>
+			<description>Name of the Matter bridge that is exposed to clients.</description>
+			<default>openHAB Matter Bridge</default>
 		</parameter>
-		<parameter name="qrCode" type="text" required="false" groupName="core">
+		<parameter name="qrCode" type="text" required="false" groupName="bridge">
 			<label>Matter QR Pairing Code</label>
 			<context>qrcode</context>
 			<description>QR code used for pairing 3rd party Matter clients.</description>
 		</parameter>
-		<parameter name="manualPairingCode" type="text" required="false" groupName="core" readOnly="true">
+		<parameter name="manualPairingCode" type="text" required="false" groupName="bridge" readOnly="true">
 			<label>Matter Manual Pairing Code</label>
 			<description>Manual code used for pairing 3rd party Matter clients.</description>
 		</parameter>
-		<parameter name="port" type="integer" required="true" groupName="network">
+		<parameter name="passcode" type="integer" min="1" max="99999998" required="true" groupName="bridge">
+			<label>Passcode</label>
+			<description>Defines the Matter bridge passcode, used for commissioning the first client.</description>
+			<default>20202021</default>
+		</parameter>
+		<parameter name="discriminator" type="integer" min="0" max="4095" required="false" groupName="bridge">
+			<label>Discriminator</label>
+			<description>Defines the Matter discriminator which uniquely identifies this bridge on the network. Used for commissioning clients.</description>
+			<advanced>true</advanced>
+		</parameter>
+		<parameter name="port" type="integer" required="true" groupName="bridge">
 			<label>Port</label>
 			<description>Defines the port the Matter bridge listens on.</description>
 			<default>5540</default>
 			<advanced>true</advanced>
 		</parameter>
-		<parameter name="passcode" type="integer" required="true" groupName="core">
-			<label>Passcode</label>
-			<description>Defines the Matter passcode, used for commissioning clients.</description>
-			<default>20202021</default>
-		</parameter>
-		<parameter name="discriminator" type="integer" required="false" groupName="core">
-			<label>Discriminator</label>
-			<description>Defines the Matter discriminator, used for commissioning clients.</description>
-			<advanced>true</advanced>
-			<default>3840</default>
-		</parameter>
-		<parameter name="resetBridge" type="boolean" required="false" groupName="core">
+		<parameter name="resetBridge" type="boolean" required="false" groupName="bridge">
 			<label>Reset Bridge</label>
 			<description>This will reset the Matter bridge, removing all pairings with 3rd party clients.</description>
 			<default>false</default>

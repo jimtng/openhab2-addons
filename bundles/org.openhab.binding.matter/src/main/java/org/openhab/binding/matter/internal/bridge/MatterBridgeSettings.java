@@ -21,17 +21,17 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public class MatterBridgeSettings {
-    public String name = "openHAB";
+    public String bridgeName = "openHAB";
     public int port = 5540;
     public int passcode = 20202021;
-    public int discriminator = 3840;
+    public int discriminator = -1;
     public String qrCode = "";
     public String manualPairingCode = "";
     public boolean resetBridge = false;
 
     public String toString() {
-        return "MatterBridgeSettings [name=" + name + ", port=" + port + ", passcode=" + passcode + ", discriminator="
-                + discriminator + ", qrCode=" + qrCode + ", manualPairingCode=" + manualPairingCode + ", resetBridge="
-                + resetBridge + "]";
+        return "MatterBridgeSettings [name=" + bridgeName + ", port=" + port + ", passcode=" + passcode
+                + ", discriminator=" + discriminator + ", qrCode=" + qrCode + ", manualPairingCode=" + manualPairingCode
+                + ", resetBridge=" + resetBridge + "]";
     }
 }

@@ -54,5 +54,6 @@ export abstract class Controller {
 
         // Fallback: log the entire error object in case there are other useful details
         logger.error(`Full error object: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`)
+        logger.error(error)
     }
 }

@@ -95,7 +95,7 @@ public class MatterWebsocketService {
             nodeProcess.destroy();
             try {
                 // Wait for the process to terminate
-                if (!nodeProcess.waitFor(20, java.util.concurrent.TimeUnit.SECONDS)) {
+                if (!nodeProcess.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)) {
                     nodeProcess.destroyForcibly();
                 }
             } catch (InterruptedException e) {

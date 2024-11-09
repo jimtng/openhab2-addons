@@ -8,28 +8,24 @@ import { Logger } from"@matter/general";
 const logger = Logger.get("OnOff");
 
 export class OnOffDevice extends GenericDevice {
-
-    #endpoint: Endpoint<OnOffLightDevice>;
     
-    constructor(bridgeController: BridgeController, attributeMap: { [key: string]: any }, endpointId: string, nodeLabel: string, productName: string, productLabel: string, serialNumber: string) {
-        super(bridgeController, attributeMap);
-        this.#endpoint = new Endpoint(OnOffLightDevice.with(BridgedDeviceBasicInformationServer), {
-            id: endpointId,
+    override createEndpoint() {
+        const endpoint = new Endpoint(OnOffLightDevice.with(BridgedDeviceBasicInformationServer), {
+            id: this.endpointId,
             bridgedDeviceBasicInformation: {
-                nodeLabel: nodeLabel,
-                productName: productName,
-                productLabel: productLabel,
-                serialNumber: serialNumber,
+                nodeLabel: this.nodeLabel,
+                productName: this.productName,
+                productLabel: this.productLabel,
+                serialNumber: this.serialNumber,
                 reachable: true,
             },
         });
-        this.#endpoint.events.onOff.onOff$Changed.on(value => {
-            logger.info(`onOff value changed to ${value}`);
+        endpoint.events.onOff.onOff$Changed.on(value => {
             this.sendBridgeEvent("onOff","onOff", value);
         });
-    }
-    
-    get endpoint() {
-        return this.#endpoint;
+        // if (attributeMap.onOff != undefined) {
+        //     this.updateState("onOff", "onOff", attributeMap.onOff)
+        // }
+        return endpoint
     }
 }

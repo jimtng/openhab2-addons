@@ -13,6 +13,7 @@
 package org.openhab.binding.matter.internal.bridge.devices;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
@@ -60,7 +61,8 @@ public class OnOffLightDevice extends GenericDevice {
     public Map<String, Object> setupDevice() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of();
+        return Map.of("onOff", Optional.ofNullable(primaryItem.getStateAs(OnOffType.class))
+                .orElseGet(() -> OnOffType.OFF) == OnOffType.ON);
     }
 
     @Override

@@ -68,17 +68,17 @@ export class DeviceNode {
                     productName: this.productName,
                     productLabel: this.productName,
                     productId: this.productId,
-                    serialNumber: `matterjs-${this.uniqueId}`,
+                    serialNumber: `openHAB-${this.uniqueId}`,
                     uniqueId: this.uniqueId,
                 },
             });
             logger.info(`ServerNode created with ID: ${this.server.id}`);
             this.aggregator = new Endpoint(AggregatorEndpoint, { id: "aggregator" });
-            logger.info(`aggregator created`);
             await this.server.add(this.aggregator);
-            logger.info(`Starting server`);
             await this.server.start();
-            logger.info(`Server started`);
+
+            //reset this for future restarts
+            this.#environment.vars.set("storage.clear", false);
         } catch (e) {
             logger.error(`Error starting server: ${e}`);
             throw e;
@@ -108,7 +108,7 @@ export class DeviceNode {
         let device: GenericDevice | null = null;
 
         if (this.devices.has(id)) {
-            logger.info(`Device ${id} already exists! Call 'resetEndpoints' first and try again.`);
+            logger.error(`Device ${id} already exists! Call 'resetEndpoints' first and try again.`);
             return;
         }
 
@@ -131,7 +131,7 @@ export class DeviceNode {
             /**
             * Log the endpoint structure for debugging reasons and to allow to verify anything is correct
             */
-            logEndpoint(EndpointServer.forEndpoint(this.server));
+            //logEndpoint(EndpointServer.forEndpoint(this.server));
         }
 
     }

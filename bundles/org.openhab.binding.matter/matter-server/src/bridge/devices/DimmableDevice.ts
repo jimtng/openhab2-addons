@@ -9,31 +9,31 @@ const logger = Logger.get("DimmableDevice");
 
 export class DimmableDevice extends GenericDevice {
 
-    #endpoint: Endpoint<DimmableLightDevice>;
     
-    constructor(bridgeController: BridgeController, attributeMap: { [key: string]: any }, endpointId: string, nodeLabel: string, productName: string, productLabel: string, serialNumber: string) {
-        super(bridgeController, attributeMap);
-        this.#endpoint = new Endpoint(DimmableLightDevice.with(BridgedDeviceBasicInformationServer), {
-            id: endpointId,
+    override createEndpoint() {
+        const endpoint = new Endpoint(DimmableLightDevice.with(BridgedDeviceBasicInformationServer), {
+            id: this.endpointId,
             bridgedDeviceBasicInformation: {
-                nodeLabel: nodeLabel,
-                productName: productName,
-                productLabel: productLabel,
-                serialNumber: serialNumber,
+                nodeLabel: this.nodeLabel,
+                productName: this.productName,
+                productLabel: this.productLabel,
+                serialNumber: this.serialNumber,
                 reachable: true,
             },
         });
-        this.#endpoint.events.onOff.onOff$Changed.on(value => {
-            logger.info(`onOff value changed to ${value}`);
+        endpoint.events.onOff.onOff$Changed.on(value => {
             this.sendBridgeEvent("onOff","onOff", value);
         });
-        this.#endpoint.events.levelControl.currentLevel$Changed.on(value => {
-            logger.info(`levelControl value changed to ${value}`);
+        endpoint.events.levelControl.currentLevel$Changed.on(value => {
             this.sendBridgeEvent("levelControl","currentLevel", value);
         });
-    }
-    
-    get endpoint() {
-        return this.#endpoint;
+
+        return endpoint;
+        // if (attributeMap.onOff != undefined) {
+        //     this.updateState("onOff", "onOff", attributeMap.onOff);
+        // }
+        // if (attributeMap.currentLevel != undefined) {
+        //     this.updateState("levelControl", "currentLevel", attributeMap.currentLevel);
+        // }
     }
 }

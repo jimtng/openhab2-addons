@@ -59,13 +59,12 @@ public class MatterBridge implements MatterClientListener {
     private static final String CONFIG_PID = "org.openhab.matter";
     private static final String CONFIG_URI = "io:matter";
 
-    private static final String PRODUCT_NAME = "openHAB Matter Bridge";
     private static final String VENDOR_NAME = "openHAB";
     private static final String DEVICE_NAME = "Bridge Device";
     private static final String PRODUCT_ID = "0001";
     private static final String VENDOR_ID = "65521";
     // this will be used in the name of the storage directory
-    private static final String UNIQUE_ID = "OH-0001";
+    private static final String UNIQUE_ID = "bridge-0";
 
     private final Map<String, GenericDevice> devices = new HashMap<>();
 
@@ -94,7 +93,6 @@ public class MatterBridge implements MatterClientListener {
         this.client = new MatterBridgeClient();
         this.settings = new MatterBridgeSettings();
 
-        // TODO execute a timer and wait for changes to stop, then process new/updated/delete items/metadata
         itemRegistryChangeListener = new ItemRegistryChangeListener() {
             @Override
             public void added(Item element) {
@@ -137,8 +135,9 @@ public class MatterBridge implements MatterClientListener {
     @Activate
     public void activate(Map<String, Object> properties) {
         logger.debug("Activating Matter Bridge");
-        this.settings = parseConfig(properties);
-        connectClient();
+        if (!parseConfig(properties)) {
+            connectClient();
+        }
     }
 
     @Deactivate
@@ -151,14 +150,9 @@ public class MatterBridge implements MatterClientListener {
 
     @Modified
     protected synchronized void modified(Map<String, Object> properties) {
-        try {
-            settings = parseConfig(properties);
-            if (resetBridge) {
-                stopClient();
-                scheduler.schedule(this::connectClient, 5, TimeUnit.SECONDS);
-            }
-        } catch (Exception e) {
-            logger.error("Error processing modified configuration", e);
+        if (!parseConfig(properties)) {
+            stopClient();
+            scheduler.schedule(this::connectClient, 5, TimeUnit.SECONDS);
         }
     }
 
@@ -179,13 +173,15 @@ public class MatterBridge implements MatterClientListener {
 
             paramsMap.put("service", "bridge");
             paramsMap.put("storagePath", folder.getAbsolutePath());
+
+            // default values the bridge exposes to clients
             paramsMap.put("deviceName", DEVICE_NAME);
             paramsMap.put("vendorName", VENDOR_NAME);
             paramsMap.put("vendorId", VENDOR_ID);
-            paramsMap.put("productName", PRODUCT_NAME);
             paramsMap.put("productId", PRODUCT_ID);
             paramsMap.put("uniqueId", UNIQUE_ID);
 
+            paramsMap.put("productName", settings.bridgeName);
             paramsMap.put("passcode", String.valueOf(settings.passcode));
             paramsMap.put("discriminator", String.valueOf(settings.discriminator));
             paramsMap.put("port", String.valueOf(settings.port));
@@ -204,6 +200,10 @@ public class MatterBridge implements MatterClientListener {
 
     public void stopClient() {
         logger.debug("Stopping Matter Bridge Client");
+        ScheduledFuture<?> modifyFuture = this.modifyFuture;
+        if (modifyFuture != null) {
+            modifyFuture.cancel(true);
+        }
         MatterBridgeClient client = this.client;
         if (client != null) {
             client.removeListener(this);
@@ -214,7 +214,7 @@ public class MatterBridge implements MatterClientListener {
         bridgeInitialized = false;
     }
 
-    public MatterBridgeSettings parseConfig(Map<String, Object> properties) {
+    public boolean parseConfig(Map<String, Object> properties) {
         logger.debug("Parse Config Matter Bridge");
 
         Dictionary<String, Object> props = null;
@@ -233,24 +233,48 @@ public class MatterBridge implements MatterClientListener {
             props = new Hashtable<>();
         }
 
-        Object resetObject = props.get("resetBridge");
-        if (resetObject instanceof Boolean reset && reset) {
-            logger.debug("Resetting Bridge");
-            props.put("resetBridge", false);
-            resetBridge = true;
-        } else {
-            resetBridge = false;
+        // A discriminator uniquely identifies a Matter device on the IPV6 network, 12-bit integer (0-4095)
+        int discriminator = -1;
+        @Nullable
+        Object discriminatorProp = props.get("discriminator");
+        if (discriminatorProp instanceof String discriminatorString) {
+            try {
+                discriminator = Integer.parseInt(discriminatorString);
+            } catch (NumberFormatException e) {
+                logger.debug("Could not parse discriminator {}", discriminatorString);
+            }
+        } else if (discriminatorProp instanceof Integer discriminatorInteger) {
+            discriminator = discriminatorInteger;
         }
-        settings.resetBridge = false;
 
+        // randomly create one if not set
+        if (discriminator < 0) {
+            Random random = new Random();
+            discriminator = random.nextInt(4096);
+        }
+
+        props.put("discriminator", discriminator);
+        settings.discriminator = discriminator;
+
+        // reset option. this is tricky, we want to detect this change, but not persist it (so change it back). This
+        // causes reactivation of this service.
+        if (!resetBridge || settings.resetBridge) {
+            resetBridge = true;
+            // reset bridge should never persist true
+            props.put("resetBridge", false);
+            settings.resetBridge = false;
+        }
+
+        boolean changed = false;
         if (config != null) {
             try {
-                config.updateIfDifferent(props);
+                changed = config.updateIfDifferent(props);
             } catch (IOException e) {
                 logger.warn("cannot update configuration {}", e.getMessage());
             }
         }
-        return settings;
+        this.settings = settings;
+        return changed;
     }
 
     @Override
@@ -327,10 +351,13 @@ public class MatterBridge implements MatterClientListener {
                     }
                     if (device != null) {
                         final GenericDevice finalDevice = device;
-                        finalDevice.registerDevice().thenAccept(node -> {
+                        try {
+                            String node = finalDevice.registerDevice().get();
                             logger.info("Registered item {} with node {}", item.getName(), node);
                             devices.put(item.getName(), finalDevice);
-                        });
+                        } catch (InterruptedException | ExecutionException e) {
+                            logger.debug("Could not register device with bridge", e);
+                        }
                     }
                 } catch (ItemNotFoundException e) {
                     logger.debug("Could not find item {}", uid.getItemName(), e);

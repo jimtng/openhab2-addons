@@ -8,12 +8,15 @@ const logger = Logger.get("GenericDevice");
 export abstract class GenericDevice {
     
     protected updateLocks = new Set<string>();
+    endpoint: Endpoint;
 
-    constructor(protected bridgeController : BridgeController, protected attributeMap: { [key: string]: any }) {
+    constructor(protected bridgeController: BridgeController, protected attributeMap: { [key: string]: any }, protected endpointId: string, protected  nodeLabel: string, protected productName: string, protected productLabel: string, protected serialNumber: string) {
+        this.nodeLabel = this.truncateString(nodeLabel);
+        this.endpoint = this.createEndpoint();
     }
-    
-    abstract get endpoint(): Endpoint;
 
+    abstract createEndpoint(): Endpoint;
+    
     async updateState(clusterName: string, attributeName: string, attributeValue: any) {
         const args = {} as { [key: string]: any }
         args[clusterName] = {} as { [key: string]: any }
@@ -41,7 +44,11 @@ export abstract class GenericDevice {
     }
 
     sendEvent(eventName: string, data: any) {
-        console.log(`Sending event: ${eventName} with data: ${data}`);
+        logger.debug(`Sending event: ${eventName} with data: ${data}`);
         this.bridgeController.ws.sendEvent(eventName, data)
+    }
+
+    truncateString(str: string, maxLength: number = 32): string {
+        return str.slice(0, maxLength);
     }
 }

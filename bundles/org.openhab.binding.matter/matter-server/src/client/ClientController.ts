@@ -8,8 +8,6 @@ import { Request, MessageType, EventType } from '../MessageTypes';
 import { Controller } from "../Controller";
 import { convertJsonFile } from "../util/storageConverter"
 
-import * as path from 'path';
-
 const logger = Logger.get("ClientController");
 
 /**
