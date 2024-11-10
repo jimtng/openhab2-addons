@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * DeviceEnergyManagement
@@ -512,7 +513,7 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
     }
 
     // Enums
-    public enum CostTypeEnum {
+    public enum CostTypeEnum implements MatterEnum {
         FINANCIAL(0, "Financial"),
         GHG_EMISSIONS(1, "GhgEmissions"),
         COMFORT(2, "Comfort"),
@@ -525,9 +526,19 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ESATypeEnum {
+    public enum ESATypeEnum implements MatterEnum {
         EVSE(0, "Evse"),
         SPACE_HEATING(1, "SpaceHeating"),
         WATER_HEATING(2, "WaterHeating"),
@@ -551,9 +562,19 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ESAStateEnum {
+    public enum ESAStateEnum implements MatterEnum {
         OFFLINE(0, "Offline"),
         ONLINE(1, "Online"),
         FAULT(2, "Fault"),
@@ -567,9 +588,19 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum OptOutStateEnum {
+    public enum OptOutStateEnum implements MatterEnum {
         NO_OPT_OUT(0, "NoOptOut"),
         LOCAL_OPT_OUT(1, "LocalOptOut"),
         GRID_OPT_OUT(2, "GridOptOut"),
@@ -582,9 +613,19 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum CauseEnum {
+    public enum CauseEnum implements MatterEnum {
         NORMAL_COMPLETION(0, "NormalCompletion"),
         OFFLINE(1, "Offline"),
         FAULT(2, "Fault"),
@@ -598,9 +639,19 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum AdjustmentCauseEnum {
+    public enum AdjustmentCauseEnum implements MatterEnum {
         LOCAL_OPTIMIZATION(0, "LocalOptimization"),
         GRID_OPTIMIZATION(1, "GridOptimization");
 
@@ -611,9 +662,19 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ForecastUpdateReasonEnum {
+    public enum ForecastUpdateReasonEnum implements MatterEnum {
         INTERNAL_OPTIMIZATION(0, "InternalOptimization"),
         LOCAL_OPTIMIZATION(1, "LocalOptimization"),
         GRID_OPTIMIZATION(2, "GridOptimization");
@@ -624,6 +685,16 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
         private ForecastUpdateReasonEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

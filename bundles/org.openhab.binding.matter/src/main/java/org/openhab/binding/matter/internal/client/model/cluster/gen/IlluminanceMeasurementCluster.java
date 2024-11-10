@@ -1,5 +1,4 @@
 /**
- * 
  * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
@@ -19,6 +18,7 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 import java.math.BigInteger;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * IlluminanceMeasurement
@@ -63,7 +63,7 @@ public class IlluminanceMeasurementCluster extends BaseCluster {
     public Integer lightSensorType; // 4 uint8 R V
 
     // Enums
-    public enum LightSensorTypeEnum {
+    public enum LightSensorTypeEnum implements MatterEnum {
         PHOTODIODE(0, "Photodiode"),
         CMOS(1, "Cmos");
 
@@ -73,6 +73,16 @@ public class IlluminanceMeasurementCluster extends BaseCluster {
         private LightSensorTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

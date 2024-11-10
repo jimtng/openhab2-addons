@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * TimeFormatLocalization
@@ -54,7 +55,7 @@ public class TimeFormatLocalizationCluster extends BaseCluster {
     public List<CalendarTypeEnum> supportedCalendarTypes; // 2 list R V
 
     // Enums
-    public enum HourFormatEnum {
+    public enum HourFormatEnum implements MatterEnum {
         V12HR(0, "12Hr"),
         V24HR(1, "24Hr"),
         USE_ACTIVE_LOCALE(255, "UseActiveLocale");
@@ -66,9 +67,19 @@ public class TimeFormatLocalizationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum CalendarTypeEnum {
+    public enum CalendarTypeEnum implements MatterEnum {
         BUDDHIST(0, "Buddhist"),
         CHINESE(1, "Chinese"),
         COPTIC(2, "Coptic"),
@@ -89,6 +100,16 @@ public class TimeFormatLocalizationCluster extends BaseCluster {
         private CalendarTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

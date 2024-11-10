@@ -8,8 +8,10 @@ import { AggregatorEndpoint } from "@matter/node/endpoints";
 import { Environment, Logger } from "@matter/general";
 import { GenericDevice } from "./devices/GenericDevice";
 import { OnOffDevice } from "./devices/OnOffDevice";
+import { OnOffPlugInDevice } from "./devices/OnOffPlugInDevice";
 import { DimmableDevice } from "./devices/DimmableDevice";
 import { ThermoDevice } from "./devices/ThermoDevice";
+import { WindowCoveringDeviceType } from "./devices/WindowCoveringDeviceType";
 import { BridgeController } from "./BridgeController";
 const logger = Logger.get("DeviceNode");
 
@@ -116,11 +118,17 @@ export class DeviceNode {
             case "OnOffLightDevice":
                 device = new OnOffDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
+            case "OnOffPlugInUnitDevice":
+                device = new OnOffPlugInDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
             case "DimmableLightDevice":
                 device = new DimmableDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             case "ThermostatDevice":
                 device = new ThermoDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "WindowCoveringDevice":
+                device = new WindowCoveringDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             default:
                 logger.error(`Unsupported device type ${deviceType}`);

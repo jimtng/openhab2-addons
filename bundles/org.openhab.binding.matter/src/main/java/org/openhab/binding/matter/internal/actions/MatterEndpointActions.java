@@ -21,6 +21,7 @@ import org.openhab.binding.matter.internal.MatterControllerClient;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.handler.EndpointHandler;
 import org.openhab.core.automation.annotation.ActionOutput;
+import org.openhab.core.automation.annotation.ActionOutputs;
 import org.openhab.core.automation.annotation.RuleAction;
 import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.binding.ThingActionsScope;
@@ -51,7 +52,9 @@ public class MatterEndpointActions implements ThingActions {
     }
 
     @RuleAction(label = "generate a new pairing code for a Matter device", description = "Generates a new manual and QR pairing code to be used to pair the Matter device with an external Matter controller")
-    public @Nullable @ActionOutput(name = "manualPairingCode", label = "manual pairing code", type = "java.lang.String") @ActionOutput(name = "qrPairingCode", label = "QR pairing code", type = "java.lang.String") Map<String, String> generateNewPairingCode() {
+    public @Nullable @ActionOutputs({
+            @ActionOutput(name = "manualPairingCode", label = "Manual pairing code", type = "java.lang.String"),
+            @ActionOutput(name = "qrPairingCode", label = "QR pairing code", type = "qrCode") }) Map<String, Object> generateNewPairingCode() {
         EndpointHandler handler = this.handler;
         if (handler != null) {
             MatterControllerClient client = handler.getClient();

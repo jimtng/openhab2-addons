@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ColorControl
@@ -292,7 +293,7 @@ public class ColorControlCluster extends BaseCluster {
      * drift over time. It shall be one of the non-reserved values in Values of the DriftCompensation Attribute.
      * ### Table 8. Values of the DriftCompensation Attribute
      */
-    public enum DriftCompensation {
+    public enum DriftCompensation implements MatterEnum {
         NONE(0, "None"),
         OTHER_UNKNOWN(1, "OtherUnknown"),
         TEMPERATURE_MONITORING(2, "TemperatureMonitoring"),
@@ -306,6 +307,16 @@ public class ColorControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
@@ -314,7 +325,7 @@ public class ColorControlCluster extends BaseCluster {
      * section Commands to the appropriate mode for that command.
      * Table 9. Values of the ColorMode Attribute
      */
-    public enum ColorMode {
+    public enum ColorMode implements MatterEnum {
         CURRENT_HUE_AND_CURRENT_SATURATION(0, "CurrentHueAndCurrentSaturation"),
         CURRENT_XAND_CURRENT_Y(1, "CurrentXAndCurrentY"),
         COLOR_TEMPERATURE_MIREDS(2, "ColorTemperatureMireds");
@@ -325,6 +336,16 @@ public class ColorControlCluster extends BaseCluster {
         private ColorMode(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 
@@ -337,7 +358,7 @@ public class ColorControlCluster extends BaseCluster {
      * e.g., due to one of the standard Color Control cluster commands defined in the ZCL, its new value shall be copied
      * to the EnhancedColorMode attribute.
      */
-    public enum EnhancedColorMode {
+    public enum EnhancedColorMode implements MatterEnum {
         CURRENT_HUE_AND_CURRENT_SATURATION(0, "CurrentHueAndCurrentSaturation"),
         CURRENT_XAND_CURRENT_Y(1, "CurrentXAndCurrentY"),
         COLOR_TEMPERATURE_MIREDS(2, "ColorTemperatureMireds"),
@@ -350,6 +371,16 @@ public class ColorControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
@@ -357,7 +388,7 @@ public class ColorControlCluster extends BaseCluster {
      * value 0, the color loop shall not be active. If this attribute has the value 1, the color loop shall be active.
      * All other values (2 to 254) are reserved.
      */
-    public enum ColorLoopActive {
+    public enum ColorLoopActive implements MatterEnum {
         INACTIVE(0, "Inactive"),
         ACTIVE(1, "Active");
 
@@ -368,6 +399,16 @@ public class ColorControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
@@ -375,7 +416,7 @@ public class ColorControlCluster extends BaseCluster {
      * value 0, the EnhancedCurrentHue attribute shall be decremented. If this attribute has the value 1, the
      * EnhancedCurrentHue attribute shall be incremented. All other values (2 to 254) are reserved.
      */
-    public enum ColorLoopDirection {
+    public enum ColorLoopDirection implements MatterEnum {
         DECREMENT(0, "Decrement"),
         INCREMENT(1, "Increment");
 
@@ -386,9 +427,19 @@ public class ColorControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum MoveMode {
+    public enum MoveMode implements MatterEnum {
         STOP(0, "Stop"),
         UP(1, "Up"),
         DOWN(3, "Down");
@@ -400,9 +451,19 @@ public class ColorControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StepMode {
+    public enum StepMode implements MatterEnum {
         UP(1, "Up"),
         DOWN(3, "Down");
 
@@ -413,9 +474,19 @@ public class ColorControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum Direction {
+    public enum Direction implements MatterEnum {
         SHORTEST_DISTANCE(0, "ShortestDistance"),
         LONGEST_DISTANCE(1, "LongestDistance"),
         UP(2, "Up"),
@@ -427,6 +498,16 @@ public class ColorControlCluster extends BaseCluster {
         private Direction(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

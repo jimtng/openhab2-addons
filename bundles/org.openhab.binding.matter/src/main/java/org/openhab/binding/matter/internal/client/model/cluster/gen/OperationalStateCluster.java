@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OperationalState
@@ -147,7 +148,7 @@ public class OperationalStateCluster extends BaseCluster {
      * the Basic Information cluster.
      * The following table defines the generally applicable states.
      */
-    public enum OperationalStateEnum {
+    public enum OperationalStateEnum implements MatterEnum {
         DEFAULT(0, "Default");
 
         public final Integer value;
@@ -156,6 +157,16 @@ public class OperationalStateCluster extends BaseCluster {
         private OperationalStateEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 
@@ -175,7 +186,7 @@ public class OperationalStateCluster extends BaseCluster {
      * The set of ErrorStateID field values defined in each of the generic or derived Operational State cluster
      * specifications is called ErrorState.
      */
-    public enum ErrorStateEnum {
+    public enum ErrorStateEnum implements MatterEnum {
         DEFAULT(0, "Default");
 
         public final Integer value;
@@ -185,12 +196,22 @@ public class OperationalStateCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * The following table defines the generally applicable ErrorState values.
      */
-    public enum GeneralErrorStateEnum {
+    public enum GeneralErrorStateEnum implements MatterEnum {
         NO_ERROR(0, "NoError"),
         UNABLE_TO_START_OR_RESUME(1, "UnableToStartOrResume"),
         UNABLE_TO_COMPLETE_OPERATION(2, "UnableToCompleteOperation"),
@@ -202,6 +223,16 @@ public class OperationalStateCluster extends BaseCluster {
         private GeneralErrorStateEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * LevelControl
@@ -120,7 +121,7 @@ public class LevelControlCluster extends BaseCluster {
     public Integer startUpCurrentLevel; // 16384 uint8 RW VM
 
     // Enums
-    public enum MoveModeEnum {
+    public enum MoveModeEnum implements MatterEnum {
         UP(0, "Up"),
         DOWN(1, "Down");
 
@@ -131,9 +132,19 @@ public class LevelControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StepModeEnum {
+    public enum StepModeEnum implements MatterEnum {
         UP(0, "Up"),
         DOWN(1, "Down");
 
@@ -143,6 +154,16 @@ public class LevelControlCluster extends BaseCluster {
         private StepModeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

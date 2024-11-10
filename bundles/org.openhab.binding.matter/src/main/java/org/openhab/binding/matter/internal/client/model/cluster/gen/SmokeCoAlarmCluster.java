@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * SmokeCoAlarm
@@ -110,7 +111,7 @@ public class SmokeCoAlarmCluster extends BaseCluster {
     public Integer expiryDate; // 12 epoch-s R V
 
     // Enums
-    public enum AlarmStateEnum {
+    public enum AlarmStateEnum implements MatterEnum {
         NORMAL(0, "Normal"),
         WARNING(1, "Warning"),
         CRITICAL(2, "Critical");
@@ -122,9 +123,19 @@ public class SmokeCoAlarmCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum SensitivityEnum {
+    public enum SensitivityEnum implements MatterEnum {
         HIGH(0, "High"),
         STANDARD(1, "Standard"),
         LOW(2, "Low");
@@ -136,9 +147,19 @@ public class SmokeCoAlarmCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ExpressedStateEnum {
+    public enum ExpressedStateEnum implements MatterEnum {
         NORMAL(0, "Normal"),
         SMOKE_ALARM(1, "SmokeAlarm"),
         CO_ALARM(2, "CoAlarm"),
@@ -156,9 +177,19 @@ public class SmokeCoAlarmCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum MuteStateEnum {
+    public enum MuteStateEnum implements MatterEnum {
         NOT_MUTED(0, "NotMuted"),
         MUTED(1, "Muted");
 
@@ -169,9 +200,19 @@ public class SmokeCoAlarmCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EndOfServiceEnum {
+    public enum EndOfServiceEnum implements MatterEnum {
         NORMAL(0, "Normal"),
         EXPIRED(1, "Expired");
 
@@ -182,9 +223,19 @@ public class SmokeCoAlarmCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ContaminationStateEnum {
+    public enum ContaminationStateEnum implements MatterEnum {
         NORMAL(0, "Normal"),
         LOW(1, "Low"),
         WARNING(2, "Warning"),
@@ -196,6 +247,16 @@ public class SmokeCoAlarmCluster extends BaseCluster {
         private ContaminationStateEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

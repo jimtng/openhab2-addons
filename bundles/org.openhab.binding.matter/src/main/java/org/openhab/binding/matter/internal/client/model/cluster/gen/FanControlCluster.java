@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * FanControl
@@ -124,7 +125,7 @@ public class FanControlCluster extends BaseCluster {
     public AirflowDirectionEnum airflowDirection; // 11 AirflowDirectionEnum RW VO
 
     // Enums
-    public enum StepDirectionEnum {
+    public enum StepDirectionEnum implements MatterEnum {
         INCREASE(0, "Increase"),
         DECREASE(1, "Decrease");
 
@@ -135,9 +136,19 @@ public class FanControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum AirflowDirectionEnum {
+    public enum AirflowDirectionEnum implements MatterEnum {
         FORWARD(0, "Forward"),
         REVERSE(1, "Reverse");
 
@@ -148,9 +159,19 @@ public class FanControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum FanModeEnum {
+    public enum FanModeEnum implements MatterEnum {
         OFF(0, "Off"),
         LOW(1, "Low"),
         MEDIUM(2, "Medium"),
@@ -166,9 +187,19 @@ public class FanControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum FanModeSequenceEnum {
+    public enum FanModeSequenceEnum implements MatterEnum {
         OFF_LOW_MED_HIGH(0, "OffLowMedHigh"),
         OFF_LOW_HIGH(1, "OffLowHigh"),
         OFF_LOW_MED_HIGH_AUTO(2, "OffLowMedHighAuto"),
@@ -182,6 +213,16 @@ public class FanControlCluster extends BaseCluster {
         private FanModeSequenceEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

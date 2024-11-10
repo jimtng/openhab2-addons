@@ -10,6 +10,7 @@ const logger = Logger.get("BridgeController");
 export class BridgeController extends Controller {
 
     deviceNode!: DeviceNode
+    uniqueId: string;
     constructor(override ws: WebSocketSession, override params: URLSearchParams) {
         super(ws, params);
         let storagePath = this.params.get('storagePath');
@@ -35,8 +36,12 @@ export class BridgeController extends Controller {
         }
 
         this.deviceNode = new DeviceNode(this, storagePath, resetStorage, deviceName, vendorName, parseInt(passcode), parseInt(discriminator), parseInt(vendorId), productName, parseInt(productId), parseInt(port), uniqueId);
+        this.uniqueId = uniqueId;
     }
-
+    override id(): string {
+        return "bridge-" + this.uniqueId;
+    }
+    
     async init() {
         await this.deviceNode.init();
     }

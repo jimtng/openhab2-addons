@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * TimeSynchronization
@@ -234,7 +235,7 @@ public class TimeSynchronizationCluster extends BaseCluster {
     }
 
     // Enums
-    public enum GranularityEnum {
+    public enum GranularityEnum implements MatterEnum {
         NO_TIME_GRANULARITY(0, "NoTimeGranularity"),
         MINUTES_GRANULARITY(1, "MinutesGranularity"),
         SECONDS_GRANULARITY(2, "SecondsGranularity"),
@@ -248,9 +249,19 @@ public class TimeSynchronizationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum TimeSourceEnum {
+    public enum TimeSourceEnum implements MatterEnum {
         NONE(0, "None"),
         UNKNOWN(1, "Unknown"),
         ADMIN(2, "Admin"),
@@ -276,6 +287,16 @@ public class TimeSynchronizationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
@@ -283,7 +304,7 @@ public class TimeSynchronizationCluster extends BaseCluster {
      * may be used to omit historical data, less commonly used time zones, and/or time zones not related to the region a
      * product is sold in.
      */
-    public enum TimeZoneDatabaseEnum {
+    public enum TimeZoneDatabaseEnum implements MatterEnum {
         FULL(0, "Full"),
         PARTIAL(1, "Partial"),
         NONE(2, "None");
@@ -295,9 +316,19 @@ public class TimeSynchronizationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusCodeEnum {
+    public enum StatusCodeEnum implements MatterEnum {
         TIME_NOT_ACCEPTED(2, "TimeNotAccepted");
 
         public final Integer value;
@@ -306,6 +337,16 @@ public class TimeSynchronizationCluster extends BaseCluster {
         private StatusCodeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

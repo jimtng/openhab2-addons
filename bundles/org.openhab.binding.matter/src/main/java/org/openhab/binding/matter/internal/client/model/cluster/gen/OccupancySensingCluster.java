@@ -18,6 +18,7 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 import java.math.BigInteger;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OccupancySensing
@@ -92,7 +93,7 @@ public class OccupancySensingCluster extends BaseCluster {
     public Integer physicalContactUnoccupiedToOccupiedThreshold; // 50 uint8 RW VM
 
     // Enums
-    public enum OccupancySensorTypeEnum {
+    public enum OccupancySensorTypeEnum implements MatterEnum {
         PIR(0, "Pir"),
         ULTRASONIC(1, "Ultrasonic"),
         PIR_AND_ULTRASONIC(2, "PirAndUltrasonic"),
@@ -104,6 +105,16 @@ public class OccupancySensingCluster extends BaseCluster {
         private OccupancySensorTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

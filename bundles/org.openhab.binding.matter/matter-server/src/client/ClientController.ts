@@ -7,6 +7,7 @@ import { WebSocketSession } from "../app";
 import { Request, MessageType, EventType } from '../MessageTypes';
 import { Controller } from "../Controller";
 import { convertJsonFile } from "../util/storageConverter"
+import { toJson } from "@matter/main";
 
 const logger = Logger.get("ClientController");
 
@@ -18,7 +19,7 @@ export class ClientController extends Controller {
     nodes?: Nodes;
     clusters?: Clusters;
     theNode: MatterNode;
-    
+    controllerName: string;
     constructor(override ws: WebSocketSession, override params: URLSearchParams) {
         super(ws, params);
         const stringId = this.params.get('nodeId');
@@ -36,9 +37,13 @@ export class ClientController extends Controller {
             storagePath = outputDir;
             controllerName = name;
         }
+        this.controllerName = controllerName;
         this.theNode = new MatterNode(storagePath, controllerName, nodeId);
     }
 
+    id(): string {
+        return "client-" + this.controllerName;
+    }
     async init() {
         await this.theNode.initialize();
         logger.info(`Started Node`);
@@ -69,7 +74,9 @@ export class ClientController extends Controller {
     }
 
     async close() {
-        return this.theNode?.close();
+        logger.info(`Closing Node`);
+        await this.theNode?.close();
+        logger.info(`Node Closed`);
     }
 
      executeCommand(namespace: string, functionName: string, args: any[]): any | Promise<any> {

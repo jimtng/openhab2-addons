@@ -145,7 +145,7 @@ public class WindowCoveringCluster extends BaseCluster {
     public SafetyStatusBitmap safetyStatus; // 26 SafetyStatusBitmap R V
 
     // Enums
-    public enum TypeEnum {
+    public enum TypeEnum implements MatterEnum {
         ROLLERSHADE(0, "Rollershade"),
         ROLLERSHADE2MOTOR(1, "Rollershade2Motor"),
         ROLLERSHADE_EXTERIOR(2, "RollershadeExterior"),
@@ -165,9 +165,19 @@ public class WindowCoveringCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EndProductTypeEnum {
+    public enum EndProductTypeEnum implements MatterEnum {
         ROLLER_SHADE(0, "RollerShade"),
         ROMAN_SHADE(1, "RomanShade"),
         BALLOON_SHADE(2, "BalloonShade"),
@@ -201,12 +211,22 @@ public class WindowCoveringCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * Values for OperationalStatus attribute fields.
      */
-    public enum MovementStatus {
+    public enum MovementStatus implements MatterEnum {
         STOPPED(0, "Stopped"),
         OPENING(1, "Opening"),
         CLOSING(2, "Closing");
@@ -217,6 +237,16 @@ public class WindowCoveringCluster extends BaseCluster {
         private MovementStatus(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

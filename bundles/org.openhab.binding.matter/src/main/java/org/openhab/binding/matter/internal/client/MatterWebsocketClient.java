@@ -60,7 +60,8 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
     private final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool("matter.MatterWebsocketClient");
     protected final Gson gson = new GsonBuilder().registerTypeAdapter(Node.class, new NodeDeserializer())
-            .registerTypeAdapter(BigInteger.class, new BigIntegerSerializer()).create();
+            .registerTypeAdapter(BigInteger.class, new BigIntegerSerializer())
+            .registerTypeHierarchyAdapter(BaseCluster.MatterEnum.class, new MatterEnumDeserializer()).create();
     private final WebSocketClient client = new WebSocketClient();
     private final ConcurrentHashMap<String, CompletableFuture<JsonElement>> pendingRequests = new ConcurrentHashMap<>();
     private final CopyOnWriteArrayList<MatterClientListener> clientListeners = new CopyOnWriteArrayList<>();
@@ -452,6 +453,25 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
         @Override
         public JsonElement serialize(BigInteger src, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(src.toString());
+        }
+    }
+
+    @NonNullByDefault({})
+    class MatterEnumDeserializer implements JsonDeserializer<BaseCluster.MatterEnum> {
+        @SuppressWarnings("null")
+        @Override
+        public BaseCluster.MatterEnum deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+            int value = json.getAsInt();
+            Class<?> rawType = (Class<?>) typeOfT;
+
+            if (BaseCluster.MatterEnum.class.isAssignableFrom(rawType) && rawType.isEnum()) {
+                @SuppressWarnings("unchecked")
+                Class<? extends BaseCluster.MatterEnum> enumType = (Class<? extends BaseCluster.MatterEnum>) rawType;
+                return BaseCluster.MatterEnum.fromValue(enumType, value);
+            }
+
+            throw new JsonParseException("Unable to deserialize " + typeOfT);
         }
     }
 }

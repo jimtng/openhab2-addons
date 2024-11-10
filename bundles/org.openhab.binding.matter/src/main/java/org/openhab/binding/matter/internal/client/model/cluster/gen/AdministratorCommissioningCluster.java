@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * AdministratorCommissioning
@@ -62,7 +63,7 @@ public class AdministratorCommissioningCluster extends BaseCluster {
     public Integer adminVendorId; // 2 vendor-id R V
 
     // Enums
-    public enum CommissioningWindowStatusEnum {
+    public enum CommissioningWindowStatusEnum implements MatterEnum {
         WINDOW_NOT_OPEN(0, "WindowNotOpen"),
         ENHANCED_WINDOW_OPEN(1, "EnhancedWindowOpen"),
         BASIC_WINDOW_OPEN(2, "BasicWindowOpen");
@@ -74,9 +75,19 @@ public class AdministratorCommissioningCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusCodeEnum {
+    public enum StatusCodeEnum implements MatterEnum {
         BUSY(2, "Busy"),
         PAKE_PARAMETER_ERROR(3, "PakeParameterError"),
         WINDOW_NOT_OPEN(4, "WindowNotOpen");
@@ -87,6 +98,16 @@ public class AdministratorCommissioningCluster extends BaseCluster {
         private StatusCodeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

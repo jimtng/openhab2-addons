@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * EnergyPreference
@@ -108,7 +109,7 @@ public class EnergyPreferenceCluster extends BaseCluster {
     }
 
     // Enums
-    public enum EnergyPriorityEnum {
+    public enum EnergyPriorityEnum implements MatterEnum {
         COMFORT(0, "Comfort"),
         SPEED(1, "Speed"),
         EFFICIENCY(2, "Efficiency"),
@@ -120,6 +121,16 @@ public class EnergyPreferenceCluster extends BaseCluster {
         private EnergyPriorityEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

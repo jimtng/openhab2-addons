@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OtaSoftwareUpdateProvider
@@ -39,7 +40,7 @@ public class OtaSoftwareUpdateProviderCluster extends BaseCluster {
     /**
      * See Section 11.20.3.2, “Querying the OTA Provider” for the semantics of these values.
      */
-    public enum StatusEnum {
+    public enum StatusEnum implements MatterEnum {
         UPDATE_AVAILABLE(0, "UpdateAvailable"),
         BUSY(1, "Busy"),
         NOT_AVAILABLE(2, "NotAvailable"),
@@ -52,13 +53,23 @@ public class OtaSoftwareUpdateProviderCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * See Section 11.20.3.6, “Applying a software update” for the semantics of the values. This enumeration is used in
      * the Action field of the ApplyUpdateResponse command. See (Section 11.20.6.5.4.1, “Action Field”).
      */
-    public enum ApplyUpdateActionEnum {
+    public enum ApplyUpdateActionEnum implements MatterEnum {
         PROCEED(0, "Proceed"),
         AWAIT_NEXT_ACTION(1, "AwaitNextAction"),
         DISCONTINUE(2, "Discontinue");
@@ -70,13 +81,23 @@ public class OtaSoftwareUpdateProviderCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * Note that only HTTP over TLS (HTTPS) is supported (see RFC 7230). Using HTTP without TLS shall
      * NOT be supported, as there is no way to authenticate the involved participants.
      */
-    public enum DownloadProtocolEnum {
+    public enum DownloadProtocolEnum implements MatterEnum {
         BDX_SYNCHRONOUS(0, "BdxSynchronous"),
         BDX_ASYNCHRONOUS(1, "BdxAsynchronous"),
         HTTPS(2, "Https"),
@@ -88,6 +109,16 @@ public class OtaSoftwareUpdateProviderCluster extends BaseCluster {
         private DownloadProtocolEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

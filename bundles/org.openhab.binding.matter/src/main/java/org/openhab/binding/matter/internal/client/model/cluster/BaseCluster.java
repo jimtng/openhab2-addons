@@ -30,6 +30,26 @@ public abstract class BaseCluster {
     public static Map<Integer, String> ATTRIBUTE_MAPPING;
     public static Map<Integer, String> COMMAND_MAPPING;
 
+    public interface MatterEnum {
+        Integer getValue();
+
+        String getLabel();
+
+        public static <E extends MatterEnum> E fromValue(Class<E> enumClass, int value) {
+            E[] constants = enumClass.getEnumConstants();
+            if (constants != null) {
+                for (E enumConstant : constants) {
+                    if (enumConstant != null) {
+                        if (enumConstant.getValue().equals(value)) {
+                            return enumConstant;
+                        }
+                    }
+                }
+            }
+            throw new IllegalArgumentException("Unknown value: " + value);
+        }
+    }
+
     public BaseCluster(BigInteger nodeId, int endpointId, int clusterId, String clusterName) {
         this.nodeId = nodeId;
         this.endpointId = endpointId;

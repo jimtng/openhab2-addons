@@ -108,7 +108,7 @@ public class OvenModeCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ModeTag {
+    public enum ModeTag implements MatterEnum {
         BAKE(16384, "Bake"),
         CONVECTION(16385, "Convection"),
         GRILL(16386, "Grill"),
@@ -127,9 +127,19 @@ public class OvenModeCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ModeChangeStatus {
+    public enum ModeChangeStatus implements MatterEnum {
         SUCCESS(0, "Success"),
         UNSUPPORTED_MODE(1, "UnsupportedMode"),
         GENERIC_FAILURE(2, "GenericFailure"),
@@ -141,6 +151,16 @@ public class OvenModeCluster extends BaseCluster {
         private ModeChangeStatus(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

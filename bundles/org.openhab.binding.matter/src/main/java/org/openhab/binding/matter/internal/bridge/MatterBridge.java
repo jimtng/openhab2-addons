@@ -22,10 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.matter.internal.bridge.devices.DimmableLightDevice;
-import org.openhab.binding.matter.internal.bridge.devices.GenericDevice;
-import org.openhab.binding.matter.internal.bridge.devices.OnOffLightDevice;
-import org.openhab.binding.matter.internal.bridge.devices.ThermostatDevice;
+import org.openhab.binding.matter.internal.bridge.devices.*;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
@@ -340,11 +337,18 @@ public class MatterBridge implements MatterClientListener {
                     switch (deviceType) {
                         case "OnOffLight":
                             device = new OnOffLightDevice(metadataRegistry, client, item);
+                            break;
+                        case "OnOffPlugInUnit":
+                            device = new OnOffPlugInUnitDevice(metadataRegistry, client, item);
+                            break;
                         case "DimmableLight":
                             device = new DimmableLightDevice(metadataRegistry, client, item);
                             break;
                         case "Thermostat":
                             device = new ThermostatDevice(metadataRegistry, client, item);
+                            break;
+                        case "WindowCovering":
+                            device = new WindowCoveringDevice(metadataRegistry, client, item);
                             break;
                         default:
                             break;

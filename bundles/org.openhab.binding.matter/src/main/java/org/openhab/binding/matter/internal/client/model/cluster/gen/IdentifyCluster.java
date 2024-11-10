@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * Identify
@@ -52,7 +53,7 @@ public class IdentifyCluster extends BaseCluster {
     public IdentifyTypeEnum identifyType; // 1 IdentifyTypeEnum R V
 
     // Enums
-    public enum IdentifyTypeEnum {
+    public enum IdentifyTypeEnum implements MatterEnum {
         NONE(0, "None"),
         LIGHT_OUTPUT(1, "LightOutput"),
         VISIBLE_INDICATOR(2, "VisibleIndicator"),
@@ -67,9 +68,19 @@ public class IdentifyCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EffectIdentifierEnum {
+    public enum EffectIdentifierEnum implements MatterEnum {
         BLINK(0, "Blink"),
         BREATHE(1, "Breathe"),
         OKAY(2, "Okay"),
@@ -84,9 +95,19 @@ public class IdentifyCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EffectVariantEnum {
+    public enum EffectVariantEnum implements MatterEnum {
         DEFAULT(0, "Default");
 
         public final Integer value;
@@ -95,6 +116,16 @@ public class IdentifyCluster extends BaseCluster {
         private EffectVariantEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

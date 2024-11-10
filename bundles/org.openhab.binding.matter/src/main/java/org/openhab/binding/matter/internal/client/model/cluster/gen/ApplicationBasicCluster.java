@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ApplicationBasic
@@ -97,7 +98,7 @@ public class ApplicationBasicCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ApplicationStatusEnum {
+    public enum ApplicationStatusEnum implements MatterEnum {
         STOPPED(0, "Stopped"),
         ACTIVE_VISIBLE_FOCUS(1, "ActiveVisibleFocus"),
         ACTIVE_HIDDEN(2, "ActiveHidden"),
@@ -109,6 +110,16 @@ public class ApplicationBasicCluster extends BaseCluster {
         private ApplicationStatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.items.SwitchItem;
@@ -46,11 +47,21 @@ public class OnOffLightDevice extends GenericDevice {
     @Override
     public void handleMatterEvent(String clusterName, String attributeName, Object data) {
         switch (attributeName) {
-            case "onOff":
-                ((SwitchItem) primaryItem).send(OnOffType.from(Boolean.valueOf(data.toString())));
+            case "onOff": {
+                if (primaryItem instanceof GroupItem groupItem) {
+                    groupItem.send(OnOffType.from(Boolean.valueOf(data.toString())));
+                } else {
+                    ((SwitchItem) primaryItem).send(OnOffType.from(Boolean.valueOf(data.toString())));
+                }
+            }
                 break;
-            case "currentLevel":
-                ((SwitchItem) primaryItem).send(OnOffType.from(data.toString()));
+            case "currentLevel": {
+                if (primaryItem instanceof GroupItem groupItem) {
+                    groupItem.send(OnOffType.from(data.toString()));
+                } else {
+                    ((SwitchItem) primaryItem).send(OnOffType.from(data.toString()));
+                }
+            }
                 break;
             default:
                 break;

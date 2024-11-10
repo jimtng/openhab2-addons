@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ModeSelect
@@ -150,7 +151,7 @@ public class ModeSelectCluster extends BaseCluster {
      * instance. Each standard namespace and corresponding values and value meanings shall be defined in another
      * document.
      */
-    public enum StandardNamespace {
+    public enum StandardNamespace implements MatterEnum {
         DEFAULT(0, "Default");
 
         public final Integer value;
@@ -159,6 +160,16 @@ public class ModeSelectCluster extends BaseCluster {
         private StandardNamespace(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

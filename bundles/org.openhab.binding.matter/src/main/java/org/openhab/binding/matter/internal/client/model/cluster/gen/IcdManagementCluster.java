@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * IcdManagement
@@ -145,7 +146,7 @@ public class IcdManagementCluster extends BaseCluster {
     }
 
     // Enums
-    public enum OperatingModeEnum {
+    public enum OperatingModeEnum implements MatterEnum {
         SIT(0, "Sit"),
         LIT(1, "Lit");
 
@@ -155,6 +156,16 @@ public class IcdManagementCluster extends BaseCluster {
         private OperatingModeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

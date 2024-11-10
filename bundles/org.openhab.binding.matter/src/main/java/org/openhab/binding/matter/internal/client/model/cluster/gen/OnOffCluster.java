@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OnOff
@@ -77,7 +78,7 @@ public class OnOffCluster extends BaseCluster {
     public StartUpOnOffEnum startUpOnOff; // 16387 StartUpOnOffEnum RW VM
 
     // Enums
-    public enum StartUpOnOffEnum {
+    public enum StartUpOnOffEnum implements MatterEnum {
         OFF(0, "Off"),
         ON(1, "On"),
         TOGGLE(2, "Toggle");
@@ -89,9 +90,19 @@ public class OnOffCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EffectIdentifierEnum {
+    public enum EffectIdentifierEnum implements MatterEnum {
         DELAYED_ALL_OFF(0, "DelayedAllOff"),
         DYING_LIGHT(1, "DyingLight");
 
@@ -102,9 +113,19 @@ public class OnOffCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum DelayedAllOffEffectVariantEnum {
+    public enum DelayedAllOffEffectVariantEnum implements MatterEnum {
         DELAYED_OFF_FAST_FADE(0, "DelayedOffFastFade"),
         NO_FADE(1, "NoFade"),
         DELAYED_OFF_SLOW_FADE(2, "DelayedOffSlowFade");
@@ -116,9 +137,19 @@ public class OnOffCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum DyingLightEffectVariantEnum {
+    public enum DyingLightEffectVariantEnum implements MatterEnum {
         DYING_LIGHT_FADE_OFF(0, "DyingLightFadeOff");
 
         public final Integer value;
@@ -127,6 +158,16 @@ public class OnOffCluster extends BaseCluster {
         private DyingLightEffectVariantEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

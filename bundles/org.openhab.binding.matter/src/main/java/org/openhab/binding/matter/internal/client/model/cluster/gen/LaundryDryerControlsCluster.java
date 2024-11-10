@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * LaundryDryerControls
@@ -55,7 +56,7 @@ public class LaundryDryerControlsCluster extends BaseCluster {
      * It is up to the device manufacturer to determine the mapping between the enum values and the corresponding
      * temperature level.
      */
-    public enum DrynessLevelEnum {
+    public enum DrynessLevelEnum implements MatterEnum {
         LOW(0, "Low"),
         NORMAL(1, "Normal"),
         EXTRA(2, "Extra"),
@@ -67,6 +68,16 @@ public class LaundryDryerControlsCluster extends BaseCluster {
         private DrynessLevelEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

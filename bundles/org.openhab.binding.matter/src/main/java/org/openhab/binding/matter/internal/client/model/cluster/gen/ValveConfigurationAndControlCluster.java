@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ValveConfigurationAndControl
@@ -128,7 +129,7 @@ public class ValveConfigurationAndControlCluster extends BaseCluster {
     public Integer levelStep; // 10 uint8 R V
 
     // Enums
-    public enum ValveStateEnum {
+    public enum ValveStateEnum implements MatterEnum {
         CLOSED(0, "Closed"),
         OPEN(1, "Open"),
         TRANSITIONING(2, "Transitioning");
@@ -140,9 +141,19 @@ public class ValveConfigurationAndControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusCodeEnum {
+    public enum StatusCodeEnum implements MatterEnum {
         FAILURE_DUE_TO_FAULT(2, "FailureDueToFault");
 
         public final Integer value;
@@ -151,6 +162,16 @@ public class ValveConfigurationAndControlCluster extends BaseCluster {
         private StatusCodeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

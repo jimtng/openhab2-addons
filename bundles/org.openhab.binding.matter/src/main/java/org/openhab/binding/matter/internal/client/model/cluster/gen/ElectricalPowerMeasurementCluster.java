@@ -19,8 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.MeasurementAccuracyStruct;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.MeasurementTypeEnum;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ElectricalPowerMeasurement
@@ -359,7 +358,7 @@ public class ElectricalPowerMeasurementCluster extends BaseCluster {
     }
 
     // Enums
-    public enum PowerModeEnum {
+    public enum PowerModeEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         DC(1, "Dc"),
         AC(2, "Ac");
@@ -370,6 +369,16 @@ public class ElectricalPowerMeasurementCluster extends BaseCluster {
         private PowerModeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

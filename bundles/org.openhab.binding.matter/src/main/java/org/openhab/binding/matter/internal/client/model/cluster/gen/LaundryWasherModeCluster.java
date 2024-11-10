@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * LaundryWasherMode
@@ -116,7 +117,7 @@ public class LaundryWasherModeCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ModeTag {
+    public enum ModeTag implements MatterEnum {
         NORMAL(16384, "Normal"),
         DELICATE(16385, "Delicate"),
         HEAVY(16386, "Heavy"),
@@ -129,9 +130,19 @@ public class LaundryWasherModeCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ModeChangeStatus {
+    public enum ModeChangeStatus implements MatterEnum {
         SUCCESS(0, "Success"),
         UNSUPPORTED_MODE(1, "UnsupportedMode"),
         GENERIC_FAILURE(2, "GenericFailure"),
@@ -143,6 +154,16 @@ public class LaundryWasherModeCluster extends BaseCluster {
         private ModeChangeStatus(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

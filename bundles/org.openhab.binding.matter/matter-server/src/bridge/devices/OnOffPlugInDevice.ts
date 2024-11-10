@@ -1,16 +1,16 @@
 import { Endpoint } from "@matter/node";
-import { OnOffLightDevice } from "@matter/node/devices/on-off-light";
+import { OnOffPlugInUnitDevice } from "@matter/node/devices/on-off-plug-in-unit";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { GenericDevice } from './GenericDevice'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
 import { Logger } from"@matter/general";
 
-const logger = Logger.get("OnOff");
+const logger = Logger.get("OnOffPlugInDevice");
 
-export class OnOffDevice extends GenericDevice {
+export class OnOffPlugInDevice extends GenericDevice {
     
     override createEndpoint() {
-        const endpoint = new Endpoint(OnOffLightDevice.with(BridgedDeviceBasicInformationServer), {
+        const endpoint = new Endpoint(OnOffPlugInUnitDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
                 nodeLabel: this.nodeLabel,

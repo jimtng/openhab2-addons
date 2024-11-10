@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ContentControl
@@ -251,7 +252,7 @@ public class ContentControlCluster extends BaseCluster {
     }
 
     // Enums
-    public enum DayOfWeekBitmap {
+    public enum DayOfWeekBitmap implements MatterEnum {
         SUNDAY(0, "Sunday"),
         MONDAY(1, "Monday"),
         TUESDAY(2, "Tuesday"),
@@ -267,9 +268,19 @@ public class ContentControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusCodeEnum {
+    public enum StatusCodeEnum implements MatterEnum {
         INVALID_PIN_CODE(2, "InvalidPinCode"),
         INVALID_RATING(3, "InvalidRating"),
         INVALID_CHANNEL(4, "InvalidChannel"),
@@ -287,6 +298,16 @@ public class ContentControlCluster extends BaseCluster {
         private StatusCodeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

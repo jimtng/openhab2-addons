@@ -283,8 +283,9 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 | On Off Light       | Item        | OnOffLight     |                       |
 | Dimmable Light     | Item        | DimmableLight  |                       |
 | Color Light        | Item, Group | ColorLight     | (not implemented yet) |
+| Plug In Unit       | Item        | PlugInUnit     |                       |
 | Thermostat         | Group       | Thermostat     |                       |
-| Window Covering    | Item, Group | WindowCovering | (not implemented yet) |
+| Window Covering    | Item        | WindowCovering |                       |
 | Temperature Sensor | Item        | Temperature    | (not implemented yet) |
 | Humidity Sensor    | Item        | Humidity       | (not implemented yet) |
 | Door Lock          | Group       | DoorLock       | (not implemented yet) |

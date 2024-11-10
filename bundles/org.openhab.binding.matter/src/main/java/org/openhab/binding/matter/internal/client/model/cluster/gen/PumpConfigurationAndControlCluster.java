@@ -18,6 +18,7 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 import java.math.BigInteger;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * PumpConfigurationAndControl
@@ -214,7 +215,7 @@ public class PumpConfigurationAndControlCluster extends BaseCluster {
     public ControlModeEnum controlMode; // 33 ControlModeEnum RW VM
 
     // Enums
-    public enum OperationModeEnum {
+    public enum OperationModeEnum implements MatterEnum {
         NORMAL(0, "Normal"),
         MINIMUM(1, "Minimum"),
         MAXIMUM(2, "Maximum"),
@@ -227,9 +228,19 @@ public class PumpConfigurationAndControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ControlModeEnum {
+    public enum ControlModeEnum implements MatterEnum {
         CONSTANT_SPEED(0, "ConstantSpeed"),
         CONSTANT_PRESSURE(1, "ConstantPressure"),
         PROPORTIONAL_PRESSURE(2, "ProportionalPressure"),
@@ -243,6 +254,16 @@ public class PumpConfigurationAndControlCluster extends BaseCluster {
         private ControlModeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

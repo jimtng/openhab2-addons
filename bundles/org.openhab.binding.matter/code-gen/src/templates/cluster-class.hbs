@@ -81,7 +81,7 @@ public class {{asUpperCamelCase name}}Cluster extends BaseCluster {
     * {{details}}
     */
 {{/if}}
-    public enum {{asUpperCamelCase name}} {
+    public enum {{asUpperCamelCase name}} implements MatterEnum {
 {{#if (isEmpty children)}}
         DEFAULT(0, "Default");
 {{else}}
@@ -94,6 +94,16 @@ public class {{asUpperCamelCase name}}Cluster extends BaseCluster {
         private {{asUpperCamelCase name}}(Integer value, String label){
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 {{/each}}

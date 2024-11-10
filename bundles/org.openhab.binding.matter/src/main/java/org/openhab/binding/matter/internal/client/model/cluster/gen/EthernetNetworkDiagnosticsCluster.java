@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
@@ -22,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * EthernetNetworkDiagnostics
@@ -85,7 +85,7 @@ public class EthernetNetworkDiagnosticsCluster extends BaseCluster {
     public BigInteger timeSinceReset; // 8 uint64 R V
 
     // Enums
-    public enum PHYRateEnum {
+    public enum PHYRateEnum implements MatterEnum {
         RATE10M(0, "Rate10M"),
         RATE100M(1, "Rate100M"),
         RATE1G(2, "Rate1G"),
@@ -103,6 +103,16 @@ public class EthernetNetworkDiagnosticsCluster extends BaseCluster {
         private PHYRateEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

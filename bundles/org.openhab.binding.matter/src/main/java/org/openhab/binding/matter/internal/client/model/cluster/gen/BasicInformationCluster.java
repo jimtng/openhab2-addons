@@ -258,7 +258,7 @@ public class BasicInformationCluster extends BaseCluster {
     /**
      * The data type of ProductFinishEnum is derived from enum8.
      */
-    public enum ProductFinishEnum {
+    public enum ProductFinishEnum implements MatterEnum {
         OTHER(0, "Other"),
         MATTE(1, "Matte"),
         SATIN(2, "Satin"),
@@ -273,12 +273,22 @@ public class BasicInformationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * The data type of ColorEnum is derived from enum8.
      */
-    public enum ColorEnum {
+    public enum ColorEnum implements MatterEnum {
         BLACK(0, "Black"),
         NAVY(1, "Navy"),
         GREEN(2, "Green"),
@@ -307,6 +317,16 @@ public class BasicInformationCluster extends BaseCluster {
         private ColorEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

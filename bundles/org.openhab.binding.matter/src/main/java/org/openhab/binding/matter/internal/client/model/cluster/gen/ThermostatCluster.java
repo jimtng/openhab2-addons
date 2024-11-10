@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * Thermostat
@@ -397,7 +398,7 @@ public class ThermostatCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ACCapacityFormatEnum {
+    public enum ACCapacityFormatEnum implements MatterEnum {
         BT_UH(0, "BtUh");
 
         public final Integer value;
@@ -407,9 +408,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ACCompressorTypeEnum {
+    public enum ACCompressorTypeEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         T1(1, "T1"),
         T2(2, "T2"),
@@ -422,9 +433,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ACLouverPositionEnum {
+    public enum ACLouverPositionEnum implements MatterEnum {
         CLOSED(1, "Closed"),
         OPEN(2, "Open"),
         QUARTER(3, "Quarter"),
@@ -438,9 +459,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ACRefrigerantTypeEnum {
+    public enum ACRefrigerantTypeEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         R22(1, "R22"),
         R410A(2, "R410A"),
@@ -453,9 +484,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ACTypeEnum {
+    public enum ACTypeEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         COOLING_FIXED(1, "CoolingFixed"),
         HEAT_PUMP_FIXED(2, "HeatPumpFixed"),
@@ -469,9 +510,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum SetpointRaiseLowerModeEnum {
+    public enum SetpointRaiseLowerModeEnum implements MatterEnum {
         HEAT(0, "Heat"),
         COOL(1, "Cool"),
         BOTH(2, "Both");
@@ -483,6 +534,16 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
@@ -493,7 +554,7 @@ public class ThermostatCluster extends BaseCluster {
      * Systems which support cooling or heating, requiring external intervention to change modes or where the whole
      * building must be in the same mode, SHOULD report CoolingOnly or HeatingOnly based on the current capability.
      */
-    public enum ControlSequenceOfOperationEnum {
+    public enum ControlSequenceOfOperationEnum implements MatterEnum {
         COOLING_ONLY(0, "CoolingOnly"),
         COOLING_WITH_REHEAT(1, "CoolingWithReheat"),
         HEATING_ONLY(2, "HeatingOnly"),
@@ -508,9 +569,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum SetpointChangeSourceEnum {
+    public enum SetpointChangeSourceEnum implements MatterEnum {
         MANUAL(0, "Manual"),
         SCHEDULE(1, "Schedule"),
         EXTERNAL(2, "External");
@@ -522,9 +593,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StartOfWeekEnum {
+    public enum StartOfWeekEnum implements MatterEnum {
         SUNDAY(0, "Sunday"),
         MONDAY(1, "Monday"),
         TUESDAY(2, "Tuesday"),
@@ -540,12 +621,22 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * Table 35. Interpretation of Heat, Cool and Auto SystemModeEnum Values
      */
-    public enum SystemModeEnum {
+    public enum SystemModeEnum implements MatterEnum {
         OFF(0, "Off"),
         AUTO(1, "Auto"),
         COOL(3, "Cool"),
@@ -563,9 +654,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ThermostatRunningModeEnum {
+    public enum ThermostatRunningModeEnum implements MatterEnum {
         OFF(0, "Off"),
         COOL(3, "Cool"),
         HEAT(4, "Heat");
@@ -577,9 +678,19 @@ public class ThermostatCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum TemperatureSetpointHoldEnum {
+    public enum TemperatureSetpointHoldEnum implements MatterEnum {
         SETPOINT_HOLD_OFF(0, "SetpointHoldOff"),
         SETPOINT_HOLD_ON(1, "SetpointHoldOn");
 
@@ -589,6 +700,16 @@ public class ThermostatCluster extends BaseCluster {
         private TemperatureSetpointHoldEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

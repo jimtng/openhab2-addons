@@ -11,6 +11,8 @@ export abstract class Controller {
     
     abstract init(): Promise<void>;
     abstract close(): void;
+    abstract id(): string;
+    
     abstract executeCommand(namespace: string, functionName: string, args: any[]): any | Promise<any>
 
     async handleRequest(request: Request): Promise<void> {

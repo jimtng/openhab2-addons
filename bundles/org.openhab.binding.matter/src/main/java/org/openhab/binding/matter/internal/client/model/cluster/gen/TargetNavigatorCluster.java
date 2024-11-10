@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
@@ -23,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * TargetNavigator
@@ -70,7 +70,7 @@ public class TargetNavigatorCluster extends BaseCluster {
     }
 
     // Enums
-    public enum StatusEnum {
+    public enum StatusEnum implements MatterEnum {
         SUCCESS(0, "Success"),
         TARGET_NOT_FOUND(1, "TargetNotFound"),
         NOT_ALLOWED(2, "NotAllowed");
@@ -81,6 +81,16 @@ public class TargetNavigatorCluster extends BaseCluster {
         private StatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

@@ -198,7 +198,7 @@ public class MediaPlaybackCluster extends BaseCluster {
     }
 
     // Enums
-    public enum PlaybackStateEnum {
+    public enum PlaybackStateEnum implements MatterEnum {
         PLAYING(0, "Playing"),
         PAUSED(1, "Paused"),
         NOT_PLAYING(2, "NotPlaying"),
@@ -211,9 +211,19 @@ public class MediaPlaybackCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusEnum {
+    public enum StatusEnum implements MatterEnum {
         SUCCESS(0, "Success"),
         INVALID_STATE_FOR_COMMAND(1, "InvalidStateForCommand"),
         NOT_ALLOWED(2, "NotAllowed"),
@@ -228,9 +238,19 @@ public class MediaPlaybackCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum CharacteristicEnum {
+    public enum CharacteristicEnum implements MatterEnum {
         FORCED_SUBTITLES(0, "ForcedSubtitles"),
         DESCRIBES_VIDEO(1, "DescribesVideo"),
         EASY_TO_READ(2, "EasyToRead"),
@@ -256,6 +276,16 @@ public class MediaPlaybackCluster extends BaseCluster {
         private CharacteristicEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

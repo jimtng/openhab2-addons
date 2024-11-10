@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * WiFiNetworkDiagnostics
@@ -95,7 +96,7 @@ public class WiFiNetworkDiagnosticsCluster extends BaseCluster {
     public BigInteger overrunCount; // 12 uint64 R V
 
     // Enums
-    public enum SecurityTypeEnum {
+    public enum SecurityTypeEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         NONE(1, "None"),
         WEP(2, "Wep"),
@@ -110,9 +111,19 @@ public class WiFiNetworkDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum WiFiVersionEnum {
+    public enum WiFiVersionEnum implements MatterEnum {
         A(0, "A"),
         B(1, "B"),
         G(2, "G"),
@@ -128,9 +139,19 @@ public class WiFiNetworkDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum AssociationFailureCauseEnum {
+    public enum AssociationFailureCauseEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         ASSOCIATION_FAILED(1, "AssociationFailed"),
         AUTHENTICATION_FAILED(2, "AuthenticationFailed"),
@@ -143,9 +164,19 @@ public class WiFiNetworkDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ConnectionStatusEnum {
+    public enum ConnectionStatusEnum implements MatterEnum {
         CONNECTED(0, "Connected"),
         NOT_CONNECTED(1, "NotConnected");
 
@@ -155,6 +186,16 @@ public class WiFiNetworkDiagnosticsCluster extends BaseCluster {
         private ConnectionStatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

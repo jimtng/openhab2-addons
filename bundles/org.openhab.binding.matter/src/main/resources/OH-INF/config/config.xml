@@ -31,7 +31,8 @@
 		</parameter>
 		<parameter name="discriminator" type="integer" min="0" max="4095" required="false" groupName="bridge">
 			<label>Discriminator</label>
-			<description>Defines the Matter discriminator which uniquely identifies this bridge on the network. Used for commissioning clients.</description>
+			<description>Defines the Matter discriminator which uniquely identifies this bridge on the network. Used for
+				commissioning clients.</description>
 			<advanced>true</advanced>
 		</parameter>
 		<parameter name="port" type="integer" required="true" groupName="bridge">

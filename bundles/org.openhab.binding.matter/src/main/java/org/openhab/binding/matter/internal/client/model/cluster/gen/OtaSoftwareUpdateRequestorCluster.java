@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OtaSoftwareUpdateRequestor
@@ -94,7 +95,7 @@ public class OtaSoftwareUpdateRequestorCluster extends BaseCluster {
     }
 
     // Enums
-    public enum AnnouncementReasonEnum {
+    public enum AnnouncementReasonEnum implements MatterEnum {
         SIMPLE_ANNOUNCEMENT(0, "SimpleAnnouncement"),
         UPDATE_AVAILABLE(1, "UpdateAvailable"),
         URGENT_UPDATE_AVAILABLE(2, "UrgentUpdateAvailable");
@@ -106,9 +107,19 @@ public class OtaSoftwareUpdateRequestorCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum UpdateStateEnum {
+    public enum UpdateStateEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         IDLE(1, "Idle"),
         QUERYING(2, "Querying"),
@@ -126,9 +137,19 @@ public class OtaSoftwareUpdateRequestorCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ChangeReasonEnum {
+    public enum ChangeReasonEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         SUCCESS(1, "Success"),
         FAILURE(2, "Failure"),
@@ -141,6 +162,16 @@ public class OtaSoftwareUpdateRequestorCluster extends BaseCluster {
         private ChangeReasonEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

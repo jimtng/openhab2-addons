@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * EnergyEvseMode
@@ -107,7 +108,7 @@ public class EnergyEvseModeCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ModeTag {
+    public enum ModeTag implements MatterEnum {
         MANUAL(16384, "Manual"),
         TIME_OF_USE(16385, "TimeOfUse"),
         SOLAR_CHARGING(16386, "SolarCharging");
@@ -119,9 +120,19 @@ public class EnergyEvseModeCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ModeChangeStatus {
+    public enum ModeChangeStatus implements MatterEnum {
         SUCCESS(0, "Success"),
         UNSUPPORTED_MODE(1, "UnsupportedMode"),
         GENERIC_FAILURE(2, "GenericFailure"),
@@ -133,6 +144,16 @@ public class EnergyEvseModeCluster extends BaseCluster {
         private ModeChangeStatus(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * RvcOperationalState
@@ -96,7 +97,7 @@ public class RvcOperationalStateCluster extends BaseCluster {
      * resumed, the device shall respond with an OperationalCommandResponse command with an ErrorStateID of
      * CommandInvalidInState but take no further action.
      */
-    public enum OperationalStateEnum {
+    public enum OperationalStateEnum implements MatterEnum {
         SEEKING_CHARGER(64, "SeekingCharger"),
         CHARGING(65, "Charging"),
         DOCKED(66, "Docked");
@@ -108,13 +109,23 @@ public class RvcOperationalStateCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * The values defined herein are applicable to this derived cluster of Operational State only and are additional to
      * the set of values defined in Operational State itself.
      */
-    public enum ErrorStateEnum {
+    public enum ErrorStateEnum implements MatterEnum {
         FAILED_TO_FIND_CHARGING_DOCK(64, "FailedToFindChargingDock"),
         STUCK(65, "Stuck"),
         DUST_BIN_MISSING(66, "DustBinMissing"),
@@ -131,12 +142,22 @@ public class RvcOperationalStateCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * The following table defines the generally applicable ErrorState values.
      */
-    public enum GeneralErrorStateEnum {
+    public enum GeneralErrorStateEnum implements MatterEnum {
         NO_ERROR(0, "NoError"),
         UNABLE_TO_START_OR_RESUME(1, "UnableToStartOrResume"),
         UNABLE_TO_COMPLETE_OPERATION(2, "UnableToCompleteOperation"),
@@ -148,6 +169,16 @@ public class RvcOperationalStateCluster extends BaseCluster {
         private GeneralErrorStateEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

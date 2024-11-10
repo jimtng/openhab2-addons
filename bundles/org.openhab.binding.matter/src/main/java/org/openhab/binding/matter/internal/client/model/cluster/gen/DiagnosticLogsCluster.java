@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * DiagnosticLogs
@@ -35,7 +36,7 @@ public class DiagnosticLogsCluster extends BaseCluster {
     public Integer clusterRevision; // 65533 ClusterRevision
 
     // Enums
-    public enum IntentEnum {
+    public enum IntentEnum implements MatterEnum {
         END_USER_SUPPORT(0, "EndUserSupport"),
         NETWORK_DIAG(1, "NetworkDiag"),
         CRASH_LOGS(2, "CrashLogs");
@@ -47,9 +48,19 @@ public class DiagnosticLogsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusEnum {
+    public enum StatusEnum implements MatterEnum {
         SUCCESS(0, "Success"),
         EXHAUSTED(1, "Exhausted"),
         NO_LOGS(2, "NoLogs"),
@@ -63,9 +74,19 @@ public class DiagnosticLogsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum TransferProtocolEnum {
+    public enum TransferProtocolEnum implements MatterEnum {
         RESPONSE_PAYLOAD(0, "ResponsePayload"),
         BDX(1, "Bdx");
 
@@ -75,6 +96,16 @@ public class DiagnosticLogsCluster extends BaseCluster {
         private TransferProtocolEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

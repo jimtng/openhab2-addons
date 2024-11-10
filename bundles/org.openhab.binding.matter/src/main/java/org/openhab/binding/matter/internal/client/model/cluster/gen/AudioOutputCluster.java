@@ -75,7 +75,7 @@ public class AudioOutputCluster extends BaseCluster {
     /**
      * The type of output, expressed as an enum, with the following values:
      */
-    public enum OutputTypeEnum {
+    public enum OutputTypeEnum implements MatterEnum {
         HDMI(0, "Hdmi"),
         BT(1, "Bt"),
         OPTICAL(2, "Optical"),
@@ -89,6 +89,16 @@ public class AudioOutputCluster extends BaseCluster {
         private OutputTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

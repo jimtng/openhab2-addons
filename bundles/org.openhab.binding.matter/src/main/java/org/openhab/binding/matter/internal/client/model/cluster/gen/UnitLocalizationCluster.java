@@ -40,7 +40,7 @@ public class UnitLocalizationCluster extends BaseCluster {
     public TempUnitEnum temperatureUnit; // 0 TempUnitEnum RW VM
 
     // Enums
-    public enum TempUnitEnum {
+    public enum TempUnitEnum implements MatterEnum {
         FAHRENHEIT(0, "Fahrenheit"),
         CELSIUS(1, "Celsius"),
         KELVIN(2, "Kelvin");
@@ -51,6 +51,16 @@ public class UnitLocalizationCluster extends BaseCluster {
         private TempUnitEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

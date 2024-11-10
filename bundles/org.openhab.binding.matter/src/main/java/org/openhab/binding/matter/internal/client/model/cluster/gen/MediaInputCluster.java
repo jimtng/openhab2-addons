@@ -78,7 +78,7 @@ public class MediaInputCluster extends BaseCluster {
     }
 
     // Enums
-    public enum InputTypeEnum {
+    public enum InputTypeEnum implements MatterEnum {
         INTERNAL(0, "Internal"),
         AUX(1, "Aux"),
         COAX(2, "Coax"),
@@ -98,6 +98,16 @@ public class MediaInputCluster extends BaseCluster {
         private InputTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

@@ -10,23 +10,32 @@ import { Logger } from"@matter/general";
 const logger = Logger.get("ThermoDevice");
 
 export class ThermoDevice extends GenericDevice {
-    
+
     override createEndpoint() {
+        let controlSequenceOfOperation = -1;
         const features: Thermostat.Feature[] = [];
         if (this.attributeMap.occupiedHeatingSetpoint != undefined) {
             features.push(Thermostat.Feature.Heating);
+            controlSequenceOfOperation = 2;
         }
         if (this.attributeMap.occupiedCoolingSetpoint != undefined) {
             features.push(Thermostat.Feature.Cooling);
+            controlSequenceOfOperation = 0;
         }
         if (features.indexOf(Thermostat.Feature.Heating) != -1 && features.indexOf(Thermostat.Feature.Cooling) != -1) {
             features.push(Thermostat.Feature.AutoMode);
+            controlSequenceOfOperation = 4;
         }
+
+        if (controlSequenceOfOperation < 0) {
+            throw new Error("At least heating, cooling or both must be added")
+        }
+
+        this.attributeMap.controlSequenceOfOperation = controlSequenceOfOperation;
 
         const defaultParams = {
             systemMode: 0,
             localTemperature: 0,
-            controlSequenceOfOperation: 4,
             minHeatSetpointLimit: 0,
             maxHeatSetpointLimit: 3500,
             absMinHeatSetpointLimit: 0,

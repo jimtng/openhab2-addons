@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * GeneralDiagnostics
@@ -170,7 +171,7 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
     }
 
     // Enums
-    public enum HardwareFaultEnum {
+    public enum HardwareFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         RADIO(1, "Radio"),
         SENSOR(2, "Sensor"),
@@ -190,9 +191,19 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum RadioFaultEnum {
+    public enum RadioFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         WI_FI_FAULT(1, "WiFiFault"),
         CELLULAR_FAULT(2, "CellularFault"),
@@ -208,9 +219,19 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum NetworkFaultEnum {
+    public enum NetworkFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         HARDWARE_FAILURE(1, "HardwareFailure"),
         NETWORK_JAMMED(2, "NetworkJammed"),
@@ -223,9 +244,19 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum InterfaceTypeEnum {
+    public enum InterfaceTypeEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         WI_FI(1, "WiFi"),
         ETHERNET(2, "Ethernet"),
@@ -239,9 +270,19 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BootReasonEnum {
+    public enum BootReasonEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         POWER_ON_REBOOT(1, "PowerOnReboot"),
         BROWN_OUT_RESET(2, "BrownOutReset"),
@@ -256,6 +297,16 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
         private BootReasonEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

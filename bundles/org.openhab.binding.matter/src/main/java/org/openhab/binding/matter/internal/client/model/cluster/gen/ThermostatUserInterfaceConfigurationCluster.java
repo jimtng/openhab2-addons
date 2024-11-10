@@ -18,6 +18,7 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 import java.math.BigInteger;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ThermostatUserInterfaceConfiguration
@@ -49,7 +50,7 @@ public class ThermostatUserInterfaceConfigurationCluster extends BaseCluster {
     public ScheduleProgrammingVisibilityEnum scheduleProgrammingVisibility; // 2 ScheduleProgrammingVisibilityEnum RW VM
 
     // Enums
-    public enum TemperatureDisplayModeEnum {
+    public enum TemperatureDisplayModeEnum implements MatterEnum {
         CELSIUS(0, "Celsius"),
         FAHRENHEIT(1, "Fahrenheit");
 
@@ -60,12 +61,22 @@ public class ThermostatUserInterfaceConfigurationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * The interpretation of the various levels is device-dependent.
      */
-    public enum KeypadLockoutEnum {
+    public enum KeypadLockoutEnum implements MatterEnum {
         NO_LOCKOUT(0, "NoLockout"),
         LOCKOUT1(1, "Lockout1"),
         LOCKOUT2(2, "Lockout2"),
@@ -80,9 +91,19 @@ public class ThermostatUserInterfaceConfigurationCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ScheduleProgrammingVisibilityEnum {
+    public enum ScheduleProgrammingVisibilityEnum implements MatterEnum {
         SCHEDULE_PROGRAMMING_PERMITTED(0, "ScheduleProgrammingPermitted"),
         SCHEDULE_PROGRAMMING_DENIED(1, "ScheduleProgrammingDenied");
 
@@ -92,6 +113,16 @@ public class ThermostatUserInterfaceConfigurationCluster extends BaseCluster {
         private ScheduleProgrammingVisibilityEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

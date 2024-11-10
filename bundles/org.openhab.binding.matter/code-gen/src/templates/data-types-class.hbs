@@ -15,6 +15,7 @@
 
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
+import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -47,7 +48,7 @@ import java.util.List;
 {{#if (isFirstElement @index)}}
     //Enums
 {{/if}}
-    public enum {{asUpperCamelCase name}} {
+    public enum {{asUpperCamelCase name}} implements BaseCluster.MatterEnum {
 {{#if (isEmpty children)}}
         DEFAULT(0, "Default");
 {{else}}
@@ -60,6 +61,16 @@ import java.util.List;
         private {{asUpperCamelCase name}}(Integer value, String label){
             this.value = value;
             this.label = label;
+        }
+        
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

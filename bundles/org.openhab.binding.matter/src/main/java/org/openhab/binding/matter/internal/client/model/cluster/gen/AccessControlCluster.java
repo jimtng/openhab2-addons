@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * AccessControl
@@ -177,7 +178,7 @@ public class AccessControlCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ChangeTypeEnum {
+    public enum ChangeTypeEnum implements MatterEnum {
         CHANGED(0, "Changed"),
         ADDED(1, "Added"),
         REMOVED(2, "Removed");
@@ -189,13 +190,23 @@ public class AccessControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * Proxy View Value
      * This value implicitly grants View privileges
      */
-    public enum AccessControlEntryPrivilegeEnum {
+    public enum AccessControlEntryPrivilegeEnum implements MatterEnum {
         VIEW(1, "View"),
         PROXY_VIEW(2, "ProxyView"),
         OPERATE(3, "Operate"),
@@ -209,9 +220,19 @@ public class AccessControlCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum AccessControlEntryAuthModeEnum {
+    public enum AccessControlEntryAuthModeEnum implements MatterEnum {
         PASE(1, "Pase"),
         CASE(2, "Case"),
         GROUP(3, "Group");
@@ -222,6 +243,16 @@ public class AccessControlCluster extends BaseCluster {
         private AccessControlEntryAuthModeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

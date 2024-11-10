@@ -285,7 +285,7 @@ public class EnergyEvseCluster extends BaseCluster {
     }
 
     // Enums
-    public enum StateEnum {
+    public enum StateEnum implements MatterEnum {
         NOT_PLUGGED_IN(0, "NotPluggedIn"),
         PLUGGED_IN_NO_DEMAND(1, "PluggedInNoDemand"),
         PLUGGED_IN_DEMAND(2, "PluggedInDemand"),
@@ -301,9 +301,19 @@ public class EnergyEvseCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum SupplyStateEnum {
+    public enum SupplyStateEnum implements MatterEnum {
         DISABLED(0, "Disabled"),
         CHARGING_ENABLED(1, "ChargingEnabled"),
         DISCHARGING_ENABLED(2, "DischargingEnabled"),
@@ -317,9 +327,19 @@ public class EnergyEvseCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum FaultStateEnum {
+    public enum FaultStateEnum implements MatterEnum {
         NO_ERROR(0, "NoError"),
         METER_FAILURE(1, "MeterFailure"),
         OVER_VOLTAGE(2, "OverVoltage"),
@@ -345,9 +365,19 @@ public class EnergyEvseCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EnergyTransferStoppedReasonEnum {
+    public enum EnergyTransferStoppedReasonEnum implements MatterEnum {
         EV_STOPPED(0, "EvStopped"),
         EVSE_STOPPED(1, "EvseStopped"),
         OTHER(2, "Other");
@@ -358,6 +388,16 @@ public class EnergyEvseCluster extends BaseCluster {
         private EnergyTransferStoppedReasonEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

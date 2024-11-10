@@ -22,7 +22,7 @@ process.on("SIGINT", () => shutdownHandler("SIGINT"));
 process.on("SIGTERM", () => shutdownHandler("SIGTERM"));
 
 const shutdownHandler = async (signal: string) => {
-   logger.info(`Received ${signal}. Closing WebSocket connections...`);
+    logger.info(`Received ${signal}. Closing WebSocket connections...`);
 
     const closePromises: Promise<void>[] = [];
 
@@ -45,11 +45,11 @@ const shutdownHandler = async (signal: string) => {
 
     await Promise.all(closePromises)
         .then(() => {
-           logger.info("All WebSocket connections closed.");
+            logger.info("All WebSocket connections closed.");
             return new Promise<void>((resolve) => wss.close(() => resolve()));
         })
         .then(() => {
-           logger.info("WebSocket server closed.");
+            logger.info("WebSocket server closed.");
             process.exit(0);
         })
         .catch((err) => {
@@ -131,7 +131,17 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
     const service = params.get('service') === 'bridge' ? 'bridge' : 'client'
 
     if (service === 'client') {
+        let controllerName = params.get('controllerName');
         try {
+            if (controllerName == null) {
+                throw new Error('No controllerName parameter in the request');
+            }
+            wss.clients.forEach((client: WebSocket) => {
+                const session = client as WebSocketSession;
+                if (session.controller && session.controller.id() === `client-${controllerName}`) {
+                    throw new Error(`Controller with name ${controllerName} already exists!`);
+                }
+            });
             ws.controller = new ClientController(ws, params);
             await ws.controller.init();
         } catch (error: any) {
@@ -140,7 +150,17 @@ wss.on('connection', async (ws: WebSocketSession, req: IncomingMessage) => {
             return;
         }
     } else {
+        const uniqueId = params.get('uniqueId');
         try {
+            if (uniqueId === null) {
+                throw new Error('No uniqueId parameter in the request');
+            }
+            wss.clients.forEach((client: WebSocket) => {
+                const session = client as WebSocketSession;
+                if (session.controller && session.controller.id() === `bridge-${uniqueId}`) {
+                    throw new Error(`Bridge with uniqueId ${uniqueId} already exists!`);
+                }
+            });
             ws.controller = new BridgeController(ws, params);
             await ws.controller.init();
         } catch (error: any) {

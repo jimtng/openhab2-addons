@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * RefrigeratorAndTemperatureControlledCabinetMode
@@ -111,7 +112,7 @@ public class RefrigeratorAndTemperatureControlledCabinetModeCluster extends Base
     }
 
     // Enums
-    public enum ModeTag {
+    public enum ModeTag implements MatterEnum {
         RAPID_COOL(16384, "RapidCool"),
         RAPID_FREEZE(16385, "RapidFreeze");
 
@@ -122,9 +123,19 @@ public class RefrigeratorAndTemperatureControlledCabinetModeCluster extends Base
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ModeChangeStatus {
+    public enum ModeChangeStatus implements MatterEnum {
         SUCCESS(0, "Success"),
         UNSUPPORTED_MODE(1, "UnsupportedMode"),
         GENERIC_FAILURE(2, "GenericFailure"),
@@ -136,6 +147,16 @@ public class RefrigeratorAndTemperatureControlledCabinetModeCluster extends Base
         private ModeChangeStatus(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

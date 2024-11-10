@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
@@ -20,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * LaundryWasherControls
@@ -70,7 +70,7 @@ public class LaundryWasherControlsCluster extends BaseCluster {
      * mode. NumberOfRinsesEnum is derived from enum8. It is up to the device manufacturer to determine the mapping
      * between the enum values and the corresponding numbers of rinses.
      */
-    public enum NumberOfRinsesEnum {
+    public enum NumberOfRinsesEnum implements MatterEnum {
         NONE(0, "None"),
         NORMAL(1, "Normal"),
         EXTRA(2, "Extra"),
@@ -82,6 +82,16 @@ public class LaundryWasherControlsCluster extends BaseCluster {
         private NumberOfRinsesEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

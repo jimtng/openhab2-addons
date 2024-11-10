@@ -161,7 +161,7 @@ public class OperationalCredentialsCluster extends BaseCluster {
      * This enumeration is used by the CertificateChainRequest command to convey which certificate from the device
      * attestation certificate chain to transmit back to the client.
      */
-    public enum CertificateChainTypeEnum {
+    public enum CertificateChainTypeEnum implements MatterEnum {
         DAC_CERTIFICATE(1, "DacCertificate"),
         PAI_CERTIFICATE(2, "PaiCertificate");
 
@@ -172,13 +172,23 @@ public class OperationalCredentialsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration is used by the NOCResponse common response command to convey detailed outcome of several of this
      * cluster’s operations.
      */
-    public enum NodeOperationalCertStatusEnum {
+    public enum NodeOperationalCertStatusEnum implements MatterEnum {
         OK(0, "Ok"),
         INVALID_PUBLIC_KEY(1, "InvalidPublicKey"),
         INVALID_NODE_OP_ID(2, "InvalidNodeOpId"),
@@ -196,6 +206,16 @@ public class OperationalCredentialsCluster extends BaseCluster {
         private NodeOperationalCertStatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

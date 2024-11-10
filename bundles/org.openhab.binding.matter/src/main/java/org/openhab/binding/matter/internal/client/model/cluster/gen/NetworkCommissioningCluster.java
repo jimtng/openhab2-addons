@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * NetworkCommissioning
@@ -230,7 +231,7 @@ public class NetworkCommissioningCluster extends BaseCluster {
      * WiFiBandEnum encodes a supported Wi-Fi frequency band present in the WiFiBand field of the
      * WiFiInterfaceScanResultStruct.
      */
-    public enum WiFiBandEnum {
+    public enum WiFiBandEnum implements MatterEnum {
         V2G4(0, "2G4"),
         V3G65(1, "3G65"),
         V5G(2, "5G"),
@@ -245,9 +246,19 @@ public class NetworkCommissioningCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum NetworkCommissioningStatusEnum {
+    public enum NetworkCommissioningStatusEnum implements MatterEnum {
         SUCCESS(0, "Success"),
         OUT_OF_RANGE(1, "OutOfRange"),
         BOUNDS_EXCEEDED(2, "BoundsExceeded"),
@@ -268,6 +279,16 @@ public class NetworkCommissioningCluster extends BaseCluster {
         private NetworkCommissioningStatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

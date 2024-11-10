@@ -18,6 +18,8 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 import java.math.BigInteger;
 import java.util.List;
 
+import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+
 /**
  * undefined
  *
@@ -112,7 +114,7 @@ public class DataTypes {
     }
 
     // Enums
-    public enum MeasurementTypeEnum {
+    public enum MeasurementTypeEnum implements BaseCluster.MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         VOLTAGE(1, "Voltage"),
         ACTIVE_CURRENT(2, "ActiveCurrent"),
@@ -136,9 +138,19 @@ public class DataTypes {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum Priority {
+    public enum Priority implements BaseCluster.MatterEnum {
         DEBUG(0, "Debug"),
         INFO(1, "Info"),
         CRITICAL(2, "Critical");
@@ -150,9 +162,19 @@ public class DataTypes {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum Status {
+    public enum Status implements BaseCluster.MatterEnum {
         SUCCESS(0, "Success"),
         FAILURE(1, "Failure"),
         INVALID_SUBSCRIPTION(125, "InvalidSubscription"),
@@ -190,9 +212,19 @@ public class DataTypes {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum Namespace {
+    public enum Namespace implements BaseCluster.MatterEnum {
         DEFAULT(0, "Default");
 
         public final Integer value;
@@ -202,9 +234,19 @@ public class DataTypes {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum Tag {
+    public enum Tag implements BaseCluster.MatterEnum {
         DEFAULT(0, "Default");
 
         public final Integer value;
@@ -214,9 +256,19 @@ public class DataTypes {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum SoftwareVersionCertificationStatusEnum {
+    public enum SoftwareVersionCertificationStatusEnum implements BaseCluster.MatterEnum {
         DEV_TEST(0, "DevTest"),
         PROVISIONAL(1, "Provisional"),
         CERTIFIED(2, "Certified"),
@@ -228,6 +280,16 @@ public class DataTypes {
         private SoftwareVersionCertificationStatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

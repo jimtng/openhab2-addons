@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ThreadNetworkDiagnostics
@@ -635,7 +636,7 @@ public class ThreadNetworkDiagnosticsCluster extends BaseCluster {
     }
 
     // Enums
-    public enum NetworkFaultEnum {
+    public enum NetworkFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         LINK_DOWN(1, "LinkDown"),
         HARDWARE_FAILURE(2, "HardwareFailure"),
@@ -648,9 +649,19 @@ public class ThreadNetworkDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ConnectionStatusEnum {
+    public enum ConnectionStatusEnum implements MatterEnum {
         CONNECTED(0, "Connected"),
         NOT_CONNECTED(1, "NotConnected");
 
@@ -661,9 +672,19 @@ public class ThreadNetworkDiagnosticsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum RoutingRoleEnum {
+    public enum RoutingRoleEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         UNASSIGNED(1, "Unassigned"),
         SLEEPY_END_DEVICE(2, "SleepyEndDevice"),
@@ -678,6 +699,16 @@ public class ThreadNetworkDiagnosticsCluster extends BaseCluster {
         private RoutingRoleEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

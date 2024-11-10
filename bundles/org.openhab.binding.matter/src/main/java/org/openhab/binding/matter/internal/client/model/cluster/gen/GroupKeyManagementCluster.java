@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * GroupKeyManagement
@@ -178,7 +179,7 @@ public class GroupKeyManagementCluster extends BaseCluster {
     }
 
     // Enums
-    public enum GroupKeySecurityPolicyEnum {
+    public enum GroupKeySecurityPolicyEnum implements MatterEnum {
         TRUST_FIRST(0, "TrustFirst"),
         CACHE_AND_SYNC(1, "CacheAndSync");
 
@@ -189,9 +190,19 @@ public class GroupKeyManagementCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum GroupKeyMulticastPolicyEnum {
+    public enum GroupKeyMulticastPolicyEnum implements MatterEnum {
         PER_GROUP_ID(0, "PerGroupId"),
         ALL_NODES(1, "AllNodes");
 
@@ -201,6 +212,16 @@ public class GroupKeyManagementCluster extends BaseCluster {
         private GroupKeyMulticastPolicyEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

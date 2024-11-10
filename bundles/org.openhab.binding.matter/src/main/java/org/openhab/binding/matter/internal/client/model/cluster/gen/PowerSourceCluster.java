@@ -226,7 +226,7 @@ public class PowerSourceCluster extends BaseCluster {
     public List<Integer> endpointList; // 31 list R V
 
     // Enums
-    public enum WiredFaultEnum {
+    public enum WiredFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         OVER_VOLTAGE(1, "OverVoltage"),
         UNDER_VOLTAGE(2, "UnderVoltage");
@@ -238,9 +238,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatFaultEnum {
+    public enum BatFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         OVER_TEMP(1, "OverTemp"),
         UNDER_TEMP(2, "UnderTemp");
@@ -252,9 +262,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatChargeFaultEnum {
+    public enum BatChargeFaultEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         AMBIENT_TOO_HOT(1, "AmbientTooHot"),
         AMBIENT_TOO_COLD(2, "AmbientTooCold"),
@@ -274,9 +294,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum PowerSourceStatusEnum {
+    public enum PowerSourceStatusEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         ACTIVE(1, "Active"),
         STANDBY(2, "Standby"),
@@ -289,9 +319,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum WiredCurrentTypeEnum {
+    public enum WiredCurrentTypeEnum implements MatterEnum {
         AC(0, "Ac"),
         DC(1, "Dc");
 
@@ -302,9 +342,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatChargeLevelEnum {
+    public enum BatChargeLevelEnum implements MatterEnum {
         OK(0, "Ok"),
         WARNING(1, "Warning"),
         CRITICAL(2, "Critical");
@@ -316,9 +366,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatReplaceabilityEnum {
+    public enum BatReplaceabilityEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         NOT_REPLACEABLE(1, "NotReplaceable"),
         USER_REPLACEABLE(2, "UserReplaceable"),
@@ -331,9 +391,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatCommonDesignationEnum {
+    public enum BatCommonDesignationEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         AAA(1, "Aaa"),
         AA(2, "Aa"),
@@ -423,9 +493,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatApprovedChemistryEnum {
+    public enum BatApprovedChemistryEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         ALKALINE(1, "Alkaline"),
         LITHIUM_CARBON_FLUORIDE(2, "LithiumCarbonFluoride"),
@@ -467,9 +547,19 @@ public class PowerSourceCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum BatChargeStateEnum {
+    public enum BatChargeStateEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         IS_CHARGING(1, "IsCharging"),
         IS_AT_FULL_CHARGE(2, "IsAtFullCharge"),
@@ -481,6 +571,16 @@ public class PowerSourceCluster extends BaseCluster {
         private BatChargeStateEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

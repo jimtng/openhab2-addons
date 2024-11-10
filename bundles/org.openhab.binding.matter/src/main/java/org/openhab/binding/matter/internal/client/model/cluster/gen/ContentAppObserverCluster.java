@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ContentAppObserver
@@ -35,7 +36,7 @@ public class ContentAppObserverCluster extends BaseCluster {
     public Integer clusterRevision; // 65533 ClusterRevision
 
     // Enums
-    public enum StatusEnum {
+    public enum StatusEnum implements MatterEnum {
         SUCCESS(0, "Success"),
         UNEXPECTED_DATA(1, "UnexpectedData");
 
@@ -45,6 +46,16 @@ public class ContentAppObserverCluster extends BaseCluster {
         private StatusEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

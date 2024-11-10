@@ -331,7 +331,7 @@ public class DoorLockCluster extends BaseCluster {
     /**
      * This enumeration shall indicate the alarm type.
      */
-    public enum AlarmCodeEnum {
+    public enum AlarmCodeEnum implements MatterEnum {
         LOCK_JAMMED(0, "LockJammed"),
         LOCK_FACTORY_RESET(1, "LockFactoryReset"),
         LOCK_RADIO_POWER_CYCLED(3, "LockRadioPowerCycled"),
@@ -348,12 +348,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the credential rule that can be applied to a particular user.
      */
-    public enum CredentialRuleEnum {
+    public enum CredentialRuleEnum implements MatterEnum {
         SINGLE(0, "Single"),
         DUAL(1, "Dual"),
         TRI(2, "Tri");
@@ -365,12 +375,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the credential type.
      */
-    public enum CredentialTypeEnum {
+    public enum CredentialTypeEnum implements MatterEnum {
         PROGRAMMING_PIN(0, "ProgrammingPin"),
         PIN(1, "Pin"),
         RFID(2, "Rfid"),
@@ -385,12 +405,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the data operation performed.
      */
-    public enum DataOperationTypeEnum {
+    public enum DataOperationTypeEnum implements MatterEnum {
         ADD(0, "Add"),
         CLEAR(1, "Clear"),
         MODIFY(2, "Modify");
@@ -402,12 +432,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the current door state.
      */
-    public enum DoorStateEnum {
+    public enum DoorStateEnum implements MatterEnum {
         DOOR_OPEN(0, "DoorOpen"),
         DOOR_CLOSED(1, "DoorClosed"),
         DOOR_JAMMED(2, "DoorJammed"),
@@ -422,12 +462,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the data type that is being or has changed.
      */
-    public enum LockDataTypeEnum {
+    public enum LockDataTypeEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         PROGRAMMING_CODE(1, "ProgrammingCode"),
         USER_INDEX(2, "UserIndex"),
@@ -447,12 +497,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the type of Lock operation performed.
      */
-    public enum LockOperationTypeEnum {
+    public enum LockOperationTypeEnum implements MatterEnum {
         LOCK(0, "Lock"),
         UNLOCK(1, "Unlock"),
         NON_ACCESS_USER_EVENT(2, "NonAccessUserEvent"),
@@ -466,12 +526,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the error cause of the Lock/Unlock operation performed.
      */
-    public enum OperationErrorEnum {
+    public enum OperationErrorEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         INVALID_CREDENTIAL(1, "InvalidCredential"),
         DISABLED_USER_DENIED(2, "DisabledUserDenied"),
@@ -485,6 +555,16 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
@@ -497,7 +577,7 @@ public class DoorLockCluster extends BaseCluster {
      * lock shall NOT disable the radio or otherwise unbind or leave the network. It shall still respond to all other
      * commands and requests.
      */
-    public enum OperatingModeEnum {
+    public enum OperatingModeEnum implements MatterEnum {
         NORMAL(0, "Normal"),
         VACATION(1, "Vacation"),
         PRIVACY(2, "Privacy"),
@@ -511,12 +591,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate the source of the Lock/Unlock or user change operation performed.
      */
-    public enum OperationSourceEnum {
+    public enum OperationSourceEnum implements MatterEnum {
         UNSPECIFIED(0, "Unspecified"),
         MANUAL(1, "Manual"),
         PROPRIETARY_REMOTE(2, "ProprietaryRemote"),
@@ -535,12 +625,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate what the status is for a specific user ID.
      */
-    public enum UserStatusEnum {
+    public enum UserStatusEnum implements MatterEnum {
         AVAILABLE(0, "Available"),
         OCCUPIED_ENABLED(1, "OccupiedEnabled"),
         OCCUPIED_DISABLED(3, "OccupiedDisabled");
@@ -552,12 +652,22 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration shall indicate what the type is for a specific user ID.
      */
-    public enum UserTypeEnum {
+    public enum UserTypeEnum implements MatterEnum {
         UNRESTRICTED_USER(0, "UnrestrictedUser"),
         YEAR_DAY_SCHEDULE_USER(1, "YearDayScheduleUser"),
         WEEK_DAY_SCHEDULE_USER(2, "WeekDayScheduleUser"),
@@ -576,9 +686,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum LockStateEnum {
+    public enum LockStateEnum implements MatterEnum {
         NOT_FULLY_LOCKED(0, "NotFullyLocked"),
         LOCKED(1, "Locked"),
         UNLOCKED(2, "Unlocked"),
@@ -591,9 +711,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum LockTypeEnum {
+    public enum LockTypeEnum implements MatterEnum {
         DEAD_BOLT(0, "DeadBolt"),
         MAGNETIC(1, "Magnetic"),
         OTHER(2, "Other"),
@@ -614,9 +744,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum LEDSettingEnum {
+    public enum LEDSettingEnum implements MatterEnum {
         NO_LED_SIGNAL(0, "NoLedSignal"),
         NO_LED_SIGNAL_ACCESS_ALLOWED(1, "NoLedSignalAccessAllowed"),
         LED_SIGNAL_ALL(2, "LedSignalAll");
@@ -628,9 +768,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum SoundVolumeEnum {
+    public enum SoundVolumeEnum implements MatterEnum {
         SILENT(0, "Silent"),
         LOW(1, "Low"),
         HIGH(2, "High"),
@@ -643,9 +793,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EventTypeEnum {
+    public enum EventTypeEnum implements MatterEnum {
         OPERATION(0, "Operation"),
         PROGRAMMING(1, "Programming"),
         ALARM(2, "Alarm");
@@ -657,9 +817,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum EventSourceEnum {
+    public enum EventSourceEnum implements MatterEnum {
         KEYPAD(0, "Keypad"),
         REMOTE(1, "Remote"),
         MANUAL(2, "Manual"),
@@ -673,9 +843,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum OperationEventCodeEnum {
+    public enum OperationEventCodeEnum implements MatterEnum {
         UNKNOWN_OR_MFG_SPECIFIC(0, "UnknownOrMfgSpecific"),
         LOCK(1, "Lock"),
         UNLOCK(2, "Unlock"),
@@ -700,9 +880,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ProgrammingEventCodeEnum {
+    public enum ProgrammingEventCodeEnum implements MatterEnum {
         UNKNOWN_OR_MFG_SPECIFIC(0, "UnknownOrMfgSpecific"),
         PROGRAMMING_CODE_CHANGED(1, "ProgrammingCodeChanged"),
         PIN_CODE_ADDED(2, "PinCodeAdded"),
@@ -718,9 +908,19 @@ public class DoorLockCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum StatusCodeEnum {
+    public enum StatusCodeEnum implements MatterEnum {
         DUPLICATE(2, "Duplicate"),
         OCCUPIED(3, "Occupied");
 
@@ -730,6 +930,16 @@ public class DoorLockCluster extends BaseCluster {
         private StatusCodeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

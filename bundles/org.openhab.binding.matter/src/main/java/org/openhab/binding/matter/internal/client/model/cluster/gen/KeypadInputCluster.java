@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * KeypadInput
@@ -36,7 +37,7 @@ public class KeypadInputCluster extends BaseCluster {
     public FeatureMap featureMap; // 65532 FeatureMap
 
     // Enums
-    public enum StatusEnum {
+    public enum StatusEnum implements MatterEnum {
         SUCCESS(0, "Success"),
         UNSUPPORTED_KEY(1, "UnsupportedKey"),
         INVALID_KEY_IN_CURRENT_STATE(2, "InvalidKeyInCurrentState");
@@ -48,9 +49,19 @@ public class KeypadInputCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum CecKeyCodeEnum {
+    public enum CecKeyCodeEnum implements MatterEnum {
         SELECT(0, "Select"),
         UP(1, "Up"),
         DOWN(2, "Down"),
@@ -143,6 +154,16 @@ public class KeypadInputCluster extends BaseCluster {
         private CecKeyCodeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

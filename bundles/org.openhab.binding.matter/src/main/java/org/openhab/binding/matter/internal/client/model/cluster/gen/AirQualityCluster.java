@@ -18,6 +18,7 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 import java.math.BigInteger;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * AirQuality
@@ -41,7 +42,7 @@ public class AirQualityCluster extends BaseCluster {
      * The AirQualityEnum provides a representation of the quality of the analyzed air. It is up to the device
      * manufacturer to determine the mapping between the measured values and their corresponding enumeration values.
      */
-    public enum AirQualityEnum {
+    public enum AirQualityEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         GOOD(1, "Good"),
         FAIR(2, "Fair"),
@@ -56,6 +57,16 @@ public class AirQualityCluster extends BaseCluster {
         private AirQualityEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

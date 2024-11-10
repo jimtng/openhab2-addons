@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * Actions
@@ -142,7 +143,7 @@ public class ActionsCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ActionTypeEnum {
+    public enum ActionTypeEnum implements MatterEnum {
         OTHER(0, "Other"),
         SCENE(1, "Scene"),
         SEQUENCE(2, "Sequence"),
@@ -158,12 +159,22 @@ public class ActionsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * Note that some of these states are applicable only for certain actions, as determined by their SupportedCommands.
      */
-    public enum ActionStateEnum {
+    public enum ActionStateEnum implements MatterEnum {
         INACTIVE(0, "Inactive"),
         ACTIVE(1, "Active"),
         PAUSED(2, "Paused"),
@@ -176,9 +187,19 @@ public class ActionsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ActionErrorEnum {
+    public enum ActionErrorEnum implements MatterEnum {
         UNKNOWN(0, "Unknown"),
         INTERRUPTED(1, "Interrupted");
 
@@ -189,13 +210,23 @@ public class ActionsCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * The Room and Zone values are provided for the cases where a user (or the system on behalf of the user) has
      * created logical grouping of the endpoints (e.g. bridged devices) based on location.
      */
-    public enum EndpointListTypeEnum {
+    public enum EndpointListTypeEnum implements MatterEnum {
         OTHER(0, "Other"),
         ROOM(1, "Room"),
         ZONE(2, "Zone");
@@ -206,6 +237,16 @@ public class ActionsCluster extends BaseCluster {
         private EndpointListTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

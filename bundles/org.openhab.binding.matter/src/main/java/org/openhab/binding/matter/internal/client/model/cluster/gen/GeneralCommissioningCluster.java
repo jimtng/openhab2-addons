@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
@@ -22,6 +21,7 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * GeneralCommissioning
@@ -105,7 +105,7 @@ public class GeneralCommissioningCluster extends BaseCluster {
     /**
      * This enumeration is used by several response commands in this cluster to indicate particular errors.
      */
-    public enum CommissioningErrorEnum {
+    public enum CommissioningErrorEnum implements MatterEnum {
         OK(0, "Ok"),
         VALUE_OUTSIDE_RANGE(1, "ValueOutsideRange"),
         INVALID_AUTHENTICATION(2, "InvalidAuthentication"),
@@ -119,13 +119,23 @@ public class GeneralCommissioningCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
     /**
      * This enumeration is used by the RegulatoryConfig and LocationCapability attributes to indicate possible radio
      * usage.
      */
-    public enum RegulatoryLocationTypeEnum {
+    public enum RegulatoryLocationTypeEnum implements MatterEnum {
         INDOOR(0, "Indoor"),
         OUTDOOR(1, "Outdoor"),
         INDOOR_OUTDOOR(2, "IndoorOutdoor");
@@ -136,6 +146,16 @@ public class GeneralCommissioningCluster extends BaseCluster {
         private RegulatoryLocationTypeEnum(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

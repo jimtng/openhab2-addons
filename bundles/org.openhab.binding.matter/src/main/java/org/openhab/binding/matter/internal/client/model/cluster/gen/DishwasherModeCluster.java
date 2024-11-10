@@ -117,7 +117,7 @@ public class DishwasherModeCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ModeTag {
+    public enum ModeTag implements MatterEnum {
         NORMAL(16384, "Normal"),
         HEAVY(16385, "Heavy"),
         LIGHT(16386, "Light");
@@ -129,9 +129,19 @@ public class DishwasherModeCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ModeChangeStatus {
+    public enum ModeChangeStatus implements MatterEnum {
         SUCCESS(0, "Success"),
         UNSUPPORTED_MODE(1, "UnsupportedMode"),
         GENERIC_FAILURE(2, "GenericFailure"),
@@ -143,6 +153,16 @@ public class DishwasherModeCluster extends BaseCluster {
         private ModeChangeStatus(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 

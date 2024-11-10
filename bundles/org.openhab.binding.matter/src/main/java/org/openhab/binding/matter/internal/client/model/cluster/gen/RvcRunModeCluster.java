@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * RvcRunMode
@@ -109,7 +110,7 @@ public class RvcRunModeCluster extends BaseCluster {
     }
 
     // Enums
-    public enum ModeChangeStatus {
+    public enum ModeChangeStatus implements MatterEnum {
         STUCK(65, "Stuck"),
         DUST_BIN_MISSING(66, "DustBinMissing"),
         DUST_BIN_FULL(67, "DustBinFull"),
@@ -126,9 +127,19 @@ public class RvcRunModeCluster extends BaseCluster {
             this.value = value;
             this.label = label;
         }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public enum ModeTag {
+    public enum ModeTag implements MatterEnum {
         IDLE(16384, "Idle"),
         CLEANING(16385, "Cleaning"),
         MAPPING(16386, "Mapping");
@@ -139,6 +150,16 @@ public class RvcRunModeCluster extends BaseCluster {
         private ModeTag(Integer value, String label) {
             this.value = value;
             this.label = label;
+        }
+
+        @Override
+        public Integer getValue() {
+            return value;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 
