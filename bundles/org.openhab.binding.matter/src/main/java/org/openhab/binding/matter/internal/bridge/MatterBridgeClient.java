@@ -48,4 +48,11 @@ public class MatterBridgeClient extends MatterWebsocketClient {
             // Do nothing, just to complete the future
         });
     }
+
+    public CompletableFuture<Void> startBridge() {
+        CompletableFuture<JsonElement> future = sendMessage("bridge", "startBridge", new Object[0]);
+        return future.thenAccept(obj -> {
+            // Do nothing, just to complete the future
+        });
+    }
 }

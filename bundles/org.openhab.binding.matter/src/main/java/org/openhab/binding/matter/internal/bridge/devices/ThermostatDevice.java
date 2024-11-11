@@ -116,7 +116,7 @@ public class ThermostatDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> setupDevice() {
+    public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
         Map<String, Object> attributeMap = new HashMap<>();

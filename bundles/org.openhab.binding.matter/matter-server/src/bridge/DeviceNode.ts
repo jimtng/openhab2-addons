@@ -77,7 +77,7 @@ export class DeviceNode {
             logger.info(`ServerNode created with ID: ${this.server.id}`);
             this.aggregator = new Endpoint(AggregatorEndpoint, { id: "aggregator" });
             await this.server.add(this.aggregator);
-            await this.server.start();
+           
 
             //reset this for future restarts
             this.#environment.vars.set("storage.clear", false);
@@ -136,10 +136,6 @@ export class DeviceNode {
         if (device != null) {
             this.devices.set(id, device);
             await this.aggregator.add(device.endpoint);
-            /**
-            * Log the endpoint structure for debugging reasons and to allow to verify anything is correct
-            */
-            //logEndpoint(EndpointServer.forEndpoint(this.server));
         }
 
     }
@@ -149,6 +145,11 @@ export class DeviceNode {
         return this.init();
     }
 
+    async startBridge() {
+        await this.server.start();
+        logEndpoint(EndpointServer.forEndpoint(this.server));
+    }
+    
     async setEndpointState(endpointId: string, clusterName: string, stateName: string, stateValue: any) {
         const device = this.devices.get(endpointId);
         if (device) {

@@ -69,7 +69,7 @@ public class OnOffLightDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> setupDevice() {
+    public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
         return Map.of("onOff", Optional.ofNullable(primaryItem.getStateAs(OnOffType.class))

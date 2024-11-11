@@ -146,7 +146,7 @@ public class MatterBridge implements MatterClientListener {
     }
 
     @Activate
-    public void activate(Map<String, Object> properties) {
+    public synchronized void activate(Map<String, Object> properties) {
         logger.debug("Activating Matter Bridge");
         if (!parseConfig(properties)) {
             connectClient();
@@ -154,7 +154,7 @@ public class MatterBridge implements MatterClientListener {
     }
 
     @Deactivate
-    public void deactivate() {
+    public synchronized void deactivate() {
         logger.debug("Deactivating Matter Bridge");
         itemRegistry.removeRegistryChangeListener(itemRegistryChangeListener);
         metadataRegistry.removeRegistryChangeListener(metadataRegistryChangeListener);
@@ -324,21 +324,23 @@ public class MatterBridge implements MatterClientListener {
         }
     }
 
-    private void registerItems() {
-
+    private synchronized void registerItems() {
         if (bridgeInitialized) {
             try {
                 logger.debug("Resetting Endpoints");
                 client.resetBridge().get();
                 bridgeInitialized = false;
-                devices.values().forEach(GenericDevice::dispose);
-                devices.clear();
             } catch (InterruptedException | ExecutionException e) {
                 logger.debug("Could not reset endpoints", e);
                 return;
             }
         }
-        metadataRegistry.getAll().forEach(metadata -> {
+
+        // clear out any existing devices
+        devices.values().forEach(GenericDevice::dispose);
+        devices.clear();
+
+        for (Metadata metadata : metadataRegistry.getAll()) {
             final MetadataKey uid = metadata.getUID();
             if ("matter".equals(uid.getNamespace())) {
                 try {
@@ -370,18 +372,24 @@ public class MatterBridge implements MatterClientListener {
                     }
                     if (device != null) {
                         try {
-                            String node = device.registerDevice().get();
-                            logger.info("Registered item {} with node {}", item.getName(), node);
+                            device.registerDevice().get();
+                            logger.info("Registered item {} with node {}", item.getName());
                             devices.put(item.getName(), device);
                         } catch (InterruptedException | ExecutionException e) {
                             logger.debug("Could not register device with bridge", e);
+                            device.dispose();
                         }
                     }
                 } catch (ItemNotFoundException e) {
                     logger.debug("Could not find item {}", uid.getItemName(), e);
                 }
             }
-        });
+        }
+        if (devices.isEmpty()) {
+            logger.info("No devices found to register with bridge, not starting bridge");
+            return;
+        }
+        client.startBridge();
         bridgeInitialized = true;
     }
 
@@ -409,7 +417,7 @@ public class MatterBridge implements MatterClientListener {
         }
     }
 
-    private void updateModifyFuture() {
+    private synchronized void updateModifyFuture() {
         ScheduledFuture<?> modifyFuture = this.modifyFuture;
         if (modifyFuture != null) {
             modifyFuture.cancel(false);

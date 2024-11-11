@@ -55,11 +55,11 @@ public abstract class GenericDevice implements StateChangeListener {
         this.primaryItem = primaryItem;
     }
 
-    abstract public void dispose();
-
     abstract public String deviceType();
 
-    abstract public Map<String, Object> setupDevice();
+    abstract public Map<String, Object> activate();
+
+    abstract public void dispose();
 
     abstract public void handleMatterEvent(String clusterName, String attributeName, Object data);
 
@@ -82,7 +82,7 @@ public abstract class GenericDevice implements StateChangeListener {
             label = primaryItem.getName();
         }
         return client.addEndpoint(deviceType(), primaryItem.getName(), label, primaryItem.getName(),
-                "Type " + primaryItem.getType(), String.valueOf(primaryItem.getName().hashCode()), setupDevice());
+                "Type " + primaryItem.getType(), String.valueOf(primaryItem.getName().hashCode()), activate());
     }
 
     public String getName() {

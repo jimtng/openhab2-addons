@@ -45,7 +45,7 @@ public class WindowCoveringDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> setupDevice() {
+    public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
         return Map.of("currentPositionLiftPercentage", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
