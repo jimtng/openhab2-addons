@@ -325,15 +325,14 @@ public class MatterBridge implements MatterClientListener {
     }
 
     private void registerItems() {
-        // we should create a new devices map and add devices to that, while removing from the old map. Any that are
-        // left we should remove from matter.js
 
-        // client.resetEndpoints().thenAccept(v -> {
         if (bridgeInitialized) {
             try {
                 logger.debug("Resetting Endpoints");
                 client.resetBridge().get();
                 bridgeInitialized = false;
+                devices.values().forEach(GenericDevice::dispose);
+                devices.clear();
             } catch (InterruptedException | ExecutionException e) {
                 logger.debug("Could not reset endpoints", e);
                 return;

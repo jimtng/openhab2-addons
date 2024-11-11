@@ -25,8 +25,6 @@ import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.types.State;
 import org.openhab.core.types.UnDefType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link DimmableLightDevice}
@@ -35,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class ThermostatDevice extends GenericDevice {
-    private final Logger logger = LoggerFactory.getLogger(ThermostatDevice.class);
+    // private final Logger logger = LoggerFactory.getLogger(ThermostatDevice.class);
     private final Map<String, GenericItem> itemMap = new HashMap<>();
     private final Map<String, String> attributeToItemNameMap = new HashMap<>();
     private final SystemModeMapper systemModeMapper = new SystemModeMapper();
@@ -179,6 +177,7 @@ public class ThermostatDevice extends GenericDevice {
         itemMap.forEach((uid, item) -> {
             ((GenericItem) item).removeStateChangeListener(this);
         });
+        itemMap.clear();
     }
 
     class SystemModeMapper {

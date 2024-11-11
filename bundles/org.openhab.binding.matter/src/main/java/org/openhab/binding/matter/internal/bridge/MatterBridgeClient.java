@@ -33,6 +33,15 @@ public class MatterBridgeClient extends MatterWebsocketClient {
         return future.thenApply(obj -> obj == null ? "" : obj.toString());
     }
 
+    public CompletableFuture<Void> setEndpointState(String endpointId, String clusterName, String attributeName,
+            Object state) {
+        CompletableFuture<JsonElement> future = sendMessage("bridge", "setEndpointState",
+                new Object[] { endpointId, clusterName, attributeName, state });
+        return future.thenAccept(obj -> {
+            // Do nothing, just to complete the future
+        });
+    }
+
     public CompletableFuture<Void> resetBridge() {
         CompletableFuture<JsonElement> future = sendMessage("bridge", "resetBridge", new Object[0]);
         return future.thenAccept(obj -> {

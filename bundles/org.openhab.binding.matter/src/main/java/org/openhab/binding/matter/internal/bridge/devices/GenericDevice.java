@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public abstract class GenericDevice implements StateChangeListener {
-    private final Logger logger = LoggerFactory.getLogger(GenericDevice.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final static BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
 
     protected final GenericItem primaryItem;
@@ -89,8 +89,8 @@ public abstract class GenericDevice implements StateChangeListener {
         return primaryItem.getName();
     }
 
-    protected void setEndpointState(String clusterName, String attributeName, Object state) {
-        client.genericCommand("bridge", "setEndpointState", primaryItem.getName(), clusterName, attributeName, state);
+    public CompletableFuture<Void> setEndpointState(String clusterName, String attributeName, Object state) {
+        return client.setEndpointState(primaryItem.getName(), clusterName, attributeName, state);
     }
 
     // TODO Move all of the following into a shared UTIL class, copied from cluster converters
