@@ -91,14 +91,24 @@ public class MatterBridge implements MatterClientListener {
         this.settings = new MatterBridgeSettings();
 
         itemRegistryChangeListener = new ItemRegistryChangeListener() {
+            private boolean handleMetadataChange(Item item) {
+                if (metadataRegistry.get(new MetadataKey("matter", item.getUID())) != null) {
+                    updateModifyFuture();
+                    return true;
+                }
+                return false;
+            }
+
             @Override
             public void added(Item element) {
-                updateModifyFuture();
+                handleMetadataChange(element);
             }
 
             @Override
             public void updated(Item oldElement, Item element) {
-                updateModifyFuture();
+                if (!handleMetadataChange(oldElement)) {
+                    handleMetadataChange(element);
+                }
             }
 
             @Override
@@ -108,23 +118,29 @@ public class MatterBridge implements MatterClientListener {
 
             @Override
             public void removed(Item element) {
-                updateModifyFuture();
+                handleMetadataChange(element);
             }
         };
         this.itemRegistry.addRegistryChangeListener(itemRegistryChangeListener);
 
         metadataRegistryChangeListener = new RegistryChangeListener<>() {
+            private void handleMetadataChange(Metadata element) {
+                if ("matter".equals(element.getUID().getNamespace())) {
+                    updateModifyFuture();
+                }
+            }
+
             public void added(Metadata element) {
-                updateModifyFuture();
-            };
+                handleMetadataChange(element);
+            }
 
             public void removed(Metadata element) {
-                updateModifyFuture();
-            };
+                handleMetadataChange(element);
+            }
 
             public void updated(Metadata oldElement, Metadata element) {
-                updateModifyFuture();
-            };
+                handleMetadataChange(element);
+            }
         };
         this.metadataRegistry.addRegistryChangeListener(metadataRegistryChangeListener);
     }
@@ -354,11 +370,10 @@ public class MatterBridge implements MatterClientListener {
                             break;
                     }
                     if (device != null) {
-                        final GenericDevice finalDevice = device;
                         try {
-                            String node = finalDevice.registerDevice().get();
+                            String node = device.registerDevice().get();
                             logger.info("Registered item {} with node {}", item.getName(), node);
-                            devices.put(item.getName(), finalDevice);
+                            devices.put(item.getName(), device);
                         } catch (InterruptedException | ExecutionException e) {
                             logger.debug("Could not register device with bridge", e);
                         }

@@ -166,8 +166,8 @@ public class ThermostatDevice extends GenericDevice {
         }
         // todo make this configurable and maybe support it in a different way
         // attributeMap.put("systemModeMap", "OFF=0,AUTO=1,COOL=3,HEAT=4");
-        attributeMap.put("controlSequenceOfOperation",
-                ThermostatCluster.ControlSequenceOfOperationEnum.COOLING_AND_HEATING.value);
+        // attributeMap.put("controlSequenceOfOperation",
+        // ThermostatCluster.ControlSequenceOfOperationEnum.COOLING_AND_HEATING.value);
 
         return attributeMap;
     }

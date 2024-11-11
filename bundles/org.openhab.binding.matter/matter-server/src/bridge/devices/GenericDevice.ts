@@ -12,6 +12,9 @@ export abstract class GenericDevice {
 
     constructor(protected bridgeController: BridgeController, protected attributeMap: { [key: string]: any }, protected endpointId: string, protected  nodeLabel: string, protected productName: string, protected productLabel: string, protected serialNumber: string) {
         this.nodeLabel = this.truncateString(nodeLabel);
+        this.productLabel = this.truncateString(productLabel);
+        this.productName = this.truncateString(productName);
+        this.serialNumber = this.truncateString(serialNumber);
         this.endpoint = this.createEndpoint();
     }
 

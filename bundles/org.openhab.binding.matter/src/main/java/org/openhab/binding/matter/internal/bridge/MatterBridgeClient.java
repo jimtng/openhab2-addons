@@ -1,8 +1,9 @@
 package org.openhab.binding.matter.internal.bridge;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
+@NonNullByDefault
 public class MatterBridgeClient extends MatterWebsocketClient {
     private static final Logger logger = LoggerFactory.getLogger(MatterBridgeClient.class);
 
@@ -24,9 +26,10 @@ public class MatterBridgeClient extends MatterWebsocketClient {
         });
     }
 
-    public CompletableFuture<String> addEndpoint(@Nullable Object... objects) {
+    public CompletableFuture<String> addEndpoint(String deviceType, String id, String nodeLabel, String productName,
+            String productLabel, String serialNumber, Map<String, Object> attributeMap) {
         CompletableFuture<JsonElement> future = sendMessage("bridge", "addEndpoint",
-                objects == null ? new Object[0] : objects);
+                new Object[] { deviceType, id, nodeLabel, productName, productLabel, serialNumber, attributeMap });
         return future.thenApply(obj -> obj == null ? "" : obj.toString());
     }
 

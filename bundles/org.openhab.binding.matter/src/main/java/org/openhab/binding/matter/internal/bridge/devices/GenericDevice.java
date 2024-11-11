@@ -77,8 +77,12 @@ public abstract class GenericDevice implements StateChangeListener {
     }
 
     public CompletableFuture<String> registerDevice() {
-        return client.addEndpoint(deviceType(), primaryItem.getName(), primaryItem.getLabel(), "openHAB Device",
-                "An openHAB Device", "0000001", setupDevice());
+        String label = primaryItem.getLabel();
+        if (label == null) {
+            label = primaryItem.getName();
+        }
+        return client.addEndpoint(deviceType(), primaryItem.getName(), label, primaryItem.getName(),
+                "Type " + primaryItem.getType(), String.valueOf(primaryItem.getName().hashCode()), setupDevice());
     }
 
     public String getName() {
