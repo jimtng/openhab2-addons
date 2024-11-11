@@ -28,7 +28,7 @@ import org.openhab.core.library.types.PercentType;
 import org.openhab.core.types.State;
 
 /**
- * The {@link DimmableLightDevice}
+ * The {@link WindowCoveringDevice}
  *
  * @author Dan Cunningham - Initial contribution
  */
@@ -48,8 +48,8 @@ public class WindowCoveringDevice extends GenericDevice {
     public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("currentPositionLiftPercentage", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
-                .orElseGet(() -> new PercentType(0)).intValue());
+        return Map.of("currentPositionLiftPercent100ths", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
+                .orElseGet(() -> new PercentType(0)).intValue() * 100);
     }
 
     @Override
@@ -83,10 +83,10 @@ public class WindowCoveringDevice extends GenericDevice {
 
     public void updateState(Item item, State state) {
         if (state instanceof PercentType percentType) {
-            setEndpointState("windowCovering", "currentPositionLiftPercentage", percentType.intValue());
+            setEndpointState("windowCovering", "currentPositionLiftPercent100ths", percentType.intValue() * 100);
         } else if (state instanceof OpenClosedType openClosedType) {
-            setEndpointState("windowCovering", "currentPositionLiftPercentage",
-                    openClosedType == OpenClosedType.OPEN ? 100 : 0);
+            setEndpointState("windowCovering", "currentPositionLiftPercent100ths",
+                    openClosedType == OpenClosedType.OPEN ? 10000 : 0);
         }
     }
 }

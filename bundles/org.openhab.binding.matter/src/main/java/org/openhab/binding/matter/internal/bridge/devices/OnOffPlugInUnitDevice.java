@@ -18,7 +18,7 @@ import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.MetadataRegistry;
 
 /**
- * The {@link DimmableLightDevice}
+ * The {@link OnOffPlugInUnitDevice}
  *
  * @author Dan Cunningham - Initial contribution
  */

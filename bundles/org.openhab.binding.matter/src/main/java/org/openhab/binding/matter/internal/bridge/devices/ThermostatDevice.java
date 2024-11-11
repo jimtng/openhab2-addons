@@ -27,13 +27,12 @@ import org.openhab.core.types.State;
 import org.openhab.core.types.UnDefType;
 
 /**
- * The {@link DimmableLightDevice}
+ * The {@link ThermostatDevice}
  *
  * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class ThermostatDevice extends GenericDevice {
-    // private final Logger logger = LoggerFactory.getLogger(ThermostatDevice.class);
     private final Map<String, GenericItem> itemMap = new HashMap<>();
     private final Map<String, String> attributeToItemNameMap = new HashMap<>();
     private final SystemModeMapper systemModeMapper = new SystemModeMapper();

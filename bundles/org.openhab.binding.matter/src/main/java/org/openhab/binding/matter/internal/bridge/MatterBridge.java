@@ -367,6 +367,9 @@ public class MatterBridge implements MatterClientListener {
                         case "WindowCovering":
                             device = new WindowCoveringDevice(metadataRegistry, client, item);
                             break;
+                        case "DoorLock":
+                            device = new DoorLockDevice(metadataRegistry, client, item);
+                            break;
                         default:
                             break;
                     }

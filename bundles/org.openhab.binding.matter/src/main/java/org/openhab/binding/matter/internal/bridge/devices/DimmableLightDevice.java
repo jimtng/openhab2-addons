@@ -49,8 +49,9 @@ public class DimmableLightDevice extends GenericDevice {
     public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("currentLevel", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
-                .orElseGet(() -> new PercentType(0)).intValue());
+        int level = Optional.ofNullable(primaryItem.getStateAs(PercentType.class)).orElseGet(() -> new PercentType(0))
+                .intValue();
+        return Map.of("currentLevel", level, "onOff", level > 0);
     }
 
     @Override

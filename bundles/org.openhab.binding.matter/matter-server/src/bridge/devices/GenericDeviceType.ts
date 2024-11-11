@@ -5,7 +5,7 @@ import { Logger } from "@matter/main";
 
 const logger = Logger.get("GenericDevice");
 
-export abstract class GenericDevice {
+export abstract class GenericDeviceType {
     
     protected updateLocks = new Set<string>();
     endpoint: Endpoint;

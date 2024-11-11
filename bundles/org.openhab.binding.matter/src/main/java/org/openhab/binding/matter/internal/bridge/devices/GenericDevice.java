@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link DimmableLightDevice}
+ * The {@link GenericDevice}
  *
  * @author Dan Cunningham - Initial contribution
  */

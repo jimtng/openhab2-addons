@@ -3,14 +3,13 @@ import { WindowCoveringDevice } from "@matter/node/devices/window-covering";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { WindowCoveringServer } from '@matter/node/behaviors/window-covering';
 import { WindowCovering } from '@matter/main/clusters';
-
-import { GenericDevice } from './GenericDevice'; 
+import { GenericDeviceType } from './GenericDeviceType'; 
 import { BridgeController } from "../BridgeController";
 import { Logger } from"@matter/general";
 
 const logger = Logger.get("WindowCoveringDeviceType");
 
-export class WindowCoveringDeviceType extends GenericDevice {
+export class WindowCoveringDeviceType extends GenericDeviceType {
     
     override createEndpoint() {
         const features: WindowCovering.Feature[] = [];
@@ -28,6 +27,9 @@ export class WindowCoveringDeviceType extends GenericDevice {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
+            windowCovering: {
+                currentPositionLiftPercent100ths: this.attributeMap.currentPositionLiftPercent100ths || 0
+            }
         });
 
         endpoint.events.windowCovering.currentPositionLift$Changed?.on(value => {
