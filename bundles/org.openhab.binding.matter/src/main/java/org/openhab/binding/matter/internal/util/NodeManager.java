@@ -100,6 +100,12 @@ class NodeManager {
                     if (Files.exists(execPath)) {
                         return execPath;
                     }
+
+                    // windows does not have a 'bin' directory
+                    execPath = path.resolve(nodeExecutable);
+                    if (Files.exists(execPath)) {
+                        return execPath;
+                    }
                 }
             }
         }
