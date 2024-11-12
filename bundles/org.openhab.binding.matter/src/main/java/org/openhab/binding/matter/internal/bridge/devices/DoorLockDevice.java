@@ -47,7 +47,7 @@ public class DoorLockDevice extends GenericDevice {
     public void handleMatterEvent(String clusterName, String attributeName, Object data) {
         switch (attributeName) {
             case "lockState": {
-                int lockInt = Integer.parseInt(data.toString());
+                int lockInt = ((Double) data).intValue();
                 boolean locked = DoorLockCluster.LockStateEnum.LOCKED.getValue() == lockInt;
                 if (primaryItem instanceof GroupItem groupItem) {
                     groupItem.send(OnOffType.from(locked));
