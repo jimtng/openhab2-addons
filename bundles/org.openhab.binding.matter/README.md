@@ -278,18 +278,18 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 
 ### Device Types
 
-| Type               | Item/Group  | Tag            | Notes                 |
-|--------------------|-------------|----------------|-----------------------|
-| On Off Light       | Item        | OnOffLight     |                       |
-| Dimmable Light     | Item        | DimmableLight  |                       |
-| Color Light        | Item, Group | ColorLight     | (not implemented yet) |
-| Plug In Unit       | Item        | PlugInUnit     |                       |
-| Thermostat         | Group       | Thermostat     |                       |
-| Window Covering    | Item        | WindowCovering |                       |
-| Temperature Sensor | Item        | Temperature    | (not implemented yet) |
-| Humidity Sensor    | Item        | Humidity       | (not implemented yet) |
-| Door Lock          | Item        | DoorLock       |                       |
-
+| Type               | Item Type      | Tag               | Notes                 |
+|--------------------|----------------|-------------------|-----------------------|
+| On Off Light       | Switch/Dimmer  | OnOffLight        |                       |
+| Dimmable Light     | Dimmer         | DimmableLight     |                       |
+| Color Light        | Color          | ColorLight        | (not implemented yet) |
+| Plug In Unit       | Switch/Dimmer  | PlugInUnit        |                       |
+| Thermostat         | Group          | Thermostat        |                       |
+| Window Covering    | Rollershutter  | WindowCovering    |                       |
+| Temperature Sensor | Number         | TemperatureSensor |                       |
+| Humidity Sensor    | Number         | HumiditySensor    |                       |
+| Occupancy Sensor   | Switch/Contact | OccupancySensor   |                       |
+| Door Lock          | Switch         | DoorLock          |                       |
 
 ### Thermostat member tags
 
@@ -306,11 +306,17 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 ### Example
 
 ```perl
-Dimmer TestDimmer  "Test Dimmer [%d%%]" {matter="DimmableLight"}
+Dimmer                TestDimmer                "Test Dimmer [%d%%]"                                                       {matter="DimmableLight"}
 
 Group                 Test_HVAC                 "Thermostat"                              ["HVAC"]                         {matter="Thermostat" }
 Number:Temperature    Test_HVAC_Temperature     "Temperature [%d °F]"      (Test_HVAC)    ["Measurement","Temperature"]    {matter="localTemperature"}
 Number:Temperature    Test_HVAC_HeatSetpoint    "Heat Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="occupiedHeatingSetpoint"}
 Number:Temperature    Test_HVAC_CoolSetpoint    "Cool Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="occupiedCoolingSetpoint"}
 Number                Test_HVAC_Mode            "Mode [%s]"                (Test_HVAC)    ["Control" ]                     {matter="systemMode" [OFF=0, HEAT=1, COOL=2, AUTO=3]}
+
+Switch                TestDoorLock              "Door Lock"                                                                {matter="DoorLock"}
+Rollershutter         TestShade                 "Window Shade"                                                             {matter="WindowCovering"}
+Number:Temperature    TestTemperatureSensor     "Temperature Sensor"                                                       {matter="TemperatureSensor"}
+Number                TestHumiditySensor        "Humidity Sensor"                                                          {matter="HumiditySensor"}
+Switch                TestOccupancySensor       "Occupancy Sensor"                                                         {matter="OccupancySensor"}
 ```

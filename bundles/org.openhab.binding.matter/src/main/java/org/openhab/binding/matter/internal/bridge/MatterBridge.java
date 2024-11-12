@@ -370,6 +370,15 @@ public class MatterBridge implements MatterClientListener {
                         case "DoorLock":
                             device = new DoorLockDevice(metadataRegistry, client, item);
                             break;
+                        case "TemperatureSensor":
+                            device = new TemperatureSensorDevice(metadataRegistry, client, item);
+                            break;
+                        case "HumiditySensor":
+                            device = new HumiditySensorDevice(metadataRegistry, client, item);
+                            break;
+                        case "OccupancySensor":
+                            device = new OccupancySensorDevice(metadataRegistry, client, item);
+                            break;
                         default:
                             break;
                     }
