@@ -288,7 +288,7 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 | Window Covering    | Item        | WindowCovering |                       |
 | Temperature Sensor | Item        | Temperature    | (not implemented yet) |
 | Humidity Sensor    | Item        | Humidity       | (not implemented yet) |
-| Door Lock          | Group       | DoorLock       |                       |
+| Door Lock          | Item        | DoorLock       |                       |
 
 
 ### Thermostat member tags
