@@ -14,6 +14,7 @@ package org.openhab.binding.matter.internal.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -36,12 +37,15 @@ import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.HSBType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
+import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.openhab.core.types.UnDefType;
 import org.openhab.core.util.ColorUtil;
 import org.slf4j.Logger;
@@ -50,7 +54,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Dan Cunningham - Initial contribution
  * @author Chris Jackson - Original Zigbee binding color logic
- * 
+ *
  */
 @NonNullByDefault
 public class ColorControlConverter extends GenericConverter<ColorControlCluster> {
@@ -89,6 +93,22 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         if (cluster.featureMap.colorTemperature) {
             map.put(ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_COLOR_TEMPERATURE.getId()), ITEM_TYPE_DIMMER)
                     .withType(CHANNEL_COLOR_TEMPERATURE).withLabel(CHANNEL_LABEL_COLOR_TEMPERATURE).build(), null);
+
+            Optional.ofNullable(cluster.colorTempPhysicalMinMireds)
+                    .ifPresent(temp -> colorTempPhysicalMinMireds = temp);
+            Optional.ofNullable(cluster.colorTempPhysicalMaxMireds)
+                    .ifPresent(temp -> colorTempPhysicalMaxMireds = temp);
+            StateDescription stateDescription = null;
+            if (colorTempPhysicalMinMireds < colorTempPhysicalMaxMireds) {
+                stateDescription = StateDescriptionFragmentBuilder.create().withPattern("%.0f mirek")
+                        .withMinimum(BigDecimal.valueOf(colorTempPhysicalMinMireds))
+                        .withMaximum(BigDecimal.valueOf(colorTempPhysicalMaxMireds)).build().toStateDescription();
+            }
+            map.put(ChannelBuilder
+                    .create(new ChannelUID(thingUID, CHANNEL_COLOR_TEMPERATURE_ABS.getId()),
+                            ITEM_TYPE_NUMBER_TEMPERATURE)
+                    .withType(CHANNEL_COLOR_TEMPERATURE_ABS).withLabel(CHANNEL_LABEL_COLOR_TEMPERATURE_ABS).build(),
+                    stateDescription);
         }
         return map;
     }
@@ -125,6 +145,19 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                         optionsBitmap, optionsBitmap);
                 handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
             }
+        } else if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
+                && command instanceof DecimalType decimal) {
+            ClusterCommand tempCommand = ColorControlCluster.moveToColorTemperature(decimal.intValue(), 0, optionsMask,
+                    optionsMask);
+            handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME, tempCommand);
+        } else if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
+                && command instanceof QuantityType<?> quantity) {
+            quantity = quantity.toInvertibleUnit(Units.MIRED);
+            if (quantity != null) {
+                ClusterCommand tempCommand = ColorControlCluster.moveToColorTemperature(quantity.intValue(), 0,
+                        optionsMask, optionsMask);
+                handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME, tempCommand);
+            }
         }
     }
 
@@ -151,6 +184,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             case "colorTemperatureMireds":
                 updateState(CHANNEL_COLOR_TEMPERATURE,
                         numberValue == 0 ? UnDefType.UNDEF : miredsToPercenType(numberValue));
+                updateState(CHANNEL_COLOR_TEMPERATURE_ABS, numberValue == 0 ? UnDefType.UNDEF
+                        : QuantityType.valueOf(Double.valueOf(numberValue), Units.MIRED));
                 break;
             case "enhancedCurrentHue":
                 break;
@@ -191,6 +226,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         if (cluster.colorTemperatureMireds != null) {
             updateState(CHANNEL_COLOR_TEMPERATURE, cluster.colorTemperatureMireds == 0 ? UnDefType.UNDEF
                     : miredsToPercenType(cluster.colorTemperatureMireds));
+            updateState(CHANNEL_COLOR_TEMPERATURE_ABS, cluster.colorTemperatureMireds == 0 ? UnDefType.UNDEF
+                    : QuantityType.valueOf(Double.valueOf(cluster.colorTemperatureMireds), Units.MIRED));
         }
     }
 

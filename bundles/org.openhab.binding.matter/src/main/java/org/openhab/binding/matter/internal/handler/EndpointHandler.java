@@ -14,8 +14,12 @@ package org.openhab.binding.matter.internal.handler;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -39,7 +43,12 @@ import org.openhab.binding.matter.internal.devices.types.DeviceType;
 import org.openhab.binding.matter.internal.devices.types.DeviceTypeRegistry;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.config.core.validation.ConfigValidationException;
-import org.openhab.core.thing.*;
+import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.ChannelUID;
+import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
+import org.openhab.core.thing.ThingStatusInfo;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.BridgeHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
@@ -249,6 +258,13 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
 
                 Optional.ofNullable(stateDescription.getPattern())
                         .ifPresent(pattern -> stateDescriptionProvider.setStatePattern(channelUID, pattern));
+
+                BigDecimal min = stateDescription.getMinimum();
+                BigDecimal max = stateDescription.getMaximum();
+                if (min != null && max != null) {
+                    stateDescriptionProvider.setMinMax(channelUID, min, max, stateDescription.getStep(),
+                            stateDescription.getPattern());
+                }
             }
         });
         this.deviceType = deviceType;

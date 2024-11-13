@@ -71,6 +71,10 @@
 			light on and off.
 		</description>
 		<category>ColorLight</category>
+		<tags>
+			<tag>Control</tag>
+			<tag>Light</tag>
+		</tags>
 	</channel-type>
 
 	<channel-type id="colorcontrol-temperature">
@@ -78,6 +82,23 @@
 		<label>Color Temperature</label>
 		<description>Sets the color temperature of the light</description>
 		<category>ColorLight</category>
+		<tags>
+			<tag>Control</tag>
+			<tag>ColorTemperature</tag>
+		</tags>
+		<state pattern="%.0f %%" min="0" max="100"/>
+	</channel-type>
+
+	<channel-type id="colorcontrol-temperature-abs" advanced="true">
+		<item-type unitHint="mirek">Number:Temperature</item-type>
+		<label>Color Temperature</label>
+		<description>Sets the color temperature of the light in mirek</description>
+		<category>ColorLight</category>
+		<tags>
+			<tag>Control</tag>
+			<tag>ColorTemperature</tag>
+		</tags>
+		<state pattern="%.0f mirek" min="100" max="1000"/>
 	</channel-type>
 
 	<!-- Door Lock Channel -->
@@ -120,6 +141,10 @@
 		<label>Dimmer</label>
 		<description>Sets the level of the light</description>
 		<category>Light</category>
+		<tags>
+			<tag>Control</tag>
+			<tag>Light</tag>
+		</tags>
 	</channel-type>
 
 	<!--Mode Select Mode -->
