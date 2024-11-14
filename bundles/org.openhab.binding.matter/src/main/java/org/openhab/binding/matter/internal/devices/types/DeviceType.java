@@ -87,7 +87,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
             GenericConverter<BaseCluster> specificConverter = (GenericConverter<BaseCluster>) converter;
             specificConverter.updateCluster(cluster);
         } else {
-            logger.debug("updateCluster: No converter found for cluster: " + cluster.id);
+            logger.debug("updateCluster: finished processing for cluster: " + cluster.id);
         }
     }
 

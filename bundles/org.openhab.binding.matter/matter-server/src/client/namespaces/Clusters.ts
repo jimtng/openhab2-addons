@@ -91,4 +91,23 @@ export class Clusters {
             }
         }
     }
+
+    async readAttribute(nodeId: number, endpointId: number, clusterName: string, attributeName: string) {
+        const node = await this.theNode.getNode(nodeId);
+
+        const device = this.theNode.getEndpoint(await this.theNode.getNode(nodeId), endpointId);
+        if (device == undefined) {
+            throw new Error(`Endpoint ${endpointId} not found`);
+        }
+        const cluster = (MatterClusters as any)[`${clusterName}Cluster`];
+        const clusterClient: any = device.getClusterClient(cluster);
+        if (clusterClient === undefined) {
+            throw new Error(`Cluster ${clusterName} not found`);
+        }
+        const attributeClient = clusterClient.attributes[attributeName];
+        if (!(attributeClient instanceof SupportedAttributeClient)) {
+            throw new Error(`Attribute ${node.nodeId.toString()}/${endpointId}/${clusterName}/${attributeName} not supported.`)
+        }
+        return await attributeClient.get(true);
+    }
 }

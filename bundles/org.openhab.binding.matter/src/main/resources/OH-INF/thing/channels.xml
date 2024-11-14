@@ -71,6 +71,7 @@
 			light on and off.
 		</description>
 		<category>ColorLight</category>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
 	<channel-type id="colorcontrol-temperature">
@@ -112,6 +113,7 @@
 		<label>Switch</label>
 		<description>Switches the power on and off</description>
 		<category>Light</category>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
 	<!-- Level Dimmer -->
@@ -120,6 +122,7 @@
 		<label>Dimmer</label>
 		<description>Sets the level of the light</description>
 		<category>Light</category>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
 	<!--Mode Select Mode -->

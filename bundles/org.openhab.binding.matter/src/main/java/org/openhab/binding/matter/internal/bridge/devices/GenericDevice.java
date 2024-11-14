@@ -20,10 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.MetadataRegistry;
-import org.openhab.core.items.StateChangeListener;
+import org.openhab.core.items.*;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.QuantityType;
@@ -46,6 +43,7 @@ public abstract class GenericDevice implements StateChangeListener {
     private final static BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
 
     protected final GenericItem primaryItem;
+    protected @Nullable Metadata primaryItemMetadata;
     protected final MatterBridgeClient client;
     protected final MetadataRegistry metadataRegistry;
 
@@ -53,6 +51,7 @@ public abstract class GenericDevice implements StateChangeListener {
         this.metadataRegistry = metadataRegistry;
         this.client = client;
         this.primaryItem = primaryItem;
+        this.primaryItemMetadata = metadataRegistry.get(new MetadataKey("matter", primaryItem.getUID()));
     }
 
     abstract public String deviceType();

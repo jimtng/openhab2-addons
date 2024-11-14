@@ -16,11 +16,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ThermostatCluster;
 import org.openhab.core.items.*;
 import org.openhab.core.library.items.NumberItem;
+import org.openhab.core.library.items.StringItem;
+import org.openhab.core.library.items.SwitchItem;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.types.State;
@@ -36,6 +40,7 @@ public class ThermostatDevice extends GenericDevice {
     private final Map<String, GenericItem> itemMap = new HashMap<>();
     private final Map<String, String> attributeToItemNameMap = new HashMap<>();
     private final SystemModeMapper systemModeMapper = new SystemModeMapper();
+    private @Nullable Object onMapping;
 
     public ThermostatDevice(MetadataRegistry metadataRegistry, MatterBridgeClient client, GenericItem item) {
         super(metadataRegistry, client, item);
@@ -65,10 +70,27 @@ public class ThermostatDevice extends GenericDevice {
                         try {
                             String mappedMode = systemModeMapper
                                     .toCustomValue(Double.valueOf(data.toString()).intValue());
-                            if (item instanceof NumberItem) {
-                                item.setState(new DecimalType(mappedMode));
-                            } else {
-                                item.setState(new StringType(mappedMode));
+                            if (item instanceof NumberItem numberItem) {
+                                numberItem.send(new DecimalType(mappedMode));
+                            } else if (item instanceof StringItem stringItem) {
+                                stringItem.send(new StringType(mappedMode));
+                            } else if (item instanceof SwitchItem switchItem) {
+                                switchItem.send(OnOffType.from(mappedMode));
+                            }
+                        } catch (SystemModeMappingException e) {
+                            logger.debug("Could not convert {} to custom value", data);
+                        }
+                        break;
+                    case "onOff":
+                        try {
+                            if (data instanceof Boolean onOff) {
+                                String mappedMode = onOff ? systemModeMapper.onToCustomValue()
+                                        : systemModeMapper.toCustomValue(0);
+                                if (item instanceof NumberItem) {
+                                    item.setState(new DecimalType(mappedMode));
+                                } else {
+                                    item.setState(new StringType(mappedMode));
+                                }
                             }
                         } catch (SystemModeMappingException e) {
                             logger.debug("Could not convert {} to custom value", data);
@@ -78,7 +100,6 @@ public class ThermostatDevice extends GenericDevice {
                         break;
                 }
             }
-
         }
     }
 
@@ -103,6 +124,7 @@ public class ThermostatDevice extends GenericDevice {
                         try {
                             int mode = systemModeMapper.fromCustomValue(state.toString()).value;
                             setEndpointState("thermostat", attribute, mode);
+                            setEndpointState("onOff", "onOff", mode > 0);
                         } catch (SystemModeMappingException e) {
                             logger.debug("Could not convert {} to matter value", state.toString());
                         }
@@ -139,11 +161,12 @@ public class ThermostatDevice extends GenericDevice {
                                 }
                                 break;
                             case "systemMode":
+                                int mode = 0;
                                 if (state instanceof DecimalType decimalType) {
-                                    attributeMap.put(attribute, decimalType.intValue());
-                                } else {
-                                    attributeMap.put(attribute, 0);
+                                    mode = decimalType.intValue();
                                 }
+                                attributeMap.put(attribute, mode);
+                                attributeMap.put("onOff", mode > 0);
                                 Map<String, Object> config = metadata.getConfiguration();
                                 if (!config.isEmpty()) {
                                     systemModeMapper.initializeMappings(config);
@@ -161,11 +184,6 @@ public class ThermostatDevice extends GenericDevice {
                 }
             }
         }
-        // todo make this configurable and maybe support it in a different way
-        // attributeMap.put("systemModeMap", "OFF=0,AUTO=1,COOL=3,HEAT=4");
-        // attributeMap.put("controlSequenceOfOperation",
-        // ThermostatCluster.ControlSequenceOfOperationEnum.COOLING_AND_HEATING.value);
-
         return attributeMap;
     }
 
@@ -182,6 +200,7 @@ public class ThermostatDevice extends GenericDevice {
     class SystemModeMapper {
         private final Map<Integer, String> intToCustomMap = new HashMap<>();
         private final Map<String, ThermostatCluster.SystemModeEnum> customToEnumMap = new HashMap<>();
+        private @Nullable String onMode = null;
 
         public SystemModeMapper() {
             Map<String, Object> mappings = new HashMap<>();
@@ -194,6 +213,7 @@ public class ThermostatDevice extends GenericDevice {
             mappings.put("FAN_ONLY", 6);
             mappings.put("DRY", 7);
             mappings.put("SLEEP", 8);
+            mappings.put("ON", 3);
             initializeMappings(mappings);
         }
 
@@ -205,17 +225,23 @@ public class ThermostatDevice extends GenericDevice {
             intToCustomMap.clear();
             customToEnumMap.clear();
             for (Map.Entry<String, Object> entry : mappings.entrySet()) {
-                try {
-                    ThermostatCluster.SystemModeEnum mode = ThermostatCluster.SystemModeEnum
-                            .valueOf(entry.getKey().trim());
-                    String customValue = entry.getValue() != null ? entry.getValue().toString().trim() : null;
+                String customKey = entry.getKey().trim();
+                Object valueObj = entry.getValue();
+                String customValue = valueObj != null ? valueObj.toString().trim() : null;
 
+                if ("ON".equals(customKey) && customValue != null) {
+                    onMode = customValue;
+                    continue;
+                }
+
+                try {
+                    ThermostatCluster.SystemModeEnum mode = ThermostatCluster.SystemModeEnum.valueOf(customKey);
                     if (customValue != null) {
-                        intToCustomMap.put(mode.value, customValue); // Use integer value of the enum
+                        intToCustomMap.put(mode.value, customValue);
                         customToEnumMap.put(customValue, mode);
                     }
                 } catch (IllegalArgumentException e) {
-                    logger.debug("Invalid mode: {}", entry.getKey());
+                    logger.debug("Invalid mode: {}", customKey);
                 }
             }
         }
@@ -228,7 +254,27 @@ public class ThermostatDevice extends GenericDevice {
             return value;
         }
 
+        public String onToCustomValue() throws SystemModeMappingException {
+            String value = this.onMode;
+            if (value == null) {
+                value = intToCustomMap.get(ThermostatCluster.SystemModeEnum.AUTO.value);
+            }
+            if (value == null) {
+                value = ThermostatCluster.SystemModeEnum.AUTO.getValue().toString();
+            }
+            return value;
+        }
+
         public ThermostatCluster.SystemModeEnum fromCustomValue(String customValue) throws SystemModeMappingException {
+            if ("ON".equals(customValue)) {
+                String onMode = this.onMode;
+                if (onMode != null) {
+                    return fromCustomValue(onMode);
+                } else {
+                    return ThermostatCluster.SystemModeEnum.AUTO;
+                }
+            }
+
             ThermostatCluster.SystemModeEnum value = customToEnumMap.get(customValue);
             if (value == null) {
                 throw new SystemModeMappingException("No mapping for custom value: " + customValue);

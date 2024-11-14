@@ -277,31 +277,32 @@ The openHAB matter bridge uses Metadata tags with the key "matter", similar to t
 Pairing codes and other options can be found in the MainUI under "Settings -> Add-on Settings -> Matter Binding"
 
 ### Device Types
+| Type               | Item Type                     | Tag               | Option                                       | Notes                 |
+|--------------------|-------------------------------|-------------------|----------------------------------------------|-----------------------|
+| On Off Light       | Switch, Dimmer                | OnOffLight        |                                              |                       |
+| Dimmable Light     | Dimmer                        | DimmableLight     |                                              |                       |
+| Color Light        | Color                         | ColorLight        |                                              | (not implemented yet) |
+| Plug In Unit       | Switch, Dimmer                | PlugInUnit        |                                              |                       |
+| Thermostat         | Group                         | Thermostat        |                                              |                       |
+| Window Covering    | Rollershutter, Dimmer, Switch | WindowCovering    | String types: [OPEN="OPEN", CLOSED="CLOSED"] |                       |
+| Temperature Sensor | Number                        | TemperatureSensor |                                              |                       |
+| Humidity Sensor    | Number                        | HumiditySensor    |                                              |                       |
+| Occupancy Sensor   | Switch, Contact               | OccupancySensor   |                                              |                       |
+| Door Lock          | Switch                        | DoorLock          |                                              |                       |
 
-| Type               | Item Type      | Tag               | Notes                 |
-|--------------------|----------------|-------------------|-----------------------|
-| On Off Light       | Switch/Dimmer  | OnOffLight        |                       |
-| Dimmable Light     | Dimmer         | DimmableLight     |                       |
-| Color Light        | Color          | ColorLight        | (not implemented yet) |
-| Plug In Unit       | Switch/Dimmer  | PlugInUnit        |                       |
-| Thermostat         | Group          | Thermostat        |                       |
-| Window Covering    | Rollershutter  | WindowCovering    |                       |
-| Temperature Sensor | Number         | TemperatureSensor |                       |
-| Humidity Sensor    | Number         | HumiditySensor    |                       |
-| Occupancy Sensor   | Switch/Contact | OccupancySensor   |                       |
-| Door Lock          | Switch         | DoorLock          |                       |
 
 ### Thermostat member tags
 
-| Item                | Tag                     | Options                                                                             |
-|---------------------|-------------------------|-------------------------------------------------------------------------------------|
-| Current Temperature | localTemperature        |                                                                                     |
-| Outdoor Temperature | outdoorTemperature      |                                                                                     |
-| Heating Setpoint    | occupiedHeatingSetpoint |                                                                                     |
-| Cooling Setpoint    | occupiedCoolingSetpoint |                                                                                     |
-| System Mode         | systemMode              | [OFF=0,AUTO=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
-| Running Mode        | runningMode             |                                                                                     |
+| Type                | Item Type              | Tag                               | Options                                                                                  |
+|---------------------|------------------------|-----------------------------------|------------------------------------------------------------------------------------------|
+| Current Temperature | Number                 | localTemperature                  |                                                                                          |
+| Outdoor Temperature | Number                 | outdoorTemperature                |                                                                                          |
+| Heating Setpoint    | Number                 | occupiedHeatingSetpoint           |                                                                                          |
+| Cooling Setpoint    | Number                 | occupiedCoolingSetpoint           |                                                                                          |
+| System Mode         | Number, String, Switch | systemMode                        | [OFF=0,AUTO=1,ON=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
+| Running Mode        | Number, String         | runningMode (not implemented yet) |                                                                                          |
 
+For `systemMode` the `ON` option should map to the system mode custom value that would be appropriate if a on/off command was issued, defaults to the `AUTO` mapping.
 
 ### Example
 

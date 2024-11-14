@@ -20,6 +20,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ColorControlCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.DeviceTypes;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster;
@@ -30,7 +31,9 @@ import org.openhab.binding.matter.internal.devices.converter.GenericConverter;
 import org.openhab.binding.matter.internal.handler.EndpointHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
+import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.type.ChannelTypeUID;
+import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,35 +44,53 @@ import org.slf4j.LoggerFactory;
  *         Lighting requires special handling for the OnOff, ColorControl and LevelControl clusters.
  *         For example, the Matter specification mandates Switches also must have a LevelControl cluster, even though
  *         they do not support dimming. We will filter those clusters out as well as coordinate commands among required
- *         clusters
+ *         clusters.
+ * 
  */
 @NonNullByDefault
 public class LightingType extends DeviceType {
     private final Logger logger = LoggerFactory.getLogger(LightingType.class);
-    private PercentType lastLevel = new PercentType(0);
+    private PercentType initLevel = new PercentType(0);
+    private OnOffType lastOnOff = OnOffType.OFF;
 
     public LightingType(Integer deviceType, EndpointHandler handler) {
         super(deviceType, handler);
     }
 
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        logger.debug("Handling command for channel: " + channelUID);
+        // we want OnOff commands to always use OnOff cluster (not levelcontrol)
+        if (command instanceof OnOffType onOffType) {
+            ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
+            handler.sendClusterCommand(OnOffCluster.CLUSTER_NAME, onOffCommand);
+        } else {
+            super.handleCommand(channelUID, command);
+        }
+    }
+
     @Override
     public void updateCluster(BaseCluster cluster) {
         if (cluster instanceof LevelControlCluster levelControlCluster) {
-            lastLevel = GenericConverter.levelToPercent(levelControlCluster.currentLevel);
-            if (clusterToConverters
-                    .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                colorControlConverter.updateBrightness(lastLevel);
+            initLevel = GenericConverter.levelToPercent(levelControlCluster.currentLevel);
+            // if the device is off, then don't update channels
+            if (lastOnOff != OnOffType.OFF) {
+                updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, initLevel);
+                if (clusterToConverters
+                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+                    colorControlConverter.updateBrightness(initLevel);
+                }
             }
         }
         if (cluster instanceof OnOffCluster onOffCluster) {
-            OnOffType onOff = OnOffType.from(Boolean.valueOf(onOffCluster.onOff));
-            logger.debug("OnOff {}", onOff);
-            updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, onOff);
+            lastOnOff = OnOffType.from(Boolean.valueOf(onOffCluster.onOff));
+            logger.debug("OnOff {}", lastOnOff);
+            updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
+            updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL,
+                    lastOnOff == OnOffType.OFF ? OnOffType.OFF : initLevel);
             if (clusterToConverters
                     .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                colorControlConverter.updateBrightness(onOff == OnOffType.OFF ? new PercentType(0) : lastLevel);
+                colorControlConverter.updateBrightness(lastOnOff == OnOffType.OFF ? new PercentType(0) : initLevel);
             }
-            updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, onOff);
         }
         super.updateCluster(cluster);
     }
@@ -77,24 +98,33 @@ public class LightingType extends DeviceType {
     @Override
     public void onEvent(AttributeChangedMessage message) {
         logger.debug("OnEvent: {}", message.path.attributeName);
-        Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
         switch (message.path.attributeName) {
             case "currentLevel":
-                lastLevel = GenericConverter.levelToPercent(numberValue);
-                if (clusterToConverters
-                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                    colorControlConverter.updateBrightness(lastLevel);
+                logger.debug("currentLevel lastOnOff {}", lastOnOff);
+                PercentType level = GenericConverter.levelToPercent(((Double) message.value).intValue());
+                // if the device is off, we don't care about level
+                if (lastOnOff != OnOffType.OFF) {
+                    updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, level);
+                    if (clusterToConverters.get(
+                            ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+                        colorControlConverter.updateBrightness(level);
+                    }
                 }
-                break;
+                return;
             case "onOff":
-                OnOffType onOff = OnOffType.from((Boolean) message.value);
-                if (clusterToConverters
-                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                    colorControlConverter.updateBrightness(onOff == OnOffType.OFF ? new PercentType(0) : lastLevel);
+                lastOnOff = OnOffType.from((Boolean) message.value);
+                logger.debug("onOff lastOnOff {}", lastOnOff);
+                updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, lastOnOff);
+                updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
+                if (lastOnOff == OnOffType.OFF) {
+                    if (clusterToConverters.get(
+                            ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+                        colorControlConverter.updateBrightness(new PercentType(0));
+                    }
                 }
-                updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, onOff);
-                break;
+                return;
         }
+        // no matching cluster, bubble up for generic cluster processing
         super.onEvent(message);
     }
 
