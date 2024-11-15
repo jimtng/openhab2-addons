@@ -39,118 +39,97 @@ public class MatterBindingConstants {
 
     // This was borrowed from the zigbee binding as Matter uses the same cluster API model
     // List of Channel UIDs
-    public static final String CHANNEL_NAME_ONOFF_ONOFF = "onoff";
     public static final String CHANNEL_LABEL_ONOFF_ONOFF = "On Off";
     public static final ChannelTypeUID CHANNEL_ONOFF_ONOFF = new ChannelTypeUID("matter:onoffcontrol-onoff");
 
-    public static final String CHANNEL_NAME_LEVEL_LEVEL = "level";
     public static final String CHANNEL_LABEL_LEVEL_LEVEL = "Level Control";
     public static final ChannelTypeUID CHANNEL_LEVEL_LEVEL = new ChannelTypeUID("matter:levelcontrol-level");
 
-    public static final String CHANNEL_NAME_COLOR_COLOR = "color";
     public static final String CHANNEL_LABEL_COLOR_COLOR = "Color Control";
     public static final ChannelTypeUID CHANNEL_COLOR_COLOR = new ChannelTypeUID("matter:colorcontrol-color");
 
-    public static final String CHANNEL_NAME_COLOR_TEMPERATURE = "colortemperature";
     public static final String CHANNEL_LABEL_COLOR_TEMPERATURE = "Color Temperature";
     public static final ChannelTypeUID CHANNEL_COLOR_TEMPERATURE = new ChannelTypeUID(
             "matter:colorcontrol-temperature");
 
-    public static final String CHANNEL_NAME_POWER_BATTERYPERCENT = "powersourcebatpercentremaining";
+    public static final String CHANNEL_LABEL_COLOR_TEMPERATURE_ABS = "Color Temperature";
+    public static final ChannelTypeUID CHANNEL_COLOR_TEMPERATURE_ABS = new ChannelTypeUID(
+            "matter:colorcontrol-temperature-abs");
+
     public static final String CHANNEL_LABEL_POWER_BATTERYPERCENT = "Battery Percent Remaining";
     public static final ChannelTypeUID CHANNEL_POWER_BATTERYPERCENT = new ChannelTypeUID(
             "matter:powersource-batpercentremaining");
 
-    public static final String CHANNEL_NAME_POWER_CHARGELEVEL = "powersourcechargelevel";
     public static final String CHANNEL_LABEL_POWER_CHARGELEVEL = "Battery Charge Level";
     public static final ChannelTypeUID CHANNEL_POWER_CHARGELEVEL = new ChannelTypeUID(
             "matter:powersource-batchargelevel");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_LOCALTEMPERATURE = "thermostatlocaltemperature";
     public static final String CHANNEL_LABEL_THERMOSTAT_LOCALTEMPERATURE = "Local Temperature";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_LOCALTEMPERATURE = new ChannelTypeUID(
             "matter:thermostat-localtemperature");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_OUTDOORTEMPERATURE = "thermostatoutdoortemperature";
     public static final String CHANNEL_LABEL_THERMOSTAT_OUTDOORTEMPERATURE = "Outdoor Temperature";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_OUTDOORTEMPERATURE = new ChannelTypeUID(
             "matter:thermostat-outdoortemperature");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_OCCUPIEDCOOLING = "thermostatoccupiedcooling";
     public static final String CHANNEL_LABEL_THERMOSTAT_OCCUPIEDCOOLING = "Occupied Cooling Setpoint";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_OCCUPIEDCOOLING = new ChannelTypeUID(
             "matter:thermostat-occupiedcooling");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_OCCUPIEDHEATING = "thermostatoccupiedheating";
     public static final String CHANNEL_LABEL_THERMOSTAT_OCCUPIEDHEATING = "Occupied Heating Setpoint";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_OCCUPIEDHEATING = new ChannelTypeUID(
             "matter:thermostat-occupiedheating");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_UNOCCUPIEDCOOLING = "thermostatunoccupiedcooling";
     public static final String CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDCOOLING = "Unoccupied Cooling Setpoint";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_UNOCCUPIEDCOOLING = new ChannelTypeUID(
             "matter:thermostat-unoccupiedcooling");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_UNOCCUPIEDHEATING = "thermostatunoccupiedheating";
     public static final String CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDHEATING = "Unoccupied Heating Setpoint";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_UNOCCUPIEDHEATING = new ChannelTypeUID(
             "matter:thermostat-unoccupiedheating");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_SYSTEMMODE = "thermostatsystemmode";
     public static final String CHANNEL_LABEL_THERMOSTAT_SYSTEMMODE = "System Mode";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_SYSTEMMODE = new ChannelTypeUID(
             "matter:thermostat-systemmode");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_RUNNINGMODE = "thermostatrunningmode";
     public static final String CHANNEL_LABEL_THERMOSTAT_RUNNINGMODE = "Running Mode";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_RUNNINGMODE = new ChannelTypeUID(
             "matter:thermostat-runningmode");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_HEATING_DEMAND = "thermostatheatingdemand";
     public static final String CHANNEL_LABEL_THERMOSTAT_HEATING_DEMAND = "Heating Demand";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_HEATING_DEMAND = new ChannelTypeUID(
             "matter:thermostat-heatingdemand");
 
-    public static final String CHANNEL_NAME_THERMOSTAT_COOLING_DEMAND = "thermostatcoolingdemand";
     public static final String CHANNEL_LABEL_THERMOSTAT_COOLING_DEMAND = "Cooling Demand";
     public static final ChannelTypeUID CHANNEL_THERMOSTAT_COOLING_DEMAND = new ChannelTypeUID(
             "matter:thermostat-coolingdemand");
 
-    public static final String CHANNEL_NAME_DOORLOCK_STATE = "doorlockstate";
     public static final String CHANNEL_LABEL_DOORLOCK_STATE = "Door Lock State";
     public static final ChannelTypeUID CHANNEL_DOORLOCK_STATE = new ChannelTypeUID("matter:door-state");
 
-    public static final String CHANNEL_NAME_WINDOWCOVERING_LIFT = "windowcoveringlift";
     public static final String CHANNEL_LABEL_WINDOWCOVERING_LIFT = "Window Covering Lift";
     public static final ChannelTypeUID CHANNEL_WINDOWCOVERING_LIFT = new ChannelTypeUID("matter:windowcovering-lift");
 
-    public static final String CHANNEL_NAME_FANCONTROL_PERCENT = "fancontrolpercent";
     public static final String CHANNEL_LABEL_FANCONTROL_PERCENT = "Fan Control Percent";
     public static final ChannelTypeUID CHANNEL_FANCONTROL_PERCENT = new ChannelTypeUID("matter:fancontrol-percent");
 
-    public static final String CHANNEL_NAME_FANCONTROL_MODE = "fancontrolmode";
     public static final String CHANNEL_LABEL_FANCONTROL_MODE = "Fan Control Mode";
     public static final ChannelTypeUID CHANNEL_FANCONTROL_MODE = new ChannelTypeUID("matter:fancontrol-mode");
 
-    public static final String CHANNEL_NAME_TEMPERATUREMEASURMENT_MEASUREDVALUE = "temperaturemeasurementmeasuredvalue";
     public static final String CHANNEL_LABEL_TEMPERATUREMEASURMENT_MEASUREDVALUE = "Temperature";
     public static final ChannelTypeUID CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE = new ChannelTypeUID(
             "matter:temperaturemeasurement-measuredvalue");
 
-    public static final String CHANNEL_NAME_HUMIDITYMEASURMENT_MEASUREDVALUE = "relativehumiditymeasurementmeasuredvalue";
     public static final String CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE = "Humidity";
     public static final ChannelTypeUID CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE = new ChannelTypeUID(
             "matter:relativehumiditymeasurement-measuredvalue");
-
-    public static final String CHANNEL_NAME_OCCUPANCYSENSING_OCCUPIED = "occupancysensingoccupied";
+  
     public static final String CHANNEL_LABEL_OCCUPANCYSENSING_OCCUPIED = "Occupied";
     public static final ChannelTypeUID CHANNEL_OCCUPANCYSENSING_OCCUPIED = new ChannelTypeUID(
             "matter:occupancysensing-occupied");
 
-    public static final String CHANNEL_NAME_MODESELECT_MODE = "MODESELECT_MODE";
     public static final ChannelTypeUID CHANNEL_MODESELECT_MODE = new ChannelTypeUID("matter:modeselect-mode");
 
-    public static final String CHANNEL_NAME_SWITCH_SWITCH = "SWITCH_SWITCH";
     public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCH = new ChannelTypeUID("matter:switch-switch");
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCHLATECHED = new ChannelTypeUID(
