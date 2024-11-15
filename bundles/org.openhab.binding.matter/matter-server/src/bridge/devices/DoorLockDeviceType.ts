@@ -4,6 +4,8 @@ import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/brid
 import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
 import { Logger } from "@matter/general";
+import { DoorLockServer } from "@matter/main/behaviors";
+import { DoorLock } from "@matter/main/clusters";
 
 const logger = Logger.get("DoorLockDeviceType");
 
@@ -15,11 +17,17 @@ export class DoorLockDeviceType extends GenericDeviceType {
             lockState: 0,
             lockType: 0,
             actuatorEnabled: true,
-            doorState: 1
+            doorState: 1,
+            maxPinCodeLength: 10,
+            minPinCodeLength: 1,
+            wrongCodeEntryLimit: 5,
+            userCodeTemporaryDisableTime: 10
         }
         const finalMap = { ...defaultParams, ...this.attributeMap }
 
-        const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer), {
+        const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer, DoorLockServer.with(
+            DoorLock.Feature.PinCredential
+        )), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
                 nodeLabel: this.nodeLabel,
@@ -29,7 +37,7 @@ export class DoorLockDeviceType extends GenericDeviceType {
                 reachable: true,
             },
             doorLock: {
-               ...finalMap
+                ...finalMap,
             },
         });
         endpoint.events.doorLock.lockState$Changed.on(value => {

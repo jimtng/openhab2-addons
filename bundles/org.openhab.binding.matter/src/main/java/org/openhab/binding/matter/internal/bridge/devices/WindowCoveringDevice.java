@@ -110,9 +110,9 @@ public class WindowCoveringDevice extends GenericDevice {
                 Object closeValue = primaryItemMetadata.getConfiguration().get("CLOSED");
                 if (openValue instanceof String && closeValue instanceof String) {
                     if (stringType.equals(openValue)) {
-                        pos = 10000;
-                    } else if (stringType.equals(closeValue)) {
                         pos = 0;
+                    } else if (stringType.equals(closeValue)) {
+                        pos = 10000;
                     }
                 }
             }

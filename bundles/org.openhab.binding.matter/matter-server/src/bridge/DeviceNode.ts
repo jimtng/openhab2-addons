@@ -17,7 +17,9 @@ import { DoorLockDeviceType } from "./devices/DoorLockDeviceType";
 import { TemperatureSensorType } from "./devices/TemperatureSensorType";
 import { HumiditySensorType } from "./devices/HumiditySensorType";
 import { OccupancySensorDeviceType } from "./devices/OccupancySensorDeviceType";
-
+import { ContactSensorDeviceType } from "./devices/ContactSensorDeviceType";
+import { FanModeDeviceType } from "./devices/FanModeDeviceType";
+import { ColorDeviceType } from "./devices/ColorDeviceType";
 
 
 const logger = Logger.get("DeviceNode");
@@ -148,6 +150,15 @@ export class DeviceNode {
                 break;
             case "OccupancySensor":
                 device = new OccupancySensorDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "ContactSensor":
+                device = new ContactSensorDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "FanMode":
+                device = new FanModeDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "Color":
+                device = new ColorDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             default:
                 throw new Error(`Unsupported device type ${deviceType}`);
