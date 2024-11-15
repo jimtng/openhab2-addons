@@ -279,15 +279,16 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 ### Device Types
 | Type               | Item Type                     | Tag               | Option                                       | Notes                 |
 |--------------------|-------------------------------|-------------------|----------------------------------------------|-----------------------|
-| On Off Light       | Switch, Dimmer                | OnOffLight        |                                              |                       |
+| OnOff Light        | Switch, Dimmer                | OnOffLight        |                                              |                       |
 | Dimmable Light     | Dimmer                        | DimmableLight     |                                              |                       |
-| Color Light        | Color                         | ColorLight        |                                              | (not implemented yet) |
+| Color Light        | Color                         | ColorLight        |                                              |                       |
 | Plug In Unit       | Switch, Dimmer                | PlugInUnit        |                                              |                       |
 | Thermostat         | Group                         | Thermostat        |                                              |                       |
 | Window Covering    | Rollershutter, Dimmer, Switch | WindowCovering    | String types: [OPEN="OPEN", CLOSED="CLOSED"] |                       |
 | Temperature Sensor | Number                        | TemperatureSensor |                                              |                       |
 | Humidity Sensor    | Number                        | HumiditySensor    |                                              |                       |
 | Occupancy Sensor   | Switch, Contact               | OccupancySensor   |                                              |                       |
+| Contact Sensor     | Switch, Contact               | ContactSensor     |                                              |                       |
 | Door Lock          | Switch                        | DoorLock          |                                              |                       |
 
 
@@ -302,7 +303,7 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 | System Mode         | Number, String, Switch | systemMode                        | [OFF=0,AUTO=1,ON=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
 | Running Mode        | Number, String         | runningMode (not implemented yet) |                                                                                          |
 
-For `systemMode` the `ON` option should map to the system mode custom value that would be appropriate if a on/off command was issued, defaults to the `AUTO` mapping.
+For `systemMode` the `ON` option should map to the system mode custom value that would be appropriate if a 'on' command was issued, defaults to the `AUTO` mapping.
 
 ### Example
 
