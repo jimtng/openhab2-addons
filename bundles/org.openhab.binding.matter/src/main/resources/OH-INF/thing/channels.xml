@@ -75,6 +75,7 @@
 			<tag>Control</tag>
 			<tag>Light</tag>
 		</tags>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
 	<channel-type id="colorcontrol-temperature">
@@ -133,6 +134,7 @@
 		<label>Switch</label>
 		<description>Switches the power on and off</description>
 		<category>Light</category>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
 	<!-- Level Dimmer -->
@@ -145,6 +147,7 @@
 			<tag>Control</tag>
 			<tag>Light</tag>
 		</tags>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
 	<!--Mode Select Mode -->
@@ -372,6 +375,14 @@
 		<category>Temperature</category>
 		<state pattern="%.1f %unit%" readOnly="true"/>
 	</channel-type>
+
+	<channel-type id="relativehumiditymeasurement-measuredvalue">
+        <item-type>Number</item-type>
+        <label>Humidity</label>
+        <description>Indicates the current relative humidity</description>
+        <category>Humidity</category>
+        <state pattern="%.1f %%" readOnly="true" />
+    </channel-type>
 
 	<channel-type id="occupancysensing-occupied">
 		<item-type>Switch</item-type>

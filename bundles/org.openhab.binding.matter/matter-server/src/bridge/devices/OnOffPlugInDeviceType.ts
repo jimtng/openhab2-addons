@@ -1,13 +1,13 @@
 import { Endpoint } from "@matter/node";
 import { OnOffPlugInUnitDevice } from "@matter/node/devices/on-off-plug-in-unit";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDevice } from './GenericDevice'; // Adjust the path as needed
+import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
 import { Logger } from"@matter/general";
 
 const logger = Logger.get("OnOffPlugInDevice");
 
-export class OnOffPlugInDevice extends GenericDevice {
+export class OnOffPlugInDeviceType extends GenericDeviceType {
     
     override createEndpoint() {
         const endpoint = new Endpoint(OnOffPlugInUnitDevice.with(BridgedDeviceBasicInformationServer), {
@@ -19,6 +19,9 @@ export class OnOffPlugInDevice extends GenericDevice {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
+            onOff: {
+                onOff: this.attributeMap.onOff || false,
+            }
         });
         endpoint.events.onOff.onOff$Changed.on(value => {
             this.sendBridgeEvent("onOff","onOff", value);

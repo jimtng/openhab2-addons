@@ -3,13 +3,13 @@ import { ThermostatDevice } from "@matter/node/devices/thermostat";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { ThermostatServer } from '@matter/node/behaviors/thermostat';
 import { Thermostat } from '@matter/main/clusters';
-import { GenericDevice } from './GenericDevice'; // Adjust the path as needed
+import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
 import { Logger } from"@matter/general";
 
-const logger = Logger.get("ThermoDevice");
+const logger = Logger.get("ThermostatDeviceType");
 
-export class ThermoDevice extends GenericDevice {
+export class ThermostatDeviceType extends GenericDeviceType {
 
     override createEndpoint() {
         let controlSequenceOfOperation = -1;

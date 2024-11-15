@@ -120,6 +120,10 @@ public class MatterBindingConstants {
     public static final ChannelTypeUID CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE = new ChannelTypeUID(
             "matter:temperaturemeasurement-measuredvalue");
 
+    public static final String CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE = "Humidity";
+    public static final ChannelTypeUID CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE = new ChannelTypeUID(
+            "matter:relativehumiditymeasurement-measuredvalue");
+  
     public static final String CHANNEL_LABEL_OCCUPANCYSENSING_OCCUPIED = "Occupied";
     public static final ChannelTypeUID CHANNEL_OCCUPANCYSENSING_OCCUPIED = new ChannelTypeUID(
             "matter:occupancysensing-occupied");

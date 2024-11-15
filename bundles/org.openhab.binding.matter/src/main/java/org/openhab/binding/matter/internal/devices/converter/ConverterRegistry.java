@@ -42,6 +42,8 @@ public class ConverterRegistry {
         ConverterRegistry.registerConverter(WindowCoveringCluster.CLUSTER_ID, WindowCoveringConverter.class);
         ConverterRegistry.registerConverter(PowerSourceCluster.CLUSTER_ID, PowerSourceConverter.class);
         ConverterRegistry.registerConverter(FanControlCluster.CLUSTER_ID, FanControlConverter.class);
+        ConverterRegistry.registerConverter(RelativeHumidityMeasurementCluster.CLUSTER_ID,
+                RelativeHumidityMeasurementConverter.class);
         ConverterRegistry.registerConverter(TemperatureMeasurementCluster.CLUSTER_ID,
                 TemperatureMeasurementConverter.class);
         ConverterRegistry.registerConverter(OccupancySensingCluster.CLUSTER_ID, OccupancySensingConverter.class);

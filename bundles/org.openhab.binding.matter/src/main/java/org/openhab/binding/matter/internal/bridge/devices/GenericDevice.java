@@ -20,10 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.MetadataRegistry;
-import org.openhab.core.items.StateChangeListener;
+import org.openhab.core.items.*;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.QuantityType;
@@ -36,16 +33,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link DimmableLightDevice}
+ * The {@link GenericDevice}
  *
  * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public abstract class GenericDevice implements StateChangeListener {
-    private final Logger logger = LoggerFactory.getLogger(GenericDevice.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final static BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
 
     protected final GenericItem primaryItem;
+    protected @Nullable Metadata primaryItemMetadata;
     protected final MatterBridgeClient client;
     protected final MetadataRegistry metadataRegistry;
 
@@ -53,13 +51,14 @@ public abstract class GenericDevice implements StateChangeListener {
         this.metadataRegistry = metadataRegistry;
         this.client = client;
         this.primaryItem = primaryItem;
+        this.primaryItemMetadata = metadataRegistry.get(new MetadataKey("matter", primaryItem.getUID()));
     }
-
-    abstract public void dispose();
 
     abstract public String deviceType();
 
-    abstract public Map<String, Object> setupDevice();
+    abstract public Map<String, Object> activate();
+
+    abstract public void dispose();
 
     abstract public void handleMatterEvent(String clusterName, String attributeName, Object data);
 
@@ -77,16 +76,20 @@ public abstract class GenericDevice implements StateChangeListener {
     }
 
     public CompletableFuture<String> registerDevice() {
-        return client.addEndpoint(deviceType(), primaryItem.getName(), primaryItem.getLabel(), "openHAB Device",
-                "An openHAB Device", "0000001", setupDevice());
+        String label = primaryItem.getLabel();
+        if (label == null) {
+            label = primaryItem.getName();
+        }
+        return client.addEndpoint(deviceType(), primaryItem.getName(), label, primaryItem.getName(),
+                "Type " + primaryItem.getType(), String.valueOf(primaryItem.getName().hashCode()), activate());
     }
 
     public String getName() {
         return primaryItem.getName();
     }
 
-    protected void setEndpointState(String clusterName, String attributeName, Object state) {
-        client.genericCommand("bridge", "setEndpointState", primaryItem.getName(), clusterName, attributeName, state);
+    public CompletableFuture<Void> setEndpointState(String clusterName, String attributeName, Object state) {
+        return client.setEndpointState(primaryItem.getName(), clusterName, attributeName, state);
     }
 
     // TODO Move all of the following into a shared UTIL class, copied from cluster converters

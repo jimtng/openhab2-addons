@@ -84,7 +84,8 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
      * @return the scaled {@link PercentType}
      */
     public static PercentType levelToPercent(int level) {
-        return new PercentType((int) (level * 100.0 / 254.0 + 0.5));
+        int result = (int) Math.round(level * 100.0 / 254.0 + 0.5);
+        return new PercentType(Math.min(result, 100));
     }
 
     /**

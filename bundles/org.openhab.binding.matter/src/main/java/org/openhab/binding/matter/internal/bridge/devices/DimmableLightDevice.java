@@ -46,11 +46,12 @@ public class DimmableLightDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> setupDevice() {
+    public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("currentLevel", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
-                .orElseGet(() -> new PercentType(0)).intValue());
+        int level = Optional.ofNullable(primaryItem.getStateAs(PercentType.class)).orElseGet(() -> new PercentType(0))
+                .intValue();
+        return Map.of("currentLevel", level, "onOff", level > 0);
     }
 
     @Override
@@ -87,7 +88,9 @@ public class DimmableLightDevice extends GenericDevice {
     public void updateState(Item item, State state) {
         if (state instanceof HSBType hsb) {
             setEndpointState("levelControl", "currentLevel", percentToLevel(hsb.getBrightness()));
+            setEndpointState("onOff", "onOff", hsb.getBrightness().intValue() > 0);
         } else if (state instanceof PercentType percentType) {
+            setEndpointState("onOff", "onOff", percentType.intValue() > 0);
             setEndpointState("levelControl", "currentLevel", percentToLevel(percentType));
         } else if (state instanceof OnOffType onOffType) {
             setEndpointState("onOff", "onOff", onOffType == OnOffType.ON ? true : false);

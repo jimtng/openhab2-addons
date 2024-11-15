@@ -154,6 +154,15 @@ public class MatterControllerClient extends MatterWebsocketClient {
         });
     }
 
+    public CompletableFuture<String> clusterReadAttribute(BigInteger nodeId, Integer endpointId, String clusterName,
+            String attributeName) {
+        Object[] clusterArgs = { String.valueOf(nodeId), endpointId, clusterName, attributeName };
+        CompletableFuture<JsonElement> future = sendMessage("clusters", "readAttribute", clusterArgs);
+        return future.thenApply(obj -> {
+            return obj.getAsString();
+        });
+    }
+
     public CompletableFuture<ActiveSessionInformation[]> getSessionInformation() {
         CompletableFuture<JsonElement> future = sendMessage("nodes", "sessionInformation", new Object[0]);
         return future.thenApply(obj -> {

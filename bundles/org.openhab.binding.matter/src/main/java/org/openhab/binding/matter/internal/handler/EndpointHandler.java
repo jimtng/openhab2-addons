@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -316,6 +317,14 @@ public class EndpointHandler extends BaseThingHandler implements AttributeListen
         if (ws != null) {
             ws.clusterWriteAttribute(nodeId, endpointId, clusterName, attributeName, value);
         }
+    }
+
+    public CompletableFuture<String> readAttribute(String clusterName, String attributeName) {
+        MatterControllerClient ws = getClient();
+        if (ws != null) {
+            return ws.clusterReadAttribute(nodeId, endpointId, clusterName, attributeName);
+        }
+        throw new RuntimeException("Client is null");
     }
 
     protected @Nullable ControllerHandler controllerHandler() {

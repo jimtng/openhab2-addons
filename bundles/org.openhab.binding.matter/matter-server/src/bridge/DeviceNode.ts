@@ -6,13 +6,20 @@ import { logEndpoint, EndpointInterface } from "@matter/protocol";
 import { Endpoint, EndpointServer, MutableEndpoint, ServerNode } from "@matter/node";
 import { AggregatorEndpoint } from "@matter/node/endpoints";
 import { Environment, Logger } from "@matter/general";
-import { GenericDevice } from "./devices/GenericDevice";
-import { OnOffDevice } from "./devices/OnOffDevice";
-import { OnOffPlugInDevice } from "./devices/OnOffPlugInDevice";
-import { DimmableDevice } from "./devices/DimmableDevice";
-import { ThermoDevice } from "./devices/ThermoDevice";
+import { GenericDeviceType } from "./devices/GenericDeviceType";
+import { OnOffDeviceType } from "./devices/OnOffDeviceType";
+import { OnOffPlugInDeviceType } from "./devices/OnOffPlugInDeviceType";
+import { DimmableDeviceType } from "./devices/DimmableDeviceType";
+import { ThermostatDeviceType } from "./devices/ThermostatDeviceType";
 import { WindowCoveringDeviceType } from "./devices/WindowCoveringDeviceType";
 import { BridgeController } from "./BridgeController";
+import { DoorLockDeviceType } from "./devices/DoorLockDeviceType";
+import { TemperatureSensorType } from "./devices/TemperatureSensorType";
+import { HumiditySensorType } from "./devices/HumiditySensorType";
+import { OccupancySensorDeviceType } from "./devices/OccupancySensorDeviceType";
+
+
+
 const logger = Logger.get("DeviceNode");
 
 export class DeviceNode {
@@ -20,7 +27,7 @@ export class DeviceNode {
     #environment: Environment = Environment.default;
 
     private aggregator!: Endpoint<AggregatorEndpoint>;
-    private devices: Map<string, GenericDevice> = new Map();
+    private devices: Map<string, GenericDeviceType> = new Map();
 
     constructor(private bridgeController: BridgeController, private storagePath: string, private resetStorage: boolean, private deviceName: string, private vendorName: string, private passcode: number, private discriminator: number, private vendorId: number, private productName: string, private productId: number, private port: number, private uniqueId: string) {
     }
@@ -77,7 +84,7 @@ export class DeviceNode {
             logger.info(`ServerNode created with ID: ${this.server.id}`);
             this.aggregator = new Endpoint(AggregatorEndpoint, { id: "aggregator" });
             await this.server.add(this.aggregator);
-            await this.server.start();
+           
 
             //reset this for future restarts
             this.#environment.vars.set("storage.clear", false);
@@ -107,7 +114,7 @@ export class DeviceNode {
 
     async addEndpoint(deviceType: string, id: string, nodeLabel: string, productName: string, productLabel: string, serialNumber: string, attributeMap: { [key: string]: any }) {
         //const deviceType = this.deviceTypes[endpointType];
-        let device: GenericDevice | null = null;
+        let device: GenericDeviceType | null = null;
 
         if (this.devices.has(id)) {
             logger.error(`Device ${id} already exists! Call 'resetEndpoints' first and try again.`);
@@ -116,30 +123,38 @@ export class DeviceNode {
 
         switch (deviceType) {
             case "OnOffLightDevice":
-                device = new OnOffDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                device = new OnOffDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             case "OnOffPlugInUnitDevice":
-                device = new OnOffPlugInDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                device = new OnOffPlugInDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             case "DimmableLightDevice":
-                device = new DimmableDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                device = new DimmableDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             case "ThermostatDevice":
-                device = new ThermoDevice(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                device = new ThermostatDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             case "WindowCoveringDevice":
                 device = new WindowCoveringDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
+            case "DoorLockDevice":
+                device = new DoorLockDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "TemperatureSensor":
+                device = new TemperatureSensorType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "HumiditySensor":
+                device = new HumiditySensorType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
+            case "OccupancySensor":
+                device = new OccupancySensorDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
+                break;
             default:
-                logger.error(`Unsupported device type ${deviceType}`);
+                throw new Error(`Unsupported device type ${deviceType}`);
         }
         if (device != null) {
             this.devices.set(id, device);
             await this.aggregator.add(device.endpoint);
-            /**
-            * Log the endpoint structure for debugging reasons and to allow to verify anything is correct
-            */
-            //logEndpoint(EndpointServer.forEndpoint(this.server));
         }
 
     }
@@ -149,6 +164,11 @@ export class DeviceNode {
         return this.init();
     }
 
+    async startBridge() {
+        await this.server.start();
+        logEndpoint(EndpointServer.forEndpoint(this.server));
+    }
+    
     async setEndpointState(endpointId: string, clusterName: string, stateName: string, stateValue: any) {
         const device = this.devices.get(endpointId);
         if (device) {

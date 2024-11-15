@@ -17,18 +17,19 @@ import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.library.items.DimmerItem;
 import org.openhab.core.library.items.RollershutterItem;
+import org.openhab.core.library.items.StringItem;
+import org.openhab.core.library.items.SwitchItem;
+import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.StringType;
 import org.openhab.core.types.State;
 
 /**
- * The {@link DimmableLightDevice}
+ * The {@link WindowCoveringDevice}
  *
  * @author Dan Cunningham - Initial contribution
  */
@@ -45,11 +46,11 @@ public class WindowCoveringDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> setupDevice() {
+    public Map<String, Object> activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("currentPositionLiftPercentage", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
-                .orElseGet(() -> new PercentType(0)).intValue());
+        return Map.of("currentPositionLiftPercent100ths", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
+                .orElseGet(() -> new PercentType(0)).intValue() * 100);
     }
 
     @Override
@@ -77,16 +78,47 @@ public class WindowCoveringDevice extends GenericDevice {
                 dimmerItem.send(percentType);
             } else if (primaryItem instanceof RollershutterItem rollerShutterItem) {
                 rollerShutterItem.send(percentType);
+            } else if (primaryItem instanceof SwitchItem switchItem) {
+                switchItem.send(percentType.intValue() > 0 ? OnOffType.ON : OnOffType.OFF);
+            } else if (primaryItem instanceof StringItem stringItem) {
+                boolean open = percentType.intValue() > 0;
+                String key = open ? "OPEN" : "CLOSED";
+                Object obj = key;
+                Metadata primaryItemMetadata = this.primaryItemMetadata;
+                if (primaryItemMetadata != null) {
+                    obj = primaryItemMetadata.getConfiguration().getOrDefault(key, key);
+                }
+                stringItem.send(new StringType(obj.toString()));
             }
         }
     }
 
     public void updateState(Item item, State state) {
         if (state instanceof PercentType percentType) {
-            setEndpointState("windowCovering", "currentPositionLiftPercentage", percentType.intValue());
+            setEndpointState("windowCovering", "currentPositionLiftPercent100ths", percentType.intValue() * 100);
         } else if (state instanceof OpenClosedType openClosedType) {
-            setEndpointState("windowCovering", "currentPositionLiftPercentage",
-                    openClosedType == OpenClosedType.OPEN ? 100 : 0);
+            setEndpointState("windowCovering", "currentPositionLiftPercent100ths",
+                    openClosedType == OpenClosedType.OPEN ? 10000 : 0);
+        } else if (state instanceof OnOffType onOffType) {
+            setEndpointState("windowCovering", "currentPositionLiftPercent100ths",
+                    onOffType == OnOffType.ON ? 0 : 10000);
+        } else if (state instanceof StringType stringType) {
+            int pos = 0;
+            Metadata primaryItemMetadata = this.primaryItemMetadata;
+            if (primaryItemMetadata != null) {
+                Object openValue = primaryItemMetadata.getConfiguration().get("OPEN");
+                Object closeValue = primaryItemMetadata.getConfiguration().get("CLOSED");
+                if (openValue instanceof String && closeValue instanceof String) {
+                    if (stringType.equals(openValue)) {
+                        pos = 10000;
+                    } else if (stringType.equals(closeValue)) {
+                        pos = 0;
+                    }
+                }
+            }
+            if (pos > -1) {
+                setEndpointState("windowCovering", "currentPositionLiftPercent100ths", pos);
+            }
         }
     }
 }

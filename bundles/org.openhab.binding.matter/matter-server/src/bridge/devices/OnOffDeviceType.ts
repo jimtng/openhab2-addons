@@ -1,13 +1,13 @@
 import { Endpoint } from "@matter/node";
 import { OnOffLightDevice } from "@matter/node/devices/on-off-light";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDevice } from './GenericDevice'; // Adjust the path as needed
+import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
 import { Logger } from"@matter/general";
 
-const logger = Logger.get("OnOff");
+const logger = Logger.get("OnOffDeviceType");
 
-export class OnOffDevice extends GenericDevice {
+export class OnOffDeviceType extends GenericDeviceType {
     
     override createEndpoint() {
         const endpoint = new Endpoint(OnOffLightDevice.with(BridgedDeviceBasicInformationServer), {
@@ -18,6 +18,9 @@ export class OnOffDevice extends GenericDevice {
                 productLabel: this.productLabel,
                 serialNumber: this.serialNumber,
                 reachable: true,
+            },
+            onOff: {
+                onOff: this.attributeMap.onOff || false,
             },
         });
         endpoint.events.onOff.onOff$Changed.on(value => {
