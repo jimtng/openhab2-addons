@@ -45,10 +45,13 @@ public class ContactSensorDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("stateValue", contactState(primaryItem.getState()));
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
+        attributeMap.put("booleanState.stateValue", contactState(primaryItem.getState()));
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

@@ -47,10 +47,13 @@ public class OccupancySensorDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("occupancy", occupiedState(primaryItem.getState()));
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
+        attributeMap.put("occupancySensing.occupancy", occupiedState(primaryItem.getState()));
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

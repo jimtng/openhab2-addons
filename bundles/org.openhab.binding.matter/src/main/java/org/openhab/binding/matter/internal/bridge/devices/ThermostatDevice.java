@@ -19,7 +19,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ThermostatCluster;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.GroupItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.items.NumberItem;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.items.SwitchItem;
@@ -40,7 +43,6 @@ public class ThermostatDevice extends GenericDevice {
     private final Map<String, GenericItem> itemMap = new HashMap<>();
     private final Map<String, String> attributeToItemNameMap = new HashMap<>();
     private final SystemModeMapper systemModeMapper = new SystemModeMapper();
-    private @Nullable Object onMapping;
 
     public ThermostatDevice(MetadataRegistry metadataRegistry, MatterBridgeClient client, GenericItem item) {
         super(metadataRegistry, client, item);
@@ -48,25 +50,26 @@ public class ThermostatDevice extends GenericDevice {
 
     @Override
     public String deviceType() {
-        return "ThermostatDevice";
+        return "Thermostat";
     }
 
     @Override
     public void handleMatterEvent(String clusterName, String attributeName, Object data) {
-        String itemUid = attributeToItemNameMap.get(attributeName);
+        String pathName = clusterName + "." + attributeName;
+        String itemUid = attributeToItemNameMap.get(pathName);
         if (itemUid != null) {
             GenericItem item = itemMap.get(itemUid);
             if (item != null) {
                 // State state = TypeParser.parseState(item.getAcceptedDataTypes(), data.toString());
-                switch (attributeName) {
-                    case "localTemperature":
-                    case "outdoorTemperature":
-                    case "occupiedHeatingSetpoint":
-                    case "occupiedCoolingSetpoint":
+                switch (pathName) {
+                    case "thermostat.localTemperature":
+                    case "thermostat.outdoorTemperature":
+                    case "thermostat.occupiedHeatingSetpoint":
+                    case "thermostat.occupiedCoolingSetpoint":
                         QuantityType t = valueToTemperature(Float.valueOf(data.toString()).intValue());
                         item.setState(t);
                         break;
-                    case "systemMode":
+                    case "thermostat.systemMode":
                         try {
                             String mappedMode = systemModeMapper
                                     .toCustomValue(Double.valueOf(data.toString()).intValue());
@@ -81,7 +84,7 @@ public class ThermostatDevice extends GenericDevice {
                             logger.debug("Could not convert {} to custom value", data);
                         }
                         break;
-                    case "onOff":
+                    case "onOff.onOff":
                         try {
                             if (data instanceof Boolean onOff) {
                                 String mappedMode = onOff ? systemModeMapper.onToCustomValue()
@@ -107,23 +110,30 @@ public class ThermostatDevice extends GenericDevice {
         attributeToItemNameMap.forEach((attribute, itemUid) -> {
             if (itemUid.equals(item.getUID())) {
                 // we need to do conversion here
+                String[] pair = attribute.split("\\.");
+                if (pair.length != 2) {
+                    logger.debug("Unknown attribute format {}", attribute);
+                    return;
+                }
+                String clusterName = pair[0];
+                String attributeName = pair[1];
                 switch (attribute) {
-                    case "localTemperature":
-                    case "outdoorTemperature":
-                    case "occupiedHeatingSetpoint":
-                    case "occupiedCoolingSetpoint":
+                    case "thermostat.localTemperature":
+                    case "thermostat.outdoorTemperature":
+                    case "thermostat.occupiedHeatingSetpoint":
+                    case "thermostat.occupiedCoolingSetpoint":
                         Integer value = temperatureToValue(state);
                         if (value != null) {
-                            logger.debug("Setting {} to {}", attribute, value);
-                            setEndpointState("thermostat", attribute, value);
+                            logger.debug("Setting {} to {}", attributeName, value);
+                            setEndpointState(clusterName, attributeName, value);
                         } else {
                             logger.debug("Could not convert {} to matter value", state.toString());
                         }
                         break;
-                    case "systemMode":
+                    case "thermostat.systemMode":
                         try {
                             int mode = systemModeMapper.fromCustomValue(state.toString()).value;
-                            setEndpointState("thermostat", attribute, mode);
+                            setEndpointState(clusterName, attributeName, mode);
                             setEndpointState("onOff", "onOff", mode > 0);
                         } catch (SystemModeMappingException e) {
                             logger.debug("Could not convert {} to matter value", state.toString());
@@ -137,22 +147,24 @@ public class ThermostatDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
         Map<String, Object> attributeMap = new HashMap<>();
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        // add any settings for attributes from config, like thermostat.minHeatSetpointLimit=0
+        attributeMap.putAll(primaryMetadata.getAttributeOptions());
         for (Item member : ((GroupItem) primaryItem).getAllMembers()) {
             if (member instanceof GenericItem genericMember) {
-                Metadata metadata = metadataRegistry.get(new MetadataKey("matter", genericMember.getUID()));
+                MetaDataMapping metadata = metaDataMapping(genericMember);
                 if (metadata != null) {
-                    String[] attributes = metadata.getValue().split(",");
                     State state = genericMember.getState();
-                    for (String attribute : attributes) {
+                    for (String attribute : metadata.attributes) {
                         switch (attribute) {
-                            case "localTemperature":
-                            case "outdoorTemperature":
-                            case "occupiedHeatingSetpoint":
-                            case "occupiedCoolingSetpoint":
+                            case "thermostat.localTemperature":
+                            case "thermostat.outdoorTemperature":
+                            case "thermostat.occupiedHeatingSetpoint":
+                            case "thermostat.occupiedCoolingSetpoint":
                                 if (state instanceof UnDefType) {
                                     attributeMap.put(attribute, 0);
                                 } else {
@@ -160,17 +172,14 @@ public class ThermostatDevice extends GenericDevice {
                                     attributeMap.put(attribute, value != null ? value : 0);
                                 }
                                 break;
-                            case "systemMode":
+                            case "thermostat.systemMode":
                                 int mode = 0;
                                 if (state instanceof DecimalType decimalType) {
                                     mode = decimalType.intValue();
                                 }
                                 attributeMap.put(attribute, mode);
-                                attributeMap.put("onOff", mode > 0);
-                                Map<String, Object> config = metadata.getConfiguration();
-                                if (!config.isEmpty()) {
-                                    systemModeMapper.initializeMappings(config);
-                                }
+                                attributeMap.put("onOff.onOff", mode > 0);
+                                systemModeMapper.initializeMappings(metadata.config);
                                 break;
                             default:
                                 continue;
@@ -179,12 +188,14 @@ public class ThermostatDevice extends GenericDevice {
                             itemMap.put(genericMember.getUID(), genericMember);
                             genericMember.addStateChangeListener(this);
                         }
+                        // add any settings for attributes from config, like thermostat.minHeatSetpointLimit=0
+                        attributeMap.putAll(metadata.getAttributeOptions());
                         attributeToItemNameMap.put(attribute, genericMember.getUID());
                     }
                 }
             }
         }
-        return attributeMap;
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override
@@ -222,6 +233,9 @@ public class ThermostatDevice extends GenericDevice {
         }
 
         private void initializeMappings(Map<String, Object> mappings) {
+            if (mappings.isEmpty()) {
+                return;
+            }
             intToCustomMap.clear();
             customToEnumMap.clear();
             for (Map.Entry<String, Object> entry : mappings.entrySet()) {
@@ -241,7 +255,7 @@ public class ThermostatDevice extends GenericDevice {
                         customToEnumMap.put(customValue, mode);
                     }
                 } catch (IllegalArgumentException e) {
-                    logger.debug("Invalid mode: {}", customKey);
+                    // ignore unknown values
                 }
             }
         }

@@ -11,7 +11,7 @@ const logger = Logger.get("FanModeDeviceType");
 
 export class FanModeDeviceType extends GenericDeviceType {
 
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
 
         const endpoint = new Endpoint(FanDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
@@ -22,12 +22,7 @@ export class FanModeDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            fanControl: {
-                fanMode: this.attributeMap.fanMode || FanControl.FanMode.Off,
-                fanModeSequence: this.attributeMap.fanModeSequence || FanControl.FanModeSequence.OffHigh,
-                percentCurrent: this.attributeMap.percentCurrent || 0,
-                percentSetting: this.attributeMap.percentCurrent || 0,
-            }
+            ...clusterValues
         });
         endpoint.events.fanControl.fanMode$Changed.on(value => {
             this.sendBridgeEvent("fan", "fanMode", value);
@@ -42,5 +37,16 @@ export class FanModeDeviceType extends GenericDeviceType {
         });
 
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            fanControl: {
+                fanMode: FanControl.FanMode.Off,
+                fanModeSequence: FanControl.FanModeSequence.OffHigh,
+                percentCurrent: 0,
+                percentSetting: 0
+            }
+        }
     }
 }

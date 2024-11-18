@@ -10,7 +10,7 @@ const logger = Logger.get("ColorDeviceType");
 
 export class ColorDeviceType extends GenericDeviceType {
 
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(ColorDimmerSwitchDevice.with(BridgedDeviceBasicInformationServer,
             ColorControlServer.with(
             ColorControl.Feature.ColorTemperature,
@@ -24,18 +24,7 @@ export class ColorDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            levelControl: {
-                currentLevel: this.attributeMap.currentLevel || 0,
-            },
-            onOff: {
-                onOff: this.attributeMap.onOff || false,
-            },
-            colorControl: {
-                currentHue: this.attributeMap.currentHue || 0,
-                currentSaturation: this.attributeMap.currentSaturation || 0,
-                coupleColorTempToLevelMinMireds: 0,
-                startUpColorTemperatureMireds: 0
-            }
+            ...clusterValues
         });
         endpoint.events.onOff.onOff$Changed.on(value => {
             this.sendBridgeEvent("onOff","onOff", value);
@@ -49,7 +38,24 @@ export class ColorDeviceType extends GenericDeviceType {
         endpoint.events.colorControl.currentSaturation$Changed.on(value => {
             this.sendBridgeEvent("colorControl","currentHue", value);
         });
-
+        
         return endpoint;
+    }
+
+    override defaultClusterValues() {
+        return {
+            levelControl: {
+                currentLevel: 0
+            },
+            onOff: {
+                onOff: false
+            },
+            colorControl: {
+                currentHue:0,
+                currentSaturation: 0,
+                coupleColorTempToLevelMinMireds: 0,
+                startUpColorTemperatureMireds: 0
+            }
+        }
     }
 }

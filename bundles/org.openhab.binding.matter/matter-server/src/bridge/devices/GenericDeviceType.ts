@@ -10,15 +10,16 @@ export abstract class GenericDeviceType {
     protected updateLocks = new Set<string>();
     endpoint: Endpoint;
 
-    constructor(protected bridgeController: BridgeController, protected attributeMap: { [key: string]: any }, protected endpointId: string, protected  nodeLabel: string, protected productName: string, protected productLabel: string, protected serialNumber: string) {
+    constructor(protected bridgeController: BridgeController, protected attributeMap: Record<string, any>, protected endpointId: string, protected  nodeLabel: string, protected productName: string, protected productLabel: string, protected serialNumber: string) {
         this.nodeLabel = this.truncateString(nodeLabel);
         this.productLabel = this.truncateString(productLabel);
         this.productName = this.truncateString(productName);
         this.serialNumber = this.truncateString(serialNumber);
-        this.endpoint = this.createEndpoint();
+        this.endpoint = this.createEndpoint(this.mergeWithDefaults(this.defaultClusterValues(), attributeMap));
     }
 
-    abstract createEndpoint(): Endpoint;
+    abstract defaultClusterValues(): Record<string, any>;
+    abstract createEndpoint(clusterValues: Record<string, any>): Endpoint;
     
     async updateState(clusterName: string, attributeName: string, attributeValue: any) {
         const args = {} as { [key: string]: any }
@@ -54,4 +55,31 @@ export abstract class GenericDeviceType {
     truncateString(str: string, maxLength: number = 32): string {
         return str.slice(0, maxLength);
     }
+
+    mergeWithDefaults<T extends Record<string, any>, U extends Partial<T>>(defaults: T, overrides: U): T {
+        // Helper function to check if a value is a plain object
+        function isPlainObject(value: any): value is Record<string, any> {
+            return value && typeof value === 'object' && !Array.isArray(value);
+        }
+        return Object.keys(defaults).reduce((result, key) => {
+            const defaultValue = defaults[key];
+            const overrideValue = overrides[key];
+    
+            // If both defaultValue and overrideValue are objects, merge them recursively
+            if (
+                isPlainObject(defaultValue) &&
+                isPlainObject(overrideValue)
+            ) {
+                result[key] = this.mergeWithDefaults(defaultValue, overrideValue);
+            } else {
+                // Otherwise, use the override value if it exists, else the default value
+                result[key] = key in overrides ? overrideValue : defaultValue;
+            }
+    
+            return result;
+        }, {} as Record<string, any>) as T;
+    }
+    
+    
+    
 }

@@ -33,11 +33,7 @@ import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControl
 import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.handler.EndpointHandler;
-import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.HSBType;
-import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.PercentType;
-import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.library.types.*;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
@@ -234,6 +230,12 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     // These functions are borrowed from the Zigbee openHAB binding
 
     // TODO make sure this is called by updates to level control if associated with color control????
+
+    public void updateOnOff(OnOffType onOffType) {
+        HSBType hsb = new HSBType(lastHSB.getHue(), lastHSB.getSaturation(),
+                onOffType == OnOffType.ON ? lastHSB.getBrightness() : new PercentType(0));
+        updateState(CHANNEL_COLOR_COLOR, hsb);
+    }
 
     public void updateBrightness(PercentType brightness) {
         // Extra temp variable to avoid thread sync concurrency issues on lastHSB

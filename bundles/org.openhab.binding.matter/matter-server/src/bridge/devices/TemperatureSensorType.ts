@@ -9,7 +9,7 @@ const logger = Logger.get("TemperatureSensorType");
 
 export class TemperatureSensorType extends GenericDeviceType {
     
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(TemperatureSensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -19,10 +19,15 @@ export class TemperatureSensorType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            temperatureMeasurement: {
-                measuredValue: this.attributeMap.measuredValue || 0,
-            },
+            ...clusterValues
         });
         return endpoint
+    }
+    override defaultClusterValues() {
+        return {
+            temperatureMeasurement: {
+                measuredValue:  0
+            }
+        }
     }
 }

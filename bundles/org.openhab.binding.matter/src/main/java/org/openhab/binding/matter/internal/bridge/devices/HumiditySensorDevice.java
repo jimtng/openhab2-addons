@@ -44,11 +44,14 @@ public class HumiditySensorDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
         DecimalType state = primaryItem.getStateAs(DecimalType.class);
-        return Map.of("measuredValue", state == null ? 0 : state.intValue() * 100);
+        attributeMap.put("relativeHumidityMeasurement.measuredValue", state == null ? 0 : state.intValue() * 100);
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

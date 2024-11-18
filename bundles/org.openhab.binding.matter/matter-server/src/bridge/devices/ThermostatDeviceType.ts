@@ -2,6 +2,8 @@ import { Endpoint } from "@matter/node";
 import { ThermostatDevice } from "@matter/node/devices/thermostat";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { ThermostatServer } from '@matter/node/behaviors/thermostat';
+import { OnOffServer } from '@matter/node/behaviors/on-off';
+
 import { Thermostat } from '@matter/main/clusters';
 import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
@@ -11,14 +13,14 @@ const logger = Logger.get("ThermostatDeviceType");
 
 export class ThermostatDeviceType extends GenericDeviceType {
 
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         let controlSequenceOfOperation = -1;
         const features: Thermostat.Feature[] = [];
-        if (this.attributeMap.occupiedHeatingSetpoint != undefined) {
+        if (clusterValues.thermostat?.occupiedHeatingSetpoint != undefined) {
             features.push(Thermostat.Feature.Heating);
             controlSequenceOfOperation = 2;
         }
-        if (this.attributeMap.occupiedCoolingSetpoint != undefined) {
+        if (clusterValues.thermostat?.occupiedCoolingSetpoint != undefined) {
             features.push(Thermostat.Feature.Cooling);
             controlSequenceOfOperation = 0;
         }
@@ -31,29 +33,11 @@ export class ThermostatDeviceType extends GenericDeviceType {
             throw new Error("At least heating, cooling or both must be added")
         }
 
-        this.attributeMap.controlSequenceOfOperation = controlSequenceOfOperation;
-
-        const defaultParams = {
-            systemMode: 0,
-            localTemperature: 0,
-            minHeatSetpointLimit: 0,
-            maxHeatSetpointLimit: 3500,
-            absMinHeatSetpointLimit: 0,
-            absMaxHeatSetpointLimit: 3500,
-            minCoolSetpointLimit: 0,
-            absMinCoolSetpointLimit: 0,
-            maxCoolSetpointLimit: 3500,
-            absMaxCoolSetpointLimit: 3500,
-            occupiedHeatingSetpoint: 0,
-            occupiedCoolingSetpoint: 0,
-            minSetpointDeadBand: 0
-        }
-
-        const finalMap = { ...defaultParams, ...this.attributeMap }
+        clusterValues.thermostat.controlSequenceOfOperation = controlSequenceOfOperation;
         
-        logger.debug(`ThermoDevice attributeMap: ${JSON.stringify(finalMap, null, 2)} features: ${features}`);
+        logger.debug(`ThermoDevice attributeMap: ${JSON.stringify(clusterValues, null, 2)} features: ${features}`);
         
-        const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer, ThermostatServer.with(
+        const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer,  OnOffServer, ThermostatServer.with(
             ...features
         )), {
             id: this.endpointId,
@@ -64,9 +48,7 @@ export class ThermostatDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            thermostat: {
-                ...finalMap
-            }
+            ...clusterValues
 
         });
         endpoint.events.thermostat.localTemperature$Changed.on((value) => {
@@ -87,6 +69,33 @@ export class ThermostatDeviceType extends GenericDeviceType {
         endpoint.events.thermostat.thermostatRunningMode$Changed?.on((value) => {
             this.sendBridgeEvent('thermostat','thermostatRunningMode', value);
         });
+        endpoint.events.onOff.onOff$Changed.on((value) => {
+            this.sendBridgeEvent('onOff','onOff', value);
+        });
         return endpoint;
     }
+
+    override defaultClusterValues() {
+        return {
+            thermostat: {
+                systemMode: 0,
+                localTemperature: 0,
+                minHeatSetpointLimit: 0,
+                maxHeatSetpointLimit: 3500,
+                absMinHeatSetpointLimit: 0,
+                absMaxHeatSetpointLimit: 3500,
+                minCoolSetpointLimit: 0,
+                absMinCoolSetpointLimit: 0,
+                maxCoolSetpointLimit: 3500,
+                absMaxCoolSetpointLimit: 3500,
+                occupiedHeatingSetpoint: 0,
+                occupiedCoolingSetpoint: 0,
+                minSetpointDeadBand: 0
+            },
+            onOff: {
+                onOff: false
+            }
+        }
+    }
+
 }

@@ -124,22 +124,22 @@ export class DeviceNode {
         }
 
         switch (deviceType) {
-            case "OnOffLightDevice":
+            case "OnOffLight":
                 device = new OnOffDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
-            case "OnOffPlugInUnitDevice":
+            case "OnOffPlugInUnit":
                 device = new OnOffPlugInDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
-            case "DimmableLightDevice":
+            case "DimmableLight":
                 device = new DimmableDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
-            case "ThermostatDevice":
+            case "Thermostat":
                 device = new ThermostatDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
-            case "WindowCoveringDevice":
+            case "WindowCovering":
                 device = new WindowCoveringDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
-            case "DoorLockDevice":
+            case "DoorLock":
                 device = new DoorLockDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             case "TemperatureSensor":

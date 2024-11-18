@@ -41,7 +41,7 @@ public class OnOffLightDevice extends GenericDevice {
 
     @Override
     public String deviceType() {
-        return "OnOffLightDevice";
+        return "OnOffLight";
     }
 
     @Override
@@ -69,11 +69,14 @@ public class OnOffLightDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("onOff", Optional.ofNullable(primaryItem.getStateAs(OnOffType.class))
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
+        attributeMap.put("onOff.onOff", Optional.ofNullable(primaryItem.getStateAs(OnOffType.class))
                 .orElseGet(() -> OnOffType.OFF) == OnOffType.ON);
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

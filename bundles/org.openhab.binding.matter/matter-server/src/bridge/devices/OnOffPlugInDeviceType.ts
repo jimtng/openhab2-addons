@@ -9,7 +9,7 @@ const logger = Logger.get("OnOffPlugInDevice");
 
 export class OnOffPlugInDeviceType extends GenericDeviceType {
     
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(OnOffPlugInUnitDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -19,13 +19,19 @@ export class OnOffPlugInDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            onOff: {
-                onOff: this.attributeMap.onOff || false,
-            }
+            ...clusterValues
         });
         endpoint.events.onOff.onOff$Changed.on(value => {
             this.sendBridgeEvent("onOff","onOff", value);
         });
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            onOff: {
+                onOff: false
+            }
+        }
     }
 }

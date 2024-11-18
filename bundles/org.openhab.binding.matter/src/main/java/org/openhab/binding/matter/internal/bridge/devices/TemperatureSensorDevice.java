@@ -43,12 +43,15 @@ public class TemperatureSensorDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
         State state = primaryItem.getState();
         Integer value = temperatureToValue(state);
-        return Map.of("measuredValue", value == null ? 0 : value);
+        attributeMap.put("temperatureMeasurement.measuredValue", value == null ? 0 : value);
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

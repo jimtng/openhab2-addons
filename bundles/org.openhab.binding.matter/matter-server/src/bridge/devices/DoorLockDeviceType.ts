@@ -11,20 +11,7 @@ const logger = Logger.get("DoorLockDeviceType");
 
 export class DoorLockDeviceType extends GenericDeviceType {
 
-    override createEndpoint() {
-
-        const defaultParams = {
-            lockState: 0,
-            lockType: 0,
-            actuatorEnabled: true,
-            doorState: 1,
-            maxPinCodeLength: 10,
-            minPinCodeLength: 1,
-            wrongCodeEntryLimit: 5,
-            userCodeTemporaryDisableTime: 10
-        }
-        const finalMap = { ...defaultParams, ...this.attributeMap }
-
+    override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer, DoorLockServer.with(
             DoorLock.Feature.PinCredential
         )), {
@@ -36,14 +23,27 @@ export class DoorLockDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            doorLock: {
-                ...finalMap,
-            },
+            ...clusterValues
         });
         endpoint.events.doorLock.lockState$Changed.on(value => {
             this.sendBridgeEvent("doorLock", "lockState", value);
         });
 
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            doorLock:  {
+                lockState: 0,
+                lockType: 0,
+                actuatorEnabled: true,
+                doorState: 1,
+                maxPinCodeLength: 10,
+                minPinCodeLength: 1,
+                wrongCodeEntryLimit: 5,
+                userCodeTemporaryDisableTime: 10
+            }
+        }
     }
 }

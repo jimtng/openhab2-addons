@@ -116,11 +116,9 @@ public class LightingType extends DeviceType {
                 logger.debug("onOff lastOnOff {}", lastOnOff);
                 updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, lastOnOff);
                 updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
-                if (lastOnOff == OnOffType.OFF) {
-                    if (clusterToConverters.get(
-                            ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                        colorControlConverter.updateBrightness(new PercentType(0));
-                    }
+                if (clusterToConverters
+                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+                    colorControlConverter.updateOnOff(lastOnOff);
                 }
                 return;
         }

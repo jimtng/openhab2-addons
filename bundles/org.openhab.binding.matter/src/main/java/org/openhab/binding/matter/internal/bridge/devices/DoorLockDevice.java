@@ -40,7 +40,7 @@ public class DoorLockDevice extends GenericDevice {
 
     @Override
     public String deviceType() {
-        return "DoorLockDevice";
+        return "DoorLock";
     }
 
     @Override
@@ -61,13 +61,16 @@ public class DoorLockDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("lockState",
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
+        attributeMap.put("doorLock.lockState",
                 Optional.ofNullable(primaryItem.getStateAs(OnOffType.class))
                         .orElseGet(() -> OnOffType.OFF) == OnOffType.ON ? DoorLockCluster.LockStateEnum.LOCKED.value
                                 : DoorLockCluster.LockStateEnum.UNLOCKED.value);
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

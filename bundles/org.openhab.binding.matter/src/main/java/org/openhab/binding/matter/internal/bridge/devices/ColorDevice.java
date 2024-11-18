@@ -44,21 +44,24 @@ public class ColorDevice extends GenericDevice {
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
         if (primaryItem instanceof ColorItem colorItem) {
             HSBType hsbType = colorItem.getStateAs(HSBType.class);
             if (hsbType != null) {
                 Float currentHue = toHue(hsbType.getHue());
                 Float currentSaturation = toSaturation(hsbType.getSaturation());
                 Integer currentLevel = toBrightness(hsbType.getBrightness());
-                return Map.of("currentLevel", currentLevel, "currentHue", currentHue, "currentSaturation",
-                        currentSaturation, "onOff", currentLevel > 0);
+                attributeMap.put("levelControl.currentLevel", currentLevel);
+                attributeMap.put("colorControl.currentHue", currentHue);
+                attributeMap.put("colorControl.currentSaturation", currentSaturation);
+                attributeMap.put("onOff.onOff", currentLevel > 0);
             }
         }
-        // we should really throw an exception
-        return Map.of();
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

@@ -31,6 +31,6 @@ public class OnOffPlugInUnitDevice extends OnOffLightDevice {
 
     @Override
     public String deviceType() {
-        return "OnOffPlugInUnitDevice";
+        return "OnOffPlugInUnit";
     }
 }

@@ -14,8 +14,12 @@ package org.openhab.binding.matter.internal.bridge.devices;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -56,7 +60,7 @@ public abstract class GenericDevice implements StateChangeListener {
 
     abstract public String deviceType();
 
-    abstract public Map<String, Object> activate();
+    abstract public MatterDeviceOptions activate();
 
     abstract public void dispose();
 
@@ -76,12 +80,9 @@ public abstract class GenericDevice implements StateChangeListener {
     }
 
     public CompletableFuture<String> registerDevice() {
-        String label = primaryItem.getLabel();
-        if (label == null) {
-            label = primaryItem.getName();
-        }
-        return client.addEndpoint(deviceType(), primaryItem.getName(), label, primaryItem.getName(),
-                "Type " + primaryItem.getType(), String.valueOf(primaryItem.getName().hashCode()), activate());
+        MatterDeviceOptions options = activate();
+        return client.addEndpoint(deviceType(), primaryItem.getName(), options.label, primaryItem.getName(),
+                "Type " + primaryItem.getType(), String.valueOf(primaryItem.getName().hashCode()), options.clusters);
     }
 
     public String getName() {
@@ -154,5 +155,72 @@ public abstract class GenericDevice implements StateChangeListener {
      */
     public static QuantityType valueToTemperature(int value) {
         return new QuantityType<>(BigDecimal.valueOf(value, 2), SIUnits.CELSIUS);
+    }
+
+    protected MetaDataMapping metaDataMapping(GenericItem item) {
+        Metadata metadata = metadataRegistry.get(new MetadataKey("matter", item.getUID()));
+        String label = item.getLabel();
+        List<String> attributeList = List.of();
+        Map<String, Object> config = Map.of();
+        if (metadata != null) {
+            attributeList = Arrays.asList(metadata.getValue().split(","));
+            config = metadata.getConfiguration();
+            if (config.get("label") instanceof String customLabel) {
+                label = customLabel;
+            }
+        }
+
+        if (label == null) {
+            label = item.getName();
+        }
+        return new MetaDataMapping(attributeList, config, label);
+    }
+
+    class MetaDataMapping {
+        public final List<String> attributes;
+        public final Map<String, Object> config;
+        public final String label;
+
+        public MetaDataMapping(List<String> attributes, Map<String, Object> config, String label) {
+            this.attributes = attributes;
+            this.config = config;
+            this.label = label;
+        }
+
+        public Map<String, Object> getAttributeOptions() {
+            return config.entrySet().stream().filter(entry -> entry.getKey().contains("."))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+    }
+
+    class MatterDeviceOptions {
+        public final Map<String, Map<String, Object>> clusters;
+        public final String label;
+
+        public MatterDeviceOptions(Map<String, Object> attributes, String label) {
+            this.clusters = mapClusterAttributes(attributes);
+            this.label = label;
+        }
+    }
+
+    Map<String, Map<String, Object>> mapClusterAttributes(Map<String, Object> clusterAttributes) {
+        Map<String, Map<String, Object>> returnMap = new HashMap<>();
+        clusterAttributes.forEach((key, value) -> {
+            String[] parts = key.split("\\.");
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("Key must be in the format 'clusterName.attributeName'");
+            }
+            String clusterName = parts[0];
+            String attributeName = parts[1];
+
+            // Get or create the child map for the clusterName
+            Map<String, Object> attributes = returnMap.computeIfAbsent(clusterName, k -> new HashMap<>());
+
+            // Update the attributeName with the value
+            if (attributes != null) {
+                attributes.put(attributeName, value);
+            }
+        });
+        return returnMap;
     }
 }

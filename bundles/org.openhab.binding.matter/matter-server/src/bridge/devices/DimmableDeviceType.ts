@@ -8,7 +8,7 @@ const logger = Logger.get("DimmableDeviceType");
 
 export class DimmableDeviceType extends GenericDeviceType {
 
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(DimmableLightDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -18,12 +18,7 @@ export class DimmableDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            levelControl: {
-                currentLevel: this.attributeMap.currentLevel || 0,
-            },
-            onOff: {
-                onOff: this.attributeMap.onOff || false,
-            },
+            ...clusterValues
         });
         endpoint.events.onOff.onOff$Changed.on(value => {
             this.sendBridgeEvent("onOff","onOff", value);
@@ -36,5 +31,16 @@ export class DimmableDeviceType extends GenericDeviceType {
         });
 
         return endpoint;
+    }
+
+    override defaultClusterValues() {
+        return {
+            levelControl: {
+                currentLevel: 0
+            },
+            onOff: {
+                onOff: false
+            },
+        }
     }
 }

@@ -9,8 +9,13 @@ const logger = Logger.get("ContactSensorDeviceType");
 
 export class ContactSensorDeviceType extends GenericDeviceType {
     
-    override createEndpoint() {
-        logger.info(`Creating Occupancy Sensor Device Endpoint ${JSON.stringify(this.attributeMap)}`);
+    override createEndpoint(clusterValues: Record<string, any>) {
+        const defaults = {
+            booleanState: {
+                stateValue : false
+            }
+        }
+        logger.info(`Creating Occupancy Sensor Device Endpoint ${JSON.stringify(clusterValues)}`);
         const endpoint = new Endpoint(ContactSensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -20,10 +25,17 @@ export class ContactSensorDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            booleanState: {
-                stateValue : this.attributeMap.stateValue || false
-            }
+            ...clusterValues
         });
+
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            booleanState: {
+                stateValue: false
+            }
+        }
     }
 }

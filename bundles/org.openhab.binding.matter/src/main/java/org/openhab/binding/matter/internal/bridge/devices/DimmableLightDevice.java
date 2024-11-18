@@ -42,16 +42,20 @@ public class DimmableLightDevice extends GenericDevice {
 
     @Override
     public String deviceType() {
-        return "DimmableLightDevice";
+        return "DimmableLight";
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
         int level = Optional.ofNullable(primaryItem.getStateAs(PercentType.class)).orElseGet(() -> new PercentType(0))
                 .intValue();
-        return Map.of("currentLevel", level, "onOff", level > 0);
+        attributeMap.put("levelControl.currentLevel", level);
+        attributeMap.put("onOff.onOff", level > 0);
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

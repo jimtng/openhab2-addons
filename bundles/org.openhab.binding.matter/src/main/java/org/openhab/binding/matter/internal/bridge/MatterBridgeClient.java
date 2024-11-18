@@ -27,7 +27,7 @@ public class MatterBridgeClient extends MatterWebsocketClient {
     }
 
     public CompletableFuture<String> addEndpoint(String deviceType, String id, String nodeLabel, String productName,
-            String productLabel, String serialNumber, Map<String, Object> attributeMap) {
+            String productLabel, String serialNumber, Map<String, Map<String, Object>> attributeMap) {
         CompletableFuture<JsonElement> future = sendMessage("bridge", "addEndpoint",
                 new Object[] { deviceType, id, nodeLabel, productName, productLabel, serialNumber, attributeMap });
         return future.thenApply(obj -> obj == null ? "" : obj.toString());

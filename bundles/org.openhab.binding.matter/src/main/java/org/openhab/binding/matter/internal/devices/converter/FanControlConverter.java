@@ -68,6 +68,9 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
             modeOptions.add(new StateOption(FanControlCluster.FanModeEnum.OFF.value.toString(),
                     FanControlCluster.FanModeEnum.OFF.label));
 
+            modeOptions.add(new StateOption(FanControlCluster.FanModeEnum.ON.value.toString(),
+                    FanControlCluster.FanModeEnum.ON.label));
+
             switch (cluster.fanModeSequence) {
                 case OFF_HIGH:
                     modeOptions.add(new StateOption(FanControlCluster.FanModeEnum.HIGH.value.toString(),

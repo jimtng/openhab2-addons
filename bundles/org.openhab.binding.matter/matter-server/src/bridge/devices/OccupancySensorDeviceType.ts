@@ -9,8 +9,8 @@ const logger = Logger.get("OccupancySensorDeviceType");
 
 export class OccupancySensorDeviceType extends GenericDeviceType {
     
-    override createEndpoint() {
-        logger.info(`Creating Occupancy Sensor Device Endpoint ${JSON.stringify(this.attributeMap)}`);
+    override createEndpoint(clusterValues: Record<string, any>) {
+        logger.info(`Creating Occupancy Sensor Device Endpoint ${JSON.stringify(clusterValues)}`);
         const endpoint = new Endpoint(OccupancySensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -20,11 +20,19 @@ export class OccupancySensorDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            occupancySensing: {
-                occupancy: this.attributeMap.occupancy,
-                occupancySensorType : this.attributeMap.occupancySensorType || 3,
-            },
+            ...clusterValues
         });
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            occupancySensing: {
+                occupancy: {
+                    occupied: false
+                },
+                occupancySensorType: 3
+            }
+        }
     }
 }

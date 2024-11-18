@@ -11,12 +11,11 @@ const logger = Logger.get("WindowCoveringDeviceType");
 
 export class WindowCoveringDeviceType extends GenericDeviceType {
     
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         const features: WindowCovering.Feature[] = [];
         features.push(WindowCovering.Feature.Lift);
         features.push(WindowCovering.Feature.PositionAwareLift);
         
-
         const endpoint = new Endpoint(WindowCoveringDevice.with(BridgedDeviceBasicInformationServer, WindowCoveringServer.with(
            ...features
         )), {
@@ -28,13 +27,15 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            windowCovering: {
-                currentPositionLiftPercent100ths: this.attributeMap.currentPositionLiftPercent100ths || 0
-            }
+            ...clusterValues
         });
 
         endpoint.events.windowCovering.currentPositionLift$Changed?.on(value => {
             this.sendBridgeEvent("windowCovering","currentPositionLift", value);
+        });
+
+        endpoint.events.windowCovering.targetPositionLiftPercent100ths$Changing.on(value => {
+            logger.info("targetPositionLiftPercent100ths changing", JSON.stringify(value, null, 2));
         });
 
         endpoint.events.windowCovering.targetPositionLiftPercent100ths$Changed.on(value => {
@@ -45,5 +46,13 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
             this.sendBridgeEvent("windowCovering","operationalStatus", value);
         });
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            windowCovering: {
+                currentPositionLiftPercent100ths: 0
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ const logger = Logger.get("HumiditySensorType");
 
 export class HumiditySensorType extends GenericDeviceType {
     
-    override createEndpoint() {
+    override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(HumiditySensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -19,10 +19,16 @@ export class HumiditySensorType extends GenericDeviceType {
                 serialNumber: this.serialNumber,
                 reachable: true,
             },
-            relativeHumidityMeasurement: {
-                measuredValue: this.attributeMap.measuredValue || 0,
-            },
+            ...clusterValues
         });
         return endpoint
+    }
+
+    override defaultClusterValues() {
+        return {
+            relativeHumidityMeasurement: {
+                measuredValue: 0
+            }
+        }
     }
 }

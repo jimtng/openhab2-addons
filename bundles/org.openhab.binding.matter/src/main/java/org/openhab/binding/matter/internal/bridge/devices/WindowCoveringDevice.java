@@ -42,15 +42,19 @@ public class WindowCoveringDevice extends GenericDevice {
 
     @Override
     public String deviceType() {
-        return "WindowCoveringDevice";
+        return "WindowCovering";
     }
 
     @Override
-    public Map<String, Object> activate() {
+    public MatterDeviceOptions activate() {
         dispose();
         primaryItem.addStateChangeListener(this);
-        return Map.of("currentPositionLiftPercent100ths", Optional.ofNullable(primaryItem.getStateAs(PercentType.class))
-                .orElseGet(() -> new PercentType(0)).intValue() * 100);
+        MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
+        Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
+        attributeMap.put("windowCovering.currentPositionLiftPercent100ths",
+                Optional.ofNullable(primaryItem.getStateAs(PercentType.class)).orElseGet(() -> new PercentType(0))
+                        .intValue() * 100);
+        return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
     @Override

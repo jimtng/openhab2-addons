@@ -16,8 +16,9 @@ This binding supports 2 different types of matter functionality.
   - This is considered experimental and is still a work in progress.
   - See [Matter Bridge](#matter-bridge) for information on configuring a bridge.
 
+This binding uses the excellent [matter.js](https://github.com/project-chip/matter.js) implementation of the the Matter 1.3 protocol.
 
-Please read the following readme in its entirety as Matter is a complex protocol with very specific requirements.
+Please read this document in its entirety as Matter is a complex protocol with very specific requirements.
 
 # General Matter Ecosystem Overview
 
@@ -291,30 +292,33 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 | Contact Sensor     | Switch, Contact               | ContactSensor     |                                              |                       |
 | Door Lock          | Switch                        | DoorLock          |                                              |                       |
 
+### Global Options
+
+By default, the Item label is used as the Matter label but can be overridden by adding `[label="My Custom Label"]` as an option, either by itself or part of other options required for a device.
 
 ### Thermostat member tags
 
 | Type                | Item Type              | Tag                               | Options                                                                                  |
 |---------------------|------------------------|-----------------------------------|------------------------------------------------------------------------------------------|
-| Current Temperature | Number                 | localTemperature                  |                                                                                          |
-| Outdoor Temperature | Number                 | outdoorTemperature                |                                                                                          |
-| Heating Setpoint    | Number                 | occupiedHeatingSetpoint           |                                                                                          |
-| Cooling Setpoint    | Number                 | occupiedCoolingSetpoint           |                                                                                          |
-| System Mode         | Number, String, Switch | systemMode                        | [OFF=0,AUTO=1,ON=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
-| Running Mode        | Number, String         | runningMode (not implemented yet) |                                                                                          |
+| Current Temperature | Number                 | thermostat.localTemperature                  |                                                                                          |
+| Outdoor Temperature | Number                 | thermostat.outdoorTemperature                |                                                                                          |
+| Heating Setpoint    | Number                 | thermostat.occupiedHeatingSetpoint           |                                                                                          |
+| Cooling Setpoint    | Number                 | thermostat.occupiedCoolingSetpoint           |                                                                                          |
+| System Mode         | Number, String, Switch | thermostat.systemMode                        | [OFF=0,AUTO=1,ON=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
+| Running Mode        | Number, String         | thermostat.runningMode                       |                                                                                          |
 
-For `systemMode` the `ON` option should map to the system mode custom value that would be appropriate if a 'on' command was issued, defaults to the `AUTO` mapping.
+For `systemMode` the `ON` option should map to the system mode custom value that would be appropriate if a 'ON' command was issued, defaults to the `AUTO` mapping.
 
 ### Example
 
 ```perl
-Dimmer                TestDimmer                "Test Dimmer [%d%%]"                                                       {matter="DimmableLight"}
+Dimmer                TestDimmer                "Test Dimmer [%d%%]"                                                       {matter="DimmableLight" [label="My Custom Dimmer"]}
 
 Group                 Test_HVAC                 "Thermostat"                              ["HVAC"]                         {matter="Thermostat" }
-Number:Temperature    Test_HVAC_Temperature     "Temperature [%d °F]"      (Test_HVAC)    ["Measurement","Temperature"]    {matter="localTemperature"}
-Number:Temperature    Test_HVAC_HeatSetpoint    "Heat Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="occupiedHeatingSetpoint"}
-Number:Temperature    Test_HVAC_CoolSetpoint    "Cool Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="occupiedCoolingSetpoint"}
-Number                Test_HVAC_Mode            "Mode [%s]"                (Test_HVAC)    ["Control" ]                     {matter="systemMode" [OFF=0, HEAT=1, COOL=2, AUTO=3]}
+Number:Temperature    Test_HVAC_Temperature     "Temperature [%d °F]"      (Test_HVAC)    ["Measurement","Temperature"]    {matter="thermostat.localTemperature"}
+Number:Temperature    Test_HVAC_HeatSetpoint    "Heat Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="thermostat.occupiedHeatingSetpoint"}
+Number:Temperature    Test_HVAC_CoolSetpoint    "Cool Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="thermostat.occupiedCoolingSetpoint"}
+Number                Test_HVAC_Mode            "Mode [%s]"                (Test_HVAC)    ["Control" ]                     {matter="thermostat.systemMode" [OFF=0, HEAT=1, COOL=2, AUTO=3]}
 
 Switch                TestDoorLock              "Door Lock"                                                                {matter="DoorLock"}
 Rollershutter         TestShade                 "Window Shade"                                                             {matter="WindowCovering"}
