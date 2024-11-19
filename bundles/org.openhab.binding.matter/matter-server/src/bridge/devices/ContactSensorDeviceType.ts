@@ -15,7 +15,7 @@ export class ContactSensorDeviceType extends GenericDeviceType {
                 stateValue : false
             }
         }
-        logger.info(`Creating Occupancy Sensor Device Endpoint ${JSON.stringify(clusterValues)}`);
+        logger.info(`Creating Contact Sensor Device Endpoint ${JSON.stringify(clusterValues)}`);
         const endpoint = new Endpoint(ContactSensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {

@@ -119,8 +119,11 @@ export class DeviceNode {
         let device: GenericDeviceType | null = null;
 
         if (this.devices.has(id)) {
-            logger.error(`Device ${id} already exists! Call 'resetEndpoints' first and try again.`);
-            return;
+            throw new Error(`Device ${id} already exists! Call 'resetEndpoints' first and try again.`);
+        }
+
+        if (!this.aggregator) {
+            throw new Error(`Aggregator not initialized, aborting.`);
         }
 
         switch (deviceType) {
@@ -176,6 +179,9 @@ export class DeviceNode {
     }
 
     async startBridge() {
+        if (this.devices.size == 0) {
+            throw new Error("No devices added, not starting");
+        }
         await this.server.start();
         logEndpoint(EndpointServer.forEndpoint(this.server));
     }
