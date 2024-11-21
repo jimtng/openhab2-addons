@@ -39,7 +39,7 @@ import org.openhab.core.types.StateDescription;
 
 /**
  * @author Dan Cunningham
- * 
+ *
  *         Converters are responsible for converting Matter cluster commands and attributes into openHAB commands and
  *         vice versa.
  */
@@ -59,9 +59,11 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
 
     public abstract void handleCommand(ChannelUID channelUID, Command command);
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
     }
 
+    @Override
     public void onEvent(EventTriggeredMessage message) {
     }
 
@@ -84,8 +86,8 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
      * @return the scaled {@link PercentType}
      */
     public static PercentType levelToPercent(int level) {
-        int result = (int) Math.round(level * 100.0 / 254.0 + 0.5);
-        return new PercentType(Math.min(result, 100));
+        int result = (int) Math.round(level * 100.0 / 254.0);
+        return level == 0 ? PercentType.ZERO : new PercentType(Math.max(result, 1));
     }
 
     /**
