@@ -181,9 +181,10 @@ export class DeviceNode {
     async startBridge() {
         if (this.devices.size == 0) {
             throw new Error("No devices added, not starting");
+
         }
-        await this.server.start();
         logEndpoint(EndpointServer.forEndpoint(this.server));
+        await this.server.start();
     }
     
     async setEndpointState(endpointId: string, clusterName: string, stateName: string, stateValue: any) {

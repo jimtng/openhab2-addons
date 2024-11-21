@@ -236,6 +236,12 @@ public class ThermostatDevice extends GenericDevice {
             if (mappings.isEmpty()) {
                 return;
             }
+
+            // don't bother mapping if there's no OFF
+            if (!mappings.containsKey("OFF")) {
+                return;
+            }
+
             intToCustomMap.clear();
             customToEnumMap.clear();
             for (Map.Entry<String, Object> entry : mappings.entrySet()) {

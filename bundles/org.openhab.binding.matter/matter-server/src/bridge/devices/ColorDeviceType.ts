@@ -13,9 +13,10 @@ export class ColorDeviceType extends GenericDeviceType {
     override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(ColorDimmerSwitchDevice.with(BridgedDeviceBasicInformationServer,
             ColorControlServer.with(
-            ColorControl.Feature.ColorTemperature,
-            ColorControl.Feature.HueSaturation
-        ), LevelControlServer, OnOffServer), {
+                ColorControl.Feature.ColorTemperature,
+                ColorControl.Feature.HueSaturation,
+                ColorControl.Feature.Xy
+            ), LevelControlServer, OnOffServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
                 nodeLabel: this.nodeLabel,
@@ -27,18 +28,23 @@ export class ColorDeviceType extends GenericDeviceType {
             ...clusterValues
         });
         endpoint.events.onOff.onOff$Changed.on(value => {
-            this.sendBridgeEvent("onOff","onOff", value);
+            this.sendBridgeEvent("onOff", "onOff", value);
         });
         endpoint.events.levelControl.currentLevel$Changed.on(value => {
-            this.sendBridgeEvent("levelControl","currentLevel", value);
+            this.sendBridgeEvent("levelControl", "currentLevel", value);
         });
         endpoint.events.colorControl.currentHue$Changed.on(value => {
-            this.sendBridgeEvent("colorControl","currentHue", value);
+            this.sendBridgeEvent("colorControl", "currentHue", value);
         });
         endpoint.events.colorControl.currentSaturation$Changed.on(value => {
-            this.sendBridgeEvent("colorControl","currentHue", value);
+            this.sendBridgeEvent("colorControl", "currentHue", value);
         });
-        
+        endpoint.events.colorControl.currentX$Changed.on(value => {
+            this.sendBridgeEvent("colorControl", "currentX", value);
+        });
+        endpoint.events.colorControl.currentY$Changed.on(value => {
+            this.sendBridgeEvent("colorControl", "currentY", value);
+        });
         return endpoint;
     }
 
@@ -51,7 +57,7 @@ export class ColorDeviceType extends GenericDeviceType {
                 onOff: false
             },
             colorControl: {
-                currentHue:0,
+                currentHue: 0,
                 currentSaturation: 0,
                 coupleColorTempToLevelMinMireds: 0,
                 startUpColorTemperatureMireds: 0

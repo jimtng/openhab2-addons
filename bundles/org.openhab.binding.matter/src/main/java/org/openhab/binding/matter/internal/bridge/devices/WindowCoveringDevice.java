@@ -83,7 +83,7 @@ public class WindowCoveringDevice extends GenericDevice {
             } else if (primaryItem instanceof RollershutterItem rollerShutterItem) {
                 rollerShutterItem.send(percentType);
             } else if (primaryItem instanceof SwitchItem switchItem) {
-                switchItem.send(percentType.intValue() > 0 ? OnOffType.ON : OnOffType.OFF);
+                switchItem.send(percentType.intValue() == 0 ? OnOffType.ON : OnOffType.OFF);
             } else if (primaryItem instanceof StringItem stringItem) {
                 boolean open = percentType.intValue() > 0;
                 String key = open ? "OPEN" : "CLOSED";
