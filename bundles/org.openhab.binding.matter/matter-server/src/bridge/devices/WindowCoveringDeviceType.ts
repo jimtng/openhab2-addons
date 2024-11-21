@@ -29,6 +29,9 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
             },
             ...clusterValues
         });
+        endpoint.events.windowCovering.currentPositionLiftPercent100ths$Changed.on(value => {
+            logger.debug("currentPositionLiftPercent100ths changed", value);
+        });
         endpoint.events.windowCovering.operationalStatus$Changed.on(value => {
             this.sendBridgeEvent("windowCovering", "operationalStatus", value);
         });

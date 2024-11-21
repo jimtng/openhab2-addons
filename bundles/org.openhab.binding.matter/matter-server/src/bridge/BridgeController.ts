@@ -1,7 +1,5 @@
-import { Device } from "@project-chip/matter.js/device";
 import { Logger } from "@matter/general";
 import { Controller } from "../Controller";
-import { Request, MessageType } from '../MessageTypes';
 import { WebSocketSession } from "../app";
 import { DeviceNode } from "./DeviceNode";
 
@@ -41,7 +39,7 @@ export class BridgeController extends Controller {
     override id(): string {
         return "bridge-" + this.uniqueId;
     }
-    
+
     async init() {
         await this.deviceNode.init();
     }
@@ -54,7 +52,7 @@ export class BridgeController extends Controller {
         if (typeof baseObject[functionName] !== 'function') {
             throw new Error(`Function ${functionName} not found`);
         }
-         
+
         return baseObject[functionName](...args);
     }
 

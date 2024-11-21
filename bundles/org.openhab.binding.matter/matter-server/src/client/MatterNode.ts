@@ -3,7 +3,7 @@ import { CommissioningController, MatterServer } from "@project-chip/matter.js";
 import { NodeId } from "@matter/types";
 import { PairedNode, CommissioningControllerNodeOptions } from "@project-chip/matter.js/device";
 import { EndpointInterface } from "@project-chip/matter.js/endpoint";
-import { Environment, Logger, StorageContext, StorageService } from "@matter/general";
+import { Environment, Logger, StorageContext } from "@matter/general";
 import { ControllerStore } from "@matter/node";
 
 const logger = Logger.get("MatterNode");
@@ -12,7 +12,7 @@ const logger = Logger.get("MatterNode");
  * This class contains all the core Matter functionality uses by "Cluster", "Nodes", etc... 
  */
 export class MatterNode {
-    
+
     private storageContext?: StorageContext;
 
     #environment: Environment = Environment.default;
@@ -40,8 +40,8 @@ export class MatterNode {
 
     async initialize() {
         const outputDir = this.storageLocation;
-        const id =  `${this.controllerName}-${this.nodeNum}`
-        
+        const id = `${this.controllerName}-${this.nodeNum}`
+
         logger.info(`Storage location: ${outputDir} (Directory)`);
         this.#environment.vars.set('storage.path', outputDir)
         if (this.netInterface !== undefined) {
@@ -59,7 +59,7 @@ export class MatterNode {
         const controllerStore = this.#environment.get(ControllerStore);
 
         this.storageContext = controllerStore.storage.createContext("Node");
-    
+
         if (this.matterController !== undefined) {
             await this.matterController.start();
         } else if (this.commissioningController !== undefined) {
@@ -67,7 +67,7 @@ export class MatterNode {
         } else {
             throw new Error("No controller initialized");
         }
-        
+
 
 
 
@@ -127,7 +127,7 @@ export class MatterNode {
         return node;
     }
 
-    async getCommissionedNodes() {  
+    async getCommissionedNodes() {
         return this.commissioningController?.getCommissionedNodes();
     }
 

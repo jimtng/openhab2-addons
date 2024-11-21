@@ -3,12 +3,9 @@ import { Level, Logger } from "@project-chip/matter.js/log";
 import { IncomingMessage } from 'http';
 import { ClientController } from './client/ClientController';
 import { Controller } from './Controller';
-import { MatterNode } from "./client/MatterNode";
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { Request, Response, Message, MessageType } from './MessageTypes';
-import { convertJsonFile } from "./util/storageConverter"
-import * as path from 'path';
 import { BridgeController } from './bridge/BridgeController';
 const argv: any = yargs(hideBin(process.argv)).argv
 

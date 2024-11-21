@@ -1,13 +1,11 @@
 import { NodeStateInformation } from "@project-chip/matter.js/device";
-import { Logger } from"@project-chip/matter.js/log";
+import { Logger } from "@project-chip/matter.js/log";
 import { MatterNode } from "./MatterNode";
 import { Nodes } from "./namespaces/Nodes";
 import { Clusters } from "./namespaces/Clusters";
 import { WebSocketSession } from "../app";
-import { Request, MessageType, EventType } from '../MessageTypes';
+import { EventType } from '../MessageTypes';
 import { Controller } from "../Controller";
-import { convertJsonFile } from "../util/storageConverter"
-import { toJson } from "@matter/main";
 
 const logger = Logger.get("ClientController");
 
@@ -15,7 +13,7 @@ const logger = Logger.get("ClientController");
  * This class exists to expose the "nodes" and "clusters" namespaces to websocket clients
  */
 export class ClientController extends Controller {
-    
+
     nodes?: Nodes;
     clusters?: Clusters;
     theNode: MatterNode;
@@ -27,16 +25,10 @@ export class ClientController extends Controller {
         let storagePath = this.params.get('storagePath');
         let controllerName = this.params.get('controllerName');
 
-        if (nodeId === null || storagePath === null) {
-            throw new Error('No nodeId or storagePath parameters in the request');
+        if (nodeId === null || storagePath === null || controllerName === null) {
+            throw new Error('Missing required parameters in the request');
         }
 
-        //migrate legacy json files
-        if (controllerName === null) {
-            const { outputDir, name } = convertJsonFile(storagePath, nodeId);
-            storagePath = outputDir;
-            controllerName = name;
-        }
         this.controllerName = controllerName;
         this.theNode = new MatterNode(storagePath, controllerName, nodeId);
     }
@@ -47,7 +39,7 @@ export class ClientController extends Controller {
     async init() {
         await this.theNode.initialize();
         logger.info(`Started Node`);
-       
+
         //set up listeners to send events back to the client
         this.nodes = new Nodes(this.theNode, {
             autoSubscribe: true,
@@ -79,21 +71,21 @@ export class ClientController extends Controller {
         logger.info(`Node Closed`);
     }
 
-     executeCommand(namespace: string, functionName: string, args: any[]): any | Promise<any> {
+    executeCommand(namespace: string, functionName: string, args: any[]): any | Promise<any> {
         const controllerAny: any = this;
         let baseObject: any;
-    
+
         logger.debug(`Executing function ${namespace}.${functionName}(${Logger.toJSON(args)})`);
-       
+
         if (typeof controllerAny[namespace] !== 'object') {
             throw new Error(`Namespace ${namespace} not found`);
         }
-         
+
         baseObject = controllerAny[namespace];
         if (typeof baseObject[functionName] !== 'function') {
             throw new Error(`Function ${functionName} not found`);
         }
-         
+
         return baseObject[functionName](...args);
-     }
+    }
 }

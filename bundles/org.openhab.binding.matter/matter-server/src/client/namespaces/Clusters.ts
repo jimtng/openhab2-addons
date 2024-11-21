@@ -4,7 +4,6 @@ import { convertJsonDataWithModel } from "../../util/Json";
 import { ValidationError } from "@matter/main/types";
 import * as MatterClusters from "@matter/types/clusters";
 import { SupportedAttributeClient } from "@matter/protocol"
-import { MatterModel, ValueModel } from "@matter/model";
 
 const logger = Logger.get("Clusters");
 
@@ -84,8 +83,8 @@ export class Clusters {
             );
         } catch (error) {
             if (error instanceof ValidationError) {
-               throw new Error(`Could not validate data for attribute ${attributeName} to ${Logger.toJSON(parsedValue)}: ${error}${error.fieldName !== undefined ? ` in field ${error.fieldName}` : ""}`,
-            )
+                throw new Error(`Could not validate data for attribute ${attributeName} to ${Logger.toJSON(parsedValue)}: ${error}${error.fieldName !== undefined ? ` in field ${error.fieldName}` : ""}`,
+                )
             } else {
                 throw new Error(`Could not set attribute ${attributeName} to ${Logger.toJSON(parsedValue)}: ${error}`)
             }

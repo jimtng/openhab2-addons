@@ -1,8 +1,7 @@
-import { MatterError } from "@project-chip/matter.js/common";
 import { CommissioningControllerNodeOptions, PairedNode } from "@project-chip/matter.js/device";
 import { EndpointInterface } from "@matter/protocol";
 import { NodeCommissioningOptions } from "@project-chip/matter.js";
-import { BasicInformationCluster, DescriptorCluster, GeneralCommissioning } from "@matter/main/clusters";
+import { GeneralCommissioning } from "@matter/main/clusters";
 import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode, NodeId } from "@matter/types";
 
 import { Logger } from "@matter/main";
@@ -72,7 +71,7 @@ export class Nodes {
         let ip: string | undefined;
         let instanceId: string | undefined;
         let ble = false
-        
+
         if (typeof pairingCode === "string" && pairingCode.trim().length > 0) {
             if (pairingCode.indexOf('MT:') == 0) {
                 const qrcode = QrPairingCodeCodec.decode(pairingCode)[0];
@@ -158,7 +157,7 @@ export class Nodes {
 
         const node = await this.theNode.getNode(nodeId, this.nodeListener);
         if (node === undefined) {
-          throw new Error(`Node ${nodeId} not found`);
+            throw new Error(`Node ${nodeId} not found`);
         }
         await node.disconnect();
     }
@@ -170,7 +169,7 @@ export class Nodes {
     sessionInformation() {
         return this.theNode.commissioningController?.getActiveSessionInformation() || {}
     }
-    
+
     async basicCommissioningWindow(nodeId: number | string, timeout = 900) {
 
         const node = await this.theNode.getNode(nodeId);

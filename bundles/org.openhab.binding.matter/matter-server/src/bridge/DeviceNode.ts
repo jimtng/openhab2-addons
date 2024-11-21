@@ -2,8 +2,8 @@
 import "@matter/node";
 
 import { VendorId } from "@matter/types";
-import { logEndpoint, EndpointInterface } from "@matter/protocol";
-import { Endpoint, EndpointServer, MutableEndpoint, ServerNode } from "@matter/node";
+import { logEndpoint } from "@matter/protocol";
+import { Endpoint, EndpointServer, ServerNode } from "@matter/node";
 import { AggregatorEndpoint } from "@matter/node/endpoints";
 import { Environment, Logger } from "@matter/general";
 import { GenericDeviceType } from "./devices/GenericDeviceType";
@@ -86,7 +86,7 @@ export class DeviceNode {
             logger.info(`ServerNode created with ID: ${this.server.id}`);
             this.aggregator = new Endpoint(AggregatorEndpoint, { id: "aggregator" });
             await this.server.add(this.aggregator);
-           
+
 
             //reset this for future restarts
             this.#environment.vars.set("storage.clear", false);
@@ -186,7 +186,7 @@ export class DeviceNode {
         logEndpoint(EndpointServer.forEndpoint(this.server));
         await this.server.start();
     }
-    
+
     async setEndpointState(endpointId: string, clusterName: string, stateName: string, stateValue: any) {
         const device = this.devices.get(endpointId);
         if (device) {
