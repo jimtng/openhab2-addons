@@ -67,17 +67,13 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     private boolean supportsHue = false;
     private int lastHue = -1;
     private int lastSaturation = -1;
-    private boolean hueChanged = false;
-    private boolean saturationChanged = false;
     private @Nullable ScheduledFuture<?> colorUpdateTimer = null;
     private int lastX = -1;
     private int lastY = -1;
-    private boolean xChanged = false;
-    private boolean yChanged = false;
+    private boolean colorChanged = false;
     private HSBType lastHSB = new HSBType("0,0,0");
     private boolean supportsColorTemperature = false;
     private @Nullable Integer lastColorTemperatureMireds;
-    private boolean coloTemperatureChanged = false;
     private Integer colorTempPhysicalMinMireds = 0;
     private Integer colorTempPhysicalMaxMireds = 0;
     private Options optionsMask = new Options(true);
@@ -173,23 +169,23 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         switch (message.path.attributeName) {
             case "currentX":
                 lastX = numberValue;
-                xChanged = true;
+                colorChanged = true;
                 break;
             case "currentY":
                 lastY = numberValue;
-                yChanged = true;
+                colorChanged = true;
                 break;
             case "currentHue":
                 lastHue = numberValue;
-                hueChanged = true;
+                colorChanged = true;
                 break;
             case "currentSaturation":
                 lastSaturation = numberValue;
-                saturationChanged = true;
+                colorChanged = true;
                 break;
             case "colorTemperatureMireds":
                 lastColorTemperatureMireds = numberValue;
-                coloTemperatureChanged = true;
+                colorChanged = true;
                 break;
             case "colorMode":
                 try {
@@ -197,6 +193,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                 } catch (IllegalArgumentException e) {
                     lastColorMode = null;
                 }
+                colorChanged = true;
                 break;
             case "enhancedCurrentHue":
             case "enhancedColorMode":
@@ -204,8 +201,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
-        if ((supportsHue && (hueChanged || saturationChanged)) || (!supportsHue && (xChanged || yChanged))
-                || coloTemperatureChanged) {
+        if (colorChanged) {
             if (colorUpdateTimer != null) {
                 colorUpdateTimer.cancel(true);
             }
@@ -327,11 +323,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                     break;
             }
         }
-        hueChanged = false;
-        saturationChanged = false;
-        xChanged = false;
-        yChanged = false;
-        coloTemperatureChanged = false;
+        colorChanged = false;
     }
 
     private void changeColorHueSaturation(HSBType color) {
