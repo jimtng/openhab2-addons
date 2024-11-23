@@ -64,14 +64,23 @@ public class ContactSensorDevice extends GenericDevice {
         setEndpointState("booleanState", "stateValue", contactState(primaryItem.getState()));
     }
 
+    /**
+     * Matter Device Library Specification R1.3
+     * 7.1.4.2. Boolean State Cluster
+     * True: Closed or contact
+     * False: Open or no contact
+     * 
+     * @param state
+     * @return closed or open
+     */
     private boolean contactState(State state) {
         boolean open = true;
         if (state instanceof OnOffType onOffType) {
-            open = onOffType == OnOffType.OFF;
+            open = onOffType == OnOffType.ON;
         }
         if (state instanceof OpenClosedType openClosedType) {
             open = openClosedType == OpenClosedType.OPEN;
         }
-        return open;
+        return !open;
     }
 }

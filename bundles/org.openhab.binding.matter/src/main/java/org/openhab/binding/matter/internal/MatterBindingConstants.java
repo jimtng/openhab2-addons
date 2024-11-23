@@ -128,6 +128,10 @@ public class MatterBindingConstants {
     public static final ChannelTypeUID CHANNEL_OCCUPANCYSENSING_OCCUPIED = new ChannelTypeUID(
             "matter:occupancysensing-occupied");
 
+    public static final String CHANNEL_LABEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE = "Illuminance";
+    public static final ChannelTypeUID CHANNEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE = new ChannelTypeUID(
+            "matter:illuminancemeasurement-measuredvalue");
+
     public static final ChannelTypeUID CHANNEL_MODESELECT_MODE = new ChannelTypeUID("matter:modeselect-mode");
 
     public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
@@ -149,6 +153,8 @@ public class MatterBindingConstants {
     public static final String ITEM_TYPE_NUMBER = "Number";
     public static final String ITEM_TYPE_NUMBER_PRESSURE = "Number:Pressure";
     public static final String ITEM_TYPE_NUMBER_TEMPERATURE = "Number:Temperature";
+    public static final String ITEM_TYPE_NUMBER_ILLUMINANCE = "Number:Illuminance";
+
     public static final String ITEM_TYPE_ROLLERSHUTTER = "Rollershutter";
     public static final String ITEM_TYPE_SWITCH = "Switch";
     public static final String ITEM_TYPE_STRING = "String";

@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.devices.*;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
+import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.client.model.ws.*;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
@@ -190,6 +191,59 @@ public class MatterBridge implements MatterClientListener {
         }
     }
 
+    @Override
+    public void onDisconnect(String reason) {
+        // TODO handle reconnecting service.
+    }
+
+    @Override
+    public void onConnect() {
+    }
+
+    @Override
+    public void onReady() {
+        registerItems();
+    }
+
+    @Override
+    public void onEvent(NodeStateMessage message) {
+    }
+
+    @Override
+    public void onEvent(AttributeChangedMessage message) {
+    }
+
+    @Override
+    public void onEvent(EventTriggeredMessage message) {
+    }
+
+    @Override
+    public void onEvent(BridgeEventMessage message) {
+        if (message instanceof BridgeEventAttributeChanged attributeChanged) {
+            GenericDevice d = devices.get(attributeChanged.data.endpointId);
+            if (d != null) {
+                d.handleMatterEvent(attributeChanged.data.clusterName, attributeChanged.data.attributeName,
+                        attributeChanged.data.data);
+            }
+        } else if (message instanceof BridgeEventTriggered bridgeEventTriggered) {
+            switch (bridgeEventTriggered.data.eventName) {
+                case "commissioningWindowOpen":
+                    // commissioningWindowOpen = true;
+                    // Object qrPairingCode = bridgeEventTriggered.data.data.get("qrPairingCode");
+                    // Object manualPairingCode = bridgeEventTriggered.data.data.get("manualPairingCode");
+                    // if (qrPairingCode != null && manualPairingCode != null) {
+                    // updatePairingCodes(qrPairingCode.toString(), manualPairingCode.toString());
+                    // }
+                    break;
+                case "commissioningWindowClosed":
+                    commissioningWindowOpen = false;
+                    updatePairingCodes(null, null);
+                    break;
+                default:
+            }
+        }
+    }
+
     private synchronized void connectClient() {
         if (client.isConnected()) {
             logger.debug("Already Connected, returning");
@@ -234,7 +288,7 @@ public class MatterBridge implements MatterClientListener {
         }
     }
 
-    public void stopClient() {
+    private void stopClient() {
         logger.debug("Stopping Matter Bridge Client");
         ScheduledFuture<?> modifyFuture = this.modifyFuture;
         if (modifyFuture != null) {
@@ -250,7 +304,7 @@ public class MatterBridge implements MatterClientListener {
         bridgeInitialized = false;
     }
 
-    public boolean parseInitialConfig(Map<String, Object> properties) {
+    private boolean parseInitialConfig(Map<String, Object> properties) {
         logger.debug("Parse Config Matter Bridge");
 
         Dictionary<String, Object> props = null;
@@ -288,6 +342,8 @@ public class MatterBridge implements MatterClientListener {
         }
 
         props.put("discriminator", discriminator);
+
+        // this should never be persisted true, temporary settings
         props.put("resetBridge", false);
 
         boolean changed = false;
@@ -299,60 +355,6 @@ public class MatterBridge implements MatterClientListener {
             }
         }
         return changed;
-    }
-
-    @Override
-    public void onDisconnect(String reason) {
-        // TODO handle reconnecting service.
-    }
-
-    @Override
-    public void onConnect() {
-    }
-
-    @Override
-    public void onReady() {
-        registerItems();
-        scheduler.schedule(this::manageCommissioningWindow, 1, TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void onEvent(NodeStateMessage message) {
-    }
-
-    @Override
-    public void onEvent(AttributeChangedMessage message) {
-    }
-
-    @Override
-    public void onEvent(EventTriggeredMessage message) {
-    }
-
-    @Override
-    public void onEvent(BridgeEventMessage message) {
-        if (message instanceof BridgeEventAttributeChanged attributeChanged) {
-            GenericDevice d = devices.get(attributeChanged.data.endpointId);
-            if (d != null) {
-                d.handleMatterEvent(attributeChanged.data.clusterName, attributeChanged.data.attributeName,
-                        attributeChanged.data.data);
-            }
-        } else if (message instanceof BridgeEventTriggered bridgeEventTriggered) {
-            switch (bridgeEventTriggered.data.eventName) {
-                case "commissioningWindowOpen":
-                    // commissioningWindowOpen = true;
-                    // Object qrPairingCode = bridgeEventTriggered.data.data.get("qrPairingCode");
-                    // Object manualPairingCode = bridgeEventTriggered.data.data.get("manualPairingCode");
-                    // if (qrPairingCode != null && manualPairingCode != null) {
-                    // updatePairingCodes(qrPairingCode.toString(), manualPairingCode.toString());
-                    // }
-                    break;
-                case "commissioningWindowClosed":
-                    commissioningWindowOpen = false;
-                    updatePairingCodes(null, null);
-                    break;
-                default:
-            }
-        }
     }
 
     private synchronized void registerItems() {
@@ -422,7 +424,7 @@ public class MatterBridge implements MatterClientListener {
                     if (device != null) {
                         try {
                             device.registerDevice().get();
-                            logger.info("Registered item {} with node {}", item.getName());
+                            logger.debug("Registered item {} with node {}", item.getName());
                             devices.put(item.getName(), device);
                         } catch (InterruptedException | ExecutionException e) {
                             logger.debug("Could not register device with bridge", e);
@@ -438,11 +440,27 @@ public class MatterBridge implements MatterClientListener {
             logger.info("No devices found to register with bridge, not starting bridge");
             return;
         }
-        client.startBridge();
-        bridgeInitialized = true;
+        try {
+            client.startBridge().get();
+            bridgeInitialized = true;
+            manageCommissioningWindow();
+        } catch (InterruptedException | ExecutionException e) {
+            logger.debug("Could not start bridge", e);
+        }
     }
 
     private void manageCommissioningWindow() {
+        try {
+            PairingCodes codes = client.getPairingCodes().get();
+            if (codes.manualPairingCode != null && codes.qrPairingCode != null) {
+                commissioningWindowOpen = true;
+                updatePairingCodes(codes.qrPairingCode, codes.manualPairingCode);
+                return;
+            }
+        } catch (CancellationException | InterruptedException | ExecutionException e) {
+            logger.debug("Could not query codes", e);
+        }
+
         if (settings.openCommissioningWindow && !commissioningWindowOpen) {
             try {
                 Map<String, String> map = client.openCommissioningWindow().get();
@@ -487,6 +505,7 @@ public class MatterBridge implements MatterClientListener {
                 return;
             }
             entires.forEach((k, v) -> props.put(k, v));
+            // id this updates, it will trigger a @Modified call
             config.updateIfDifferent(props);
         } catch (IOException e) {
             logger.debug("Could not get pairing codes", e);

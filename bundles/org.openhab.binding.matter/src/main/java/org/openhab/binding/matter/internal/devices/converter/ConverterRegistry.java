@@ -47,6 +47,8 @@ public class ConverterRegistry {
         ConverterRegistry.registerConverter(TemperatureMeasurementCluster.CLUSTER_ID,
                 TemperatureMeasurementConverter.class);
         ConverterRegistry.registerConverter(OccupancySensingCluster.CLUSTER_ID, OccupancySensingConverter.class);
+        ConverterRegistry.registerConverter(IlluminanceMeasurementCluster.CLUSTER_ID,
+                IlluminanceMeasurementConverter.class);
     }
 
     public static void registerConverter(Integer clusterId,

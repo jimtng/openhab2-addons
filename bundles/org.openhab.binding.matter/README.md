@@ -236,6 +236,7 @@ Possible channels include:
 | temperaturemeasurement-measuredvalue      | Number:Temperature       | Temperature                  | The measured temperature                                                                                                                                                                                                                                             | Temperature | true     | %.1f %unit% |
 | occupancysensing-occupied                 | Switch                   | Occupancy                    | Indicates if an occupancy sensor is triggered                                                                                                                                                                                                                        |             | true     |             |
 | relativehumiditymeasurement-measuredvalue | Number                   | Humidity                     | The measured humidity                                                                                                                                                                                                                                                | Humidity    | true     | %.1f %%     |
+| illuminancemeasurement-measuredvalue      | Number:Illuminance       | Illuminance                  | The measured illuminance in Lux                                                                                                                                                                                                                                      | Illuminance | true     | %d %unit%   |
 
 ## Full Example
 
@@ -307,14 +308,30 @@ By default, the Item label is used as the Matter label but can be overridden by 
 | System Mode         | Number, String, Switch | thermostat.systemMode                        | [OFF=0,AUTO=1,ON=1,COOL=3,HEAT=4,EMERGENCY_HEAT=5,PRECOOLING=6,FAN_ONLY=7,DRY=8,SLEEP=9] |
 | Running Mode        | Number, String         | thermostat.runningMode                       |                                                                                          |
 
+
 For `systemMode` the `ON` option should map to the system mode custom value that would be appropriate if a 'ON' command was issued, defaults to the `AUTO` mapping.
+
+The following attributes can be set in the options of any thermostat member or on the Group item to set temperature options
+
+| Setting                              | Description                                                                                     | Value (in 0.01°C) |
+|--------------------------------------|-------------------------------------------------------------------------------------------------|-------------------|
+| `thermostat.minHeatSetpointLimit`    | The minimum allowable heat setpoint limit.                                                      | 0                 |
+| `thermostat.maxHeatSetpointLimit`    | The maximum allowable heat setpoint limit.                                                      | 3500              |
+| `thermostat.absMinHeatSetpointLimit` | The absolute minimum heat setpoint limit that cannot be exceeded by the `minHeatSetpointLimit`. | 0                 |
+| `thermostat.absMaxHeatSetpointLimit` | The absolute maximum heat setpoint limit that cannot be exceeded by the `maxHeatSetpointLimit`. | 3500              |
+| `thermostat.minCoolSetpointLimit`    | The minimum allowable cool setpoint limit.                                                      | 0                 |
+| `thermostat.maxCoolSetpointLimit`    | The maximum allowable cool setpoint limit.                                                      | 3500              |
+| `thermostat.absMinCoolSetpointLimit` | The absolute minimum cool setpoint limit that cannot be exceeded by the `minCoolSetpointLimit`. | 0                 |
+| `thermostat.absMaxCoolSetpointLimit` | The absolute maximum cool setpoint limit that cannot be exceeded by the `maxCoolSetpointLimit`. | 3500              |
+| `thermostat.minSetpointDeadBand`     | The minimum deadband (temperature gap) between heating and cooling setpoints.                   | 0                 |
+
 
 ### Example
 
 ```perl
 Dimmer                TestDimmer                "Test Dimmer [%d%%]"                                                       {matter="DimmableLight" [label="My Custom Dimmer"]}
 
-Group                 Test_HVAC                 "Thermostat"                              ["HVAC"]                         {matter="Thermostat" }
+Group                 Test_HVAC                 "Thermostat"                              ["HVAC"]                         {matter="Thermostat" [thermostat.minHeatSetpointLimit=0, thermostat.maxHeatSetpointLimit=3500] }
 Number:Temperature    Test_HVAC_Temperature     "Temperature [%d °F]"      (Test_HVAC)    ["Measurement","Temperature"]    {matter="thermostat.localTemperature"}
 Number:Temperature    Test_HVAC_HeatSetpoint    "Heat Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="thermostat.occupiedHeatingSetpoint"}
 Number:Temperature    Test_HVAC_CoolSetpoint    "Cool Setpoint [%d °F]"    (Test_HVAC)    ["Setpoint", "Temperature"]      {matter="thermostat.occupiedCoolingSetpoint"}

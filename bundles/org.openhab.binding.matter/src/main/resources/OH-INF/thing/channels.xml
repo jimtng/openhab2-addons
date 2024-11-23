@@ -392,4 +392,12 @@
 		<state readOnly="true"></state>
 	</channel-type>
 
+	<channel-type id="illuminancemeasurement-measuredvalue">
+		<item-type>Number:Illuminance</item-type>
+		<label>Illumination</label>
+		<description>Indicates the brightness in Lux.</description>
+		<category>Humidity</category>
+		<state pattern="%d %unit%" readOnly="true"></state>
+	</channel-type>
+
 </thing:thing-descriptions>
