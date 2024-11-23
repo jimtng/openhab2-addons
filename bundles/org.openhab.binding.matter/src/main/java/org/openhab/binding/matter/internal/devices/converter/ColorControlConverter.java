@@ -25,15 +25,21 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster.MatterEnum;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ColorControlCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.ColorControlCluster.ColorMode;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ColorControlCluster.Options;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster.OptionsBitmap;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.handler.EndpointHandler;
-import org.openhab.core.library.types.*;
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
@@ -57,17 +63,17 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
 
     private final Logger logger = LoggerFactory.getLogger(ColorControlConverter.class);
 
+    private @Nullable ColorMode lastColorMode;
     private boolean supportsHue = false;
     private int lastHue = -1;
     private int lastSaturation = -1;
-    private boolean hueChanged = false;
-    private boolean saturationChanged = false;
     private @Nullable ScheduledFuture<?> colorUpdateTimer = null;
     private int lastX = -1;
     private int lastY = -1;
-    private boolean xChanged = false;
-    private boolean yChanged = false;
+    private boolean colorChanged = false;
     private HSBType lastHSB = new HSBType("0,0,0");
+    private boolean supportsColorTemperature = false;
+    private @Nullable Integer lastColorTemperatureMireds;
     private Integer colorTempPhysicalMinMireds = 0;
     private Integer colorTempPhysicalMaxMireds = 0;
     private Options optionsMask = new Options(true);
@@ -163,68 +169,60 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         switch (message.path.attributeName) {
             case "currentX":
                 lastX = numberValue;
-                xChanged = true;
+                colorChanged = true;
                 break;
             case "currentY":
                 lastY = numberValue;
-                yChanged = true;
+                colorChanged = true;
                 break;
             case "currentHue":
                 lastHue = numberValue;
-                hueChanged = true;
+                colorChanged = true;
                 break;
             case "currentSaturation":
                 lastSaturation = numberValue;
-                saturationChanged = true;
+                colorChanged = true;
                 break;
             case "colorTemperatureMireds":
-                updateState(CHANNEL_COLOR_TEMPERATURE,
-                        numberValue == 0 ? UnDefType.UNDEF : miredsToPercenType(numberValue));
-                updateState(CHANNEL_COLOR_TEMPERATURE_ABS, numberValue == 0 ? UnDefType.UNDEF
-                        : QuantityType.valueOf(Double.valueOf(numberValue), Units.MIRED));
+                lastColorTemperatureMireds = numberValue;
+                colorChanged = true;
+                break;
+            case "colorMode":
+                try {
+                    lastColorMode = MatterEnum.fromValue(ColorMode.class, numberValue);
+                } catch (IllegalArgumentException e) {
+                    lastColorMode = null;
+                }
+                colorChanged = true;
                 break;
             case "enhancedCurrentHue":
+            case "enhancedColorMode":
                 break;
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
-        if (supportsHue && (hueChanged || saturationChanged)) {
+        if (colorChanged) {
             if (colorUpdateTimer != null) {
                 colorUpdateTimer.cancel(true);
             }
-
-            colorUpdateTimer = colorUpdateScheduler.schedule(() -> updateColorHSB(), 500, TimeUnit.MILLISECONDS);
-        }
-        if (!supportsHue && (xChanged || yChanged)) {
-            if (colorUpdateTimer != null) {
-                colorUpdateTimer.cancel(true);
-            }
-            colorUpdateTimer = colorUpdateScheduler.schedule(() -> updateColorXY(), 500, TimeUnit.MILLISECONDS);
+            colorUpdateTimer = colorUpdateScheduler.schedule(() -> updateColor(), 500, TimeUnit.MILLISECONDS);
         }
     }
 
     @Override
     public void updateCluster(ColorControlCluster cluster) {
         super.updateCluster(cluster);
+        lastColorMode = cluster.colorMode;
         supportsHue = cluster.featureMap.hueSaturation;
         lastX = cluster.currentX;
         lastY = cluster.currentY;
         lastHue = cluster.currentHue;
         lastSaturation = cluster.currentSaturation;
+        supportsColorTemperature = cluster.featureMap.colorTemperature;
+        lastColorTemperatureMireds = cluster.colorTemperatureMireds;
         Optional.ofNullable(cluster.colorTempPhysicalMaxMireds).ifPresent(temp -> colorTempPhysicalMaxMireds = temp);
         Optional.ofNullable(cluster.colorTempPhysicalMinMireds).ifPresent(temp -> colorTempPhysicalMinMireds = temp);
-
-        if (supportsHue) {
-            updateColorHSB();
-        } else {
-            updateColorXY();
-        }
-        if (cluster.colorTemperatureMireds != null) {
-            updateState(CHANNEL_COLOR_TEMPERATURE, cluster.colorTemperatureMireds == 0 ? UnDefType.UNDEF
-                    : miredsToPercenType(cluster.colorTemperatureMireds));
-            updateState(CHANNEL_COLOR_TEMPERATURE_ABS, cluster.colorTemperatureMireds == 0 ? UnDefType.UNDEF
-                    : QuantityType.valueOf(Double.valueOf(cluster.colorTemperatureMireds), Units.MIRED));
-        }
+        updateColor();
     }
 
     // These functions are borrowed from the Zigbee openHAB binding
@@ -254,8 +252,12 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     }
 
     private void updateColorXY(PercentType x, PercentType y) {
-        HSBType color = ColorUtil.xyToHsb(new double[] { x.floatValue() / 100.0f, y.floatValue() / 100.0f });
-        updateColorHSB(color.getHue(), color.getSaturation());
+        try {
+            HSBType color = ColorUtil.xyToHsb(new double[] { x.floatValue() / 100.0f, y.floatValue() / 100.0f });
+            updateColorHSB(color.getHue(), color.getSaturation());
+        } catch (IllegalArgumentException e) {
+            updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
+        }
     }
 
     private void updateColorHSB() {
@@ -264,8 +266,10 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         DecimalType hue = new DecimalType(Float.valueOf(hueValue).toString());
         PercentType saturation = new PercentType(Float.valueOf(saturationValue).toString());
         updateColorHSB(hue, saturation);
-        hueChanged = false;
-        saturationChanged = false;
+        if (supportsColorTemperature) {
+            updateState(CHANNEL_COLOR_TEMPERATURE, UnDefType.UNDEF);
+            updateState(CHANNEL_COLOR_TEMPERATURE_ABS, UnDefType.UNDEF);
+        }
     }
 
     private void updateColorXY() {
@@ -274,8 +278,52 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         PercentType x = new PercentType(Float.valueOf(xValue * 100.0f).toString());
         PercentType y = new PercentType(Float.valueOf(yValue * 100.0f).toString());
         updateColorXY(x, y);
-        xChanged = false;
-        yChanged = false;
+        if (supportsColorTemperature) {
+            updateState(CHANNEL_COLOR_TEMPERATURE, UnDefType.UNDEF);
+            updateState(CHANNEL_COLOR_TEMPERATURE_ABS, UnDefType.UNDEF);
+        }
+    }
+
+    private void updateColorTemperature() {
+        Integer mirek = lastColorTemperatureMireds;
+        if (mirek != null) {
+            if (mirek == 0) {
+                updateState(CHANNEL_COLOR_TEMPERATURE, UnDefType.UNDEF);
+                updateState(CHANNEL_COLOR_TEMPERATURE_ABS, UnDefType.UNDEF);
+                updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
+            } else {
+                updateState(CHANNEL_COLOR_TEMPERATURE, miredsToPercenType(mirek));
+                updateState(CHANNEL_COLOR_TEMPERATURE_ABS, QuantityType.valueOf(Double.valueOf(mirek), Units.MIRED));
+                try {
+                    HSBType color = ColorUtil.xyToHsb(ColorUtil.kelvinToXY(1000000.0 / mirek));
+                    updateColorHSB(color.getHue(), color.getSaturation());
+                } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+                    updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
+                }
+            }
+        }
+    }
+
+    private void updateColor() {
+        ColorMode mode = lastColorMode;
+        if (mode != null) {
+            switch (mode) {
+                case CURRENT_HUE_AND_CURRENT_SATURATION:
+                case CURRENT_XAND_CURRENT_Y:
+                    if (supportsHue) {
+                        updateColorHSB();
+                    } else {
+                        updateColorXY();
+                    }
+                    break;
+                case COLOR_TEMPERATURE_MIREDS:
+                    if (supportsColorTemperature) {
+                        updateColorTemperature();
+                    }
+                    break;
+            }
+        }
+        colorChanged = false;
     }
 
     private void changeColorHueSaturation(HSBType color) {
