@@ -1,5 +1,5 @@
 import { Endpoint } from "@matter/node";
-import { ColorDimmerSwitchDevice } from "@matter/node/devices/color-dimmer-switch";
+import { ExtendedColorLightDevice } from "@matter/node/devices/extended-color-light";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { Logger } from "@matter/general";
@@ -11,11 +11,10 @@ const logger = Logger.get("ColorDeviceType");
 export class ColorDeviceType extends GenericDeviceType {
 
     override createEndpoint(clusterValues: Record<string, any>) {
-        const endpoint = new Endpoint(ColorDimmerSwitchDevice.with(BridgedDeviceBasicInformationServer,
+        const endpoint = new Endpoint(ExtendedColorLightDevice.with(BridgedDeviceBasicInformationServer,
             ColorControlServer.with(
                 ColorControl.Feature.ColorTemperature,
-                ColorControl.Feature.HueSaturation,
-                ColorControl.Feature.Xy
+                ColorControl.Feature.HueSaturation
             ), LevelControlServer, OnOffServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {
@@ -39,12 +38,15 @@ export class ColorDeviceType extends GenericDeviceType {
         endpoint.events.colorControl.currentSaturation$Changed.on(value => {
             this.sendBridgeEvent("colorControl", "currentHue", value);
         });
-        endpoint.events.colorControl.currentX$Changed.on(value => {
-            this.sendBridgeEvent("colorControl", "currentX", value);
+        endpoint.events.colorControl.colorTemperatureMireds$Changing.on(value => {
+            this.sendBridgeEvent("colorControl", "colorTemperatureMireds", value);
         });
-        endpoint.events.colorControl.currentY$Changed.on(value => {
-            this.sendBridgeEvent("colorControl", "currentY", value);
-        });
+        // endpoint.events.colorControl.currentX$Changed.on(value => {
+        //     this.sendBridgeEvent("colorControl", "currentX", value);
+        // });
+        // endpoint.events.colorControl.currentY$Changed.on(value => {
+        //     this.sendBridgeEvent("colorControl", "currentY", value);
+        // });
         return endpoint;
     }
 

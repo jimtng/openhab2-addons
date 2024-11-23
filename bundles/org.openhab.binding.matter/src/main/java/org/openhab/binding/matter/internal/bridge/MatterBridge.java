@@ -15,20 +15,13 @@ package org.openhab.binding.matter.internal.bridge;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.devices.*;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
-import org.openhab.binding.matter.internal.client.model.PairingCodes;
-import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.client.model.ws.BridgeEventMessage;
-import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
-import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
+import org.openhab.binding.matter.internal.client.model.ws.*;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
 import org.openhab.core.common.ThreadPoolManager;
@@ -78,6 +71,7 @@ public class MatterBridge implements MatterClientListener {
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
     private boolean resetBridge = false;
     private boolean bridgeInitialized = false;
+    private boolean commissioningWindowOpen = false;
     private @Nullable ScheduledFuture<?> modifyFuture;
 
     @Activate
@@ -147,8 +141,10 @@ public class MatterBridge implements MatterClientListener {
 
     @Activate
     public synchronized void activate(Map<String, Object> properties) {
-        logger.debug("Activating Matter Bridge");
-        if (!parseConfig(properties)) {
+        logger.debug("Activating Matter Bridge {}", properties);
+        // if this returns true, we will wait for @Modified to be called after the config is persisted
+        if (!parseInitialConfig(properties)) {
+            this.settings = (new Configuration(properties)).as(MatterBridgeSettings.class);
             connectClient();
         }
     }
@@ -163,9 +159,34 @@ public class MatterBridge implements MatterClientListener {
 
     @Modified
     protected synchronized void modified(Map<String, Object> properties) {
-        if (!parseConfig(properties)) {
+        logger.debug("Modified Matter Bridge {}", properties);
+        MatterBridgeSettings settings = (new Configuration(properties)).as(MatterBridgeSettings.class);
+        boolean restart = false;
+        if (!this.settings.bridgeName.equals(settings.bridgeName)) {
+            restart = true;
+        }
+        if (this.settings.discriminator != settings.discriminator) {
+            restart = true;
+        }
+        if (this.settings.passcode != settings.passcode) {
+            restart = true;
+        }
+        if (this.settings.port != settings.port) {
+            restart = true;
+        }
+        if (settings.resetBridge) {
+            this.resetBridge = true;
+            restart = true;
+
+        }
+        settings.resetBridge = false;
+
+        this.settings = settings;
+        if (!client.isConnected() || restart) {
             stopClient();
             scheduler.schedule(this::connectClient, 5, TimeUnit.SECONDS);
+        } else {
+            manageCommissioningWindow();
         }
     }
 
@@ -176,6 +197,7 @@ public class MatterBridge implements MatterClientListener {
         }
 
         try {
+            commissioningWindowOpen = false;
             String folderName = OpenHAB.getUserDataFolder() + File.separator + "matter";
             File folder = new File(folderName);
             if (!folder.exists()) {
@@ -202,6 +224,7 @@ public class MatterBridge implements MatterClientListener {
             if (resetBridge) {
                 resetBridge = false;
                 paramsMap.put("resetBridge", "true");
+                updateResetConfig();
             }
 
             client.addListener(this);
@@ -227,12 +250,11 @@ public class MatterBridge implements MatterClientListener {
         bridgeInitialized = false;
     }
 
-    public boolean parseConfig(Map<String, Object> properties) {
+    public boolean parseInitialConfig(Map<String, Object> properties) {
         logger.debug("Parse Config Matter Bridge");
 
         Dictionary<String, Object> props = null;
         org.osgi.service.cm.Configuration config = null;
-        MatterBridgeSettings settings = (new Configuration(properties)).as(MatterBridgeSettings.class);
 
         try {
             config = configAdmin.getConfiguration(MatterBridge.CONFIG_PID);
@@ -241,7 +263,6 @@ public class MatterBridge implements MatterClientListener {
             logger.warn("cannot retrieve config admin {}", e.getMessage());
         }
 
-        logger.debug("settings {} config {} props {}", settings, config, props);
         if (props == null) { // if null, the configuration is new
             props = new Hashtable<>();
         }
@@ -267,16 +288,7 @@ public class MatterBridge implements MatterClientListener {
         }
 
         props.put("discriminator", discriminator);
-        settings.discriminator = discriminator;
-
-        // reset option. this is tricky, we want to detect this change, but not persist it (so change it back). This
-        // causes reactivation of this service.
-        if (!resetBridge || settings.resetBridge) {
-            resetBridge = true;
-            // reset bridge should never persist true
-            props.put("resetBridge", false);
-            settings.resetBridge = false;
-        }
+        props.put("resetBridge", false);
 
         boolean changed = false;
         if (config != null) {
@@ -286,12 +298,12 @@ public class MatterBridge implements MatterClientListener {
                 logger.warn("cannot update configuration {}", e.getMessage());
             }
         }
-        this.settings = settings;
         return changed;
     }
 
     @Override
     public void onDisconnect(String reason) {
+        // TODO handle reconnecting service.
     }
 
     @Override
@@ -300,8 +312,8 @@ public class MatterBridge implements MatterClientListener {
 
     @Override
     public void onReady() {
-        updatePairingCodes();
         registerItems();
+        scheduler.schedule(this::manageCommissioningWindow, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -318,9 +330,28 @@ public class MatterBridge implements MatterClientListener {
 
     @Override
     public void onEvent(BridgeEventMessage message) {
-        GenericDevice d = devices.get(message.endpointId);
-        if (d != null) {
-            d.handleMatterEvent(message.clusterName, message.attributeName, message.data);
+        if (message instanceof BridgeEventAttributeChanged attributeChanged) {
+            GenericDevice d = devices.get(attributeChanged.data.endpointId);
+            if (d != null) {
+                d.handleMatterEvent(attributeChanged.data.clusterName, attributeChanged.data.attributeName,
+                        attributeChanged.data.data);
+            }
+        } else if (message instanceof BridgeEventTriggered bridgeEventTriggered) {
+            switch (bridgeEventTriggered.data.eventName) {
+                case "commissioningWindowOpen":
+                    // commissioningWindowOpen = true;
+                    // Object qrPairingCode = bridgeEventTriggered.data.data.get("qrPairingCode");
+                    // Object manualPairingCode = bridgeEventTriggered.data.data.get("manualPairingCode");
+                    // if (qrPairingCode != null && manualPairingCode != null) {
+                    // updatePairingCodes(qrPairingCode.toString(), manualPairingCode.toString());
+                    // }
+                    break;
+                case "commissioningWindowClosed":
+                    commissioningWindowOpen = false;
+                    updatePairingCodes(null, null);
+                    break;
+                default:
+            }
         }
     }
 
@@ -411,27 +442,54 @@ public class MatterBridge implements MatterClientListener {
         bridgeInitialized = true;
     }
 
-    private void updatePairingCodes() {
-        MatterBridgeClient client = this.client;
-        if (client != null) {
+    private void manageCommissioningWindow() {
+        if (settings.openCommissioningWindow && !commissioningWindowOpen) {
             try {
-                org.osgi.service.cm.Configuration config = configAdmin.getConfiguration(MatterBridge.CONFIG_PID);
-                Dictionary<String, Object> props = config.getProperties();
-                if (props == null) {
-                    props = new Hashtable<>();
-                }
-                PairingCodes codes = client.getPairingCodes().get();
-                if (codes.manualPairingCode != null) {
-                    props.put("manualPairingCode", codes.manualPairingCode);
-                    props.put("qrCode", codes.qrPairingCode);
-                } else {
-                    props.put("manualPairingCode", "Already commissioned, use paired client to generate code.");
-                    props.put("qrCode", "");
-                }
-                config.updateIfDifferent(props);
-            } catch (IOException | InterruptedException | ExecutionException | RuntimeException e) {
-                logger.debug("Could not get pairing codes", e);
+                Map<String, String> map = client.openCommissioningWindow().get();
+                commissioningWindowOpen = true;
+                updatePairingCodes(map.get("qrPairingCode"), map.get("manualPairingCode"));
+            } catch (CancellationException | InterruptedException | ExecutionException e) {
+                logger.debug("Could not open commissioning window", e);
+                updatePairingCodes(null, null);
             }
+        } else if (!settings.openCommissioningWindow && commissioningWindowOpen) {
+            try {
+                client.closeCommissioningWindow().get();
+                commissioningWindowOpen = false;
+                updatePairingCodes(null, null);
+            } catch (CancellationException | InterruptedException | ExecutionException e) {
+                logger.debug("Could not close commissioning window", e);
+            }
+        }
+    }
+
+    private void updatePairingCodes(@Nullable String qrPairingCode, @Nullable String manualPairingCode) {
+        if (manualPairingCode != null && qrPairingCode != null) {
+            updateConfig(Map.of("manualPairingCode", manualPairingCode, "qrCode", qrPairingCode,
+                    "openCommissioningWindow", true));
+        } else {
+            updateConfig(Map.of("manualPairingCode",
+                    "Enable \"Allow Commissioning\" and save configuration to enable commissioning", "qrCode", "",
+                    "openCommissioningWindow", false));
+
+        }
+    }
+
+    private void updateResetConfig() {
+        updateConfig(Map.of("resetBridge", false));
+    }
+
+    private void updateConfig(Map<String, Object> entires) {
+        try {
+            org.osgi.service.cm.Configuration config = configAdmin.getConfiguration(MatterBridge.CONFIG_PID);
+            Dictionary<String, Object> props = config.getProperties();
+            if (props == null) {
+                return;
+            }
+            entires.forEach((k, v) -> props.put(k, v));
+            config.updateIfDifferent(props);
+        } catch (IOException e) {
+            logger.debug("Could not get pairing codes", e);
         }
     }
 

@@ -28,10 +28,11 @@ public class MatterBridgeSettings {
     public String qrCode = "";
     public String manualPairingCode = "";
     public boolean resetBridge = false;
+    public boolean openCommissioningWindow = false;
 
     public String toString() {
         return "MatterBridgeSettings [name=" + bridgeName + ", port=" + port + ", passcode=" + passcode
                 + ", discriminator=" + discriminator + ", qrCode=" + qrCode + ", manualPairingCode=" + manualPairingCode
-                + ", resetBridge=" + resetBridge + "]";
+                + ", resetBridge=" + resetBridge + ", openCommissioningWindow=" + openCommissioningWindow + "]";
     }
 }

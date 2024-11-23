@@ -35,9 +35,23 @@ export enum MessageType {
     ResultSuccess = "resultSuccess",
 }
 
+export enum BridgeEventType {
+    AttributeChanged = "attributeChanged",
+    EventTriggered = "eventTriggered",
+}
 export interface BridgeEvent {
+    type: string;
+    data: any;
+}
+
+export interface BridgeAttributeChangedEvent {
     endpointId: string;
     clusterName: string;
     attributeName: string;
+    data: any;
+}
+
+export interface BridgeEventTrigger {
+    eventName: string;
     data: any;
 }

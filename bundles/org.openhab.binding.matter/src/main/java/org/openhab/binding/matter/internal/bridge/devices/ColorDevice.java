@@ -81,8 +81,14 @@ public class ColorDevice extends GenericDevice {
                         break;
                     case "currentHue":
                     case "currentSaturation":
+                        // ignore 0 values for these
+                        if ((Double) data == 0) {
+                            break;
+                        }
                     case "currentLevel":
                         colorItem.send(updateHSB(hsb, clusterName, attributeName, data));
+                        break;
+                    case "colorTemperatureMireds":
                         break;
                     default:
                         break;
@@ -95,16 +101,17 @@ public class ColorDevice extends GenericDevice {
         DecimalType h = hsb.getHue();
         PercentType s = hsb.getSaturation();
         PercentType b = hsb.getBrightness();
+        Double value = (Double) data;
         switch (attributeName) {
             case "currentHue":
-                float hueValue = ((Double) data).floatValue() * 360.0f / 254.0f;
+                float hueValue = value.floatValue() * 360.0f / 254.0f;
                 h = new DecimalType(Float.valueOf(hueValue).toString());
                 break;
             case "currentSaturation":
-                float saturationValue = ((Double) data).floatValue() * 100.0f / 254.0f;
+                float saturationValue = value.floatValue() * 100.0f / 254.0f;
                 s = new PercentType(Float.valueOf(saturationValue).toString());
             case "currentLevel":
-                b = levelToPercent(((Double) data).intValue());
+                b = levelToPercent(value.intValue());
                 break;
             default:
                 break;

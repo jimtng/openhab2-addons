@@ -57,7 +57,7 @@ handlebars.registerHelper('isLastElement', function (index: number, count: numbe
 handlebars.registerHelper('isFirstElement', function (index: number) {
     return index == 0;
 });
-handlebars.registerHelper('isEmpty', function (e: Array<any> | undefined) {
+handlebars.registerHelper('isEmpty', function (e: Array<any> | String |  undefined) {
     return e == undefined || e.length == 0
 });
 handlebars.registerHelper('isDepreciated', function (field) {
@@ -439,8 +439,8 @@ const dataTypeSource = fs.readFileSync('src/templates/data-types-class.hbs', 'ut
 const dataTypeTemplate = handlebars.compile(dataTypeSource);
 const deviceTypeSource = fs.readFileSync('src/templates/device-types-class.hbs', 'utf8');
 const deviceTypeTemplate = handlebars.compile(deviceTypeSource);
-const clusterConstantsSource = fs.readFileSync('src/templates/cluster-constants.hbs', 'utf8');
-const clusterConstantsTemplate = handlebars.compile(clusterConstantsSource);
+const clusterRegistrySource = fs.readFileSync('src/templates/cluster-registry.hbs', 'utf8');
+const clusterRegistryTemplate = handlebars.compile(clusterRegistrySource);
 
 // Generate Java code
 
@@ -469,8 +469,8 @@ const deviceTypeClass = deviceTypeTemplate({ deviceTypes: Matter.children.filter
 fs.writeFileSync(`out/DeviceTypes.java`, deviceTypeClass);
 
 
-const clusterConstantsClass = clusterConstantsTemplate({ clusters: clusters });
-fs.writeFileSync(`out/ClusterConstants.java`, clusterConstantsClass);
+const clusterRegistryClass = clusterRegistryTemplate({ clusters: clusters });
+fs.writeFileSync(`out/ClusterRegistry.java`, clusterRegistryClass);
 
 
 clusters.forEach(cluster => {

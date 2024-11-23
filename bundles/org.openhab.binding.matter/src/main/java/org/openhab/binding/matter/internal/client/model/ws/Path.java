@@ -22,6 +22,7 @@ public class Path {
     public BigInteger nodeId;
     public Integer endpointId;
     public Integer clusterId;
+    public String clusterName;
     public Integer attributeId;
     public String attributeName;
     public Integer eventId;

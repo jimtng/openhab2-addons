@@ -377,12 +377,12 @@
 	</channel-type>
 
 	<channel-type id="relativehumiditymeasurement-measuredvalue">
-        <item-type>Number</item-type>
-        <label>Humidity</label>
-        <description>Indicates the current relative humidity</description>
-        <category>Humidity</category>
-        <state pattern="%.1f %%" readOnly="true" />
-    </channel-type>
+		<item-type>Number</item-type>
+		<label>Humidity</label>
+		<description>Indicates the current relative humidity</description>
+		<category>Humidity</category>
+		<state pattern="%.1f %%" readOnly="true"/>
+	</channel-type>
 
 	<channel-type id="occupancysensing-occupied">
 		<item-type>Switch</item-type>

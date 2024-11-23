@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
+import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.ClusterRegistry;
 import org.openhab.core.items.*;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PercentType;
@@ -64,9 +66,18 @@ public abstract class GenericDevice implements StateChangeListener {
 
     abstract public void dispose();
 
+    abstract public void updateState(Item item, State state);
+
     abstract public void handleMatterEvent(String clusterName, String attributeName, Object data);
 
-    abstract public void updateState(Item item, State state);
+    public void handleMatterEvent(Integer clusterId, String attributeName, Object data) {
+        Class<? extends BaseCluster> cluster = ClusterRegistry.CLUSTER_IDS.get(clusterId);
+        if (cluster == null) {
+            logger.debug("Unknown cluster {}", clusterId);
+            return;
+        }
+        handleMatterEvent(cluster.getName(), attributeName, data);
+    }
 
     @Override
     public void stateChanged(Item item, State oldState, State newState) {

@@ -16,6 +16,13 @@ package org.openhab.binding.matter.internal.client.model.ws;
  * @author Dan Cunningham
  *
  */
-public class BridgeEventMessage {
-    public String type;
+public class BridgeEventAttributeChanged extends BridgeEventMessage {
+    public AttributeChangedData data;
+
+    public class AttributeChangedData {
+        public String endpointId;
+        public String clusterName;
+        public String attributeName;
+        public Object data;
+    }
 }

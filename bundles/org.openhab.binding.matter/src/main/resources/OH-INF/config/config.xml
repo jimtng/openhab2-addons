@@ -24,6 +24,11 @@
 			<label>Matter Manual Pairing Code</label>
 			<description>Manual code used for pairing 3rd party Matter clients.</description>
 		</parameter>
+		<parameter name="openCommissioningWindow" type="boolean" required="false" groupName="bridge">
+			<label>Allow Commissioning</label>
+			<description>This will open the commissioning window for 15 minutes, allowing pairings with 3rd party clients.</description>
+			<default>false</default>
+		</parameter>
 		<parameter name="passcode" type="integer" min="1" max="99999998" required="true" groupName="bridge">
 			<label>Passcode</label>
 			<description>Defines the Matter bridge passcode, used for commissioning the first client.</description>

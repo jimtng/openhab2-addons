@@ -171,12 +171,14 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
 
     protected CompletableFuture<JsonElement> sendMessage(String namespace, String functionName,
             @Nullable Object args[]) {
+        CompletableFuture<JsonElement> responseFuture = new CompletableFuture<>();
+
         Session session = this.session;
         if (session == null) {
-            throw new RuntimeException("No valid session");
+            logger.debug("Could not send {} {} : no valid session", namespace, functionName);
+            return responseFuture;
         }
         String requestId = UUID.randomUUID().toString();
-        CompletableFuture<JsonElement> responseFuture = new CompletableFuture<>();
         pendingRequests.put(requestId, responseFuture);
         Request message = new Request(requestId, namespace, functionName, args);
         String jsonMessage = gson.toJson(message);
@@ -279,10 +281,26 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
                     case "bridgeEvent":
                         logger.debug("bridgeEvent message {}", event.data);
                         BridgeEventMessage bridgeEventMessage = gson.fromJson(event.data, BridgeEventMessage.class);
+
                         if (bridgeEventMessage == null) {
                             logger.debug("invalid bridgeEvent");
                             return;
                         }
+
+                        switch (bridgeEventMessage.type) {
+                            case "attributeChanged":
+                                bridgeEventMessage = gson.fromJson(event.data, BridgeEventAttributeChanged.class);
+                                break;
+                            case "eventTriggered":
+                                bridgeEventMessage = gson.fromJson(event.data, BridgeEventTriggered.class);
+                                break;
+                        }
+
+                        if (bridgeEventMessage == null) {
+                            logger.debug("invalid bridgeEvent subtype");
+                            return;
+                        }
+
                         for (MatterClientListener listener : clientListeners) {
                             try {
                                 listener.onEvent(bridgeEventMessage);

@@ -1,5 +1,6 @@
 package org.openhab.binding.matter.internal.bridge;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -10,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 @NonNullByDefault
 public class MatterBridgeClient extends MatterWebsocketClient {
@@ -51,6 +54,29 @@ public class MatterBridgeClient extends MatterWebsocketClient {
 
     public CompletableFuture<Void> startBridge() {
         CompletableFuture<JsonElement> future = sendMessage("bridge", "startBridge", new Object[0]);
+        return future.thenAccept(obj -> {
+            // Do nothing, just to complete the future
+        });
+    }
+
+    public CompletableFuture<Map<String, String>> openCommissioningWindow() {
+        CompletableFuture<JsonElement> future = sendMessage("bridge", "openCommissioningWindow", new Object[0]);
+        return future.thenApply(obj -> {
+            if (obj.isJsonObject()) {
+                JsonObject jsonObject = obj.getAsJsonObject();
+                Type mapType = new TypeToken<Map<String, Object>>() {
+                }.getType();
+                Map<String, String> map = gson.fromJson(jsonObject, mapType);
+                if (map != null) {
+                    return map;
+                }
+            }
+            return Map.of();
+        });
+    }
+
+    public CompletableFuture<Void> closeCommissioningWindow() {
+        CompletableFuture<JsonElement> future = sendMessage("bridge", "closeCommissioningWindow", new Object[0]);
         return future.thenAccept(obj -> {
             // Do nothing, just to complete the future
         });

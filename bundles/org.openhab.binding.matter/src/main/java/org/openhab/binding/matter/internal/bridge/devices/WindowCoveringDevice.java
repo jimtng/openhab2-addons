@@ -76,6 +76,10 @@ public class WindowCoveringDevice extends GenericDevice {
                 break;
         }
         if (percentType != null) {
+            boolean open = percentType.intValue() > 0;
+            Metadata primaryItemMetadata = this.primaryItemMetadata;
+            String key = open ? "OPEN" : "CLOSED";
+
             if (primaryItem instanceof GroupItem groupItem) {
                 groupItem.send(percentType);
             } else if (primaryItem instanceof DimmerItem dimmerItem) {
@@ -83,16 +87,17 @@ public class WindowCoveringDevice extends GenericDevice {
             } else if (primaryItem instanceof RollershutterItem rollerShutterItem) {
                 rollerShutterItem.send(percentType);
             } else if (primaryItem instanceof SwitchItem switchItem) {
-                switchItem.send(percentType.intValue() == 0 ? OnOffType.ON : OnOffType.OFF);
-            } else if (primaryItem instanceof StringItem stringItem) {
-                boolean open = percentType.intValue() > 0;
-                String key = open ? "OPEN" : "CLOSED";
-                Object obj = key;
-                Metadata primaryItemMetadata = this.primaryItemMetadata;
+                String value = open ? "ON" : "OFF";
                 if (primaryItemMetadata != null) {
-                    obj = primaryItemMetadata.getConfiguration().getOrDefault(key, key);
+                    value = primaryItemMetadata.getConfiguration().getOrDefault(key, value).toString();
                 }
-                stringItem.send(new StringType(obj.toString()));
+                switchItem.send(OnOffType.from(value));
+            } else if (primaryItem instanceof StringItem stringItem) {
+                Object value = key;
+                if (primaryItemMetadata != null) {
+                    value = primaryItemMetadata.getConfiguration().getOrDefault(key, key);
+                }
+                stringItem.send(new StringType(value.toString()));
             }
         }
     }

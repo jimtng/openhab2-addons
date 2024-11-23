@@ -2,7 +2,7 @@
 import "@matter/node";
 
 import { VendorId } from "@matter/types";
-import { logEndpoint } from "@matter/protocol";
+import { logEndpoint, DeviceCommissioner } from "@matter/protocol";
 import { Endpoint, EndpointServer, ServerNode } from "@matter/node";
 import { AggregatorEndpoint } from "@matter/node/endpoints";
 import { Environment, Logger } from "@matter/general";
@@ -20,6 +20,7 @@ import { OccupancySensorDeviceType } from "./devices/OccupancySensorDeviceType";
 import { ContactSensorDeviceType } from "./devices/ContactSensorDeviceType";
 import { FanModeDeviceType } from "./devices/FanModeDeviceType";
 import { ColorDeviceType } from "./devices/ColorDeviceType";
+import { BridgeEvent, BridgeEventType, EventType } from "../MessageTypes";
 
 
 const logger = Logger.get("DeviceNode");
@@ -30,6 +31,7 @@ export class DeviceNode {
 
     private aggregator!: Endpoint<AggregatorEndpoint>;
     private devices: Map<string, GenericDeviceType> = new Map();
+    private inCommission = false;
 
     constructor(private bridgeController: BridgeController, private storagePath: string, private resetStorage: boolean, private deviceName: string, private vendorName: string, private passcode: number, private discriminator: number, private vendorId: number, private productName: string, private productId: number, private port: number, private uniqueId: string) {
     }
@@ -102,7 +104,7 @@ export class DeviceNode {
     }
 
     getPairingCodes() {
-        if (this.server.state.commissioning.commissioned) {
+        if (this.server.state.commissioning.commissioned && !this.inCommission) {
             return {
                 manualPairingCode: null,
                 qrPairingCode: null
@@ -181,10 +183,10 @@ export class DeviceNode {
     async startBridge() {
         if (this.devices.size == 0) {
             throw new Error("No devices added, not starting");
-
         }
         logEndpoint(EndpointServer.forEndpoint(this.server));
         await this.server.start();
+        //this.#sendCommissioningCodes();
     }
 
     async setEndpointState(endpointId: string, clusterName: string, stateName: string, stateValue: any) {
@@ -193,4 +195,58 @@ export class DeviceNode {
             device.updateState(clusterName, stateName, stateValue);
         }
     }
+
+    async openCommissioningWindow() {
+        const dc = this.server.env.get(DeviceCommissioner);
+        logger.debug('opening basic commissioning window')
+        await dc.allowBasicCommissioning(() => {
+            this.inCommission = false;
+            logger.debug('commissioning window closed')
+            const be: BridgeEvent = {
+                type: BridgeEventType.EventTriggered,
+                data: {
+                    eventName: "commissioningWindowClosed",
+                    data: {}
+                }
+            }
+            this.bridgeController.ws.sendEvent(EventType.BridgeEvent, be);
+        });
+        this.inCommission = true;
+        logger.debug('basic commissioning window open')
+        return {
+            manualPairingCode: this.server.state.commissioning.pairingCodes.manualPairingCode,
+            qrPairingCode: this.server.state.commissioning.pairingCodes.qrPairingCode
+        }
+    }
+
+    async closeCommissioningWindow() {
+        const dc = this.server.env.get(DeviceCommissioner);
+        logger.debug('closing basic commissioning window')
+        await dc.endCommissioning();
+    }
+
+    // #sendCommissioningCodes() {
+    //     if (!this.server.state.commissioning.commissioned || this.inCommission) {
+    //         const be: BridgeEvent = {
+    //             type: BridgeEventType.EventTriggered,
+    //             data: {
+    //                 eventName: "commissioningWindowOpen",
+    //                 data: {
+    //                     manualPairingCode: this.server.state.commissioning.pairingCodes.manualPairingCode,
+    //                     qrPairingCode: this.server.state.commissioning.pairingCodes.qrPairingCode
+    //                 }
+    //             }
+    //         }
+    //         this.bridgeController.ws.sendEvent(EventType.BridgeEvent, be);
+    //     } else {
+    //         const be: BridgeEvent = {
+    //             type: BridgeEventType.EventTriggered,
+    //             data: {
+    //                 eventName: "commissioningWindowClosed",
+    //                 data: {}
+    //             }
+    //         }
+    //         this.bridgeController.ws.sendEvent(EventType.BridgeEvent, be);
+    //     }
+    //}
 }

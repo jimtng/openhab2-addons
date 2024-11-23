@@ -28,8 +28,8 @@
         "#types": "@matter/types"
     },
     "dependencies": {
-        "@matter/main": "0.11.3",
-        "@project-chip/matter.js" : "0.11.3",
+        "@matter/main": "0.11.5-alpha.0-20241123-e56e38864",
+        "@project-chip/matter.js" : "0.11.5-alpha.0-20241123-e56e38864",
         "uuid": "^9.0.1",
         "ws": "^8.18.0",
         "yargs": "^17.7.2"

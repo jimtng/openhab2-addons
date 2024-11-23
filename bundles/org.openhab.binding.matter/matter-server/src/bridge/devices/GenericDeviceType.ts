@@ -1,6 +1,6 @@
 import { Endpoint } from "@matter/node";
 import { BridgeController } from "../BridgeController";
-import { Request, MessageType, EventType, BridgeEvent } from '../../MessageTypes';
+import { Request, MessageType, EventType, BridgeEvent, BridgeAttributeChangedEvent, BridgeEventType } from '../../MessageTypes';
 import { Logger } from "@matter/main";
 
 const logger = Logger.get("GenericDevice");
@@ -38,11 +38,20 @@ export abstract class GenericDeviceType {
             logger.debug(`skipping sending bridge event for ${clusterName}.${attributeName} = ${attributeValue}`);
             return;
         }
-        const be: BridgeEvent = {  
-            endpointId: this.endpoint.id,
-            clusterName: clusterName,
-            attributeName: attributeName,
-            data: attributeValue,
+        // const be: BridgeAttributeChangedEvent = {  
+        //     endpointId: this.endpoint.id,
+        //     clusterName: clusterName,
+        //     attributeName: attributeName,
+        //     data: attributeValue,
+        // }
+        const be: BridgeEvent = {
+            type: BridgeEventType.AttributeChanged,
+            data: {  
+                endpointId: this.endpoint.id,
+                clusterName: clusterName,
+                attributeName: attributeName,
+                data: attributeValue,
+            }
         }
         this.sendEvent(EventType.BridgeEvent, be)
     }
