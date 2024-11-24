@@ -12,14 +12,7 @@ export class DoorLockDeviceType extends GenericDeviceType {
         const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer, DoorLockServer.with(
             DoorLock.Feature.PinCredential
         )), {
-            id: this.endpointId,
-            bridgedDeviceBasicInformation: {
-                nodeLabel: this.nodeLabel,
-                productName: this.productName,
-                productLabel: this.productLabel,
-                serialNumber: this.serialNumber,
-                reachable: true,
-            },
+            ...this.endPointDefaults(),
             ...clusterValues
         });
         endpoint.events.doorLock.lockState$Changed.on(value => {

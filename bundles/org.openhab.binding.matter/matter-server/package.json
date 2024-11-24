@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "@matter/main": "0.11.5-alpha.0-20241124-c836aa892",
+        "@matter/node": "0.11.5-alpha.0-20241124-c836aa892",
         "@project-chip/matter.js" : "0.11.5-alpha.0-20241124-c836aa892",
         "uuid": "^9.0.1",
         "ws": "^8.18.0",

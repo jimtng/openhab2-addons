@@ -33,14 +33,7 @@ export class ThermostatDeviceType extends GenericDeviceType {
         const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer,  OnOffServer, ThermostatServer.with(
             ...features
         )), {
-            id: this.endpointId,
-            bridgedDeviceBasicInformation: {
-                nodeLabel: this.nodeLabel,
-                productName: this.productName,
-                productLabel: this.productLabel,
-                serialNumber: this.serialNumber,
-                reachable: true,
-            },
+            ...this.endPointDefaults(),
             ...clusterValues
 
         });

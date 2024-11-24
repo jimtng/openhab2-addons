@@ -13,14 +13,7 @@ export class ColorDeviceType extends GenericDeviceType {
                 ColorControl.Feature.HueSaturation,
                 ColorControl.Feature.ColorTemperature
             )), {
-            id: this.endpointId,
-            bridgedDeviceBasicInformation: {
-                nodeLabel: this.nodeLabel,
-                productName: this.productName,
-                productLabel: this.productLabel,
-                serialNumber: this.serialNumber,
-                reachable: true,
-            },
+            ...this.endPointDefaults(),
             ...clusterValues
         });
         return endpoint;

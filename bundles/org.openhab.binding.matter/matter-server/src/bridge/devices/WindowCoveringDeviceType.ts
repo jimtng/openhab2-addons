@@ -15,14 +15,7 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
         const endpoint = new Endpoint(WindowCoveringDevice.with(BridgedDeviceBasicInformationServer, this.createWindowCoveringServer().with(
             ...features,
         )), {
-            id: this.endpointId,
-            bridgedDeviceBasicInformation: {
-                nodeLabel: this.nodeLabel,
-                productName: this.productName,
-                productLabel: this.productLabel,
-                serialNumber: this.serialNumber,
-                reachable: true,
-            },
+            ...this.endPointDefaults(),
             ...clusterValues
         });
         endpoint.events.windowCovering.operationalStatus$Changed.on(value => {

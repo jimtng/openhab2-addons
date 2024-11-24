@@ -1,9 +1,8 @@
-import { Endpoint } from "@matter/node";
+import { Endpoint } from "@matter/main";
 import { BridgeController } from "../BridgeController";
 import { EventType, BridgeEvent, BridgeEventType } from '../../MessageTypes';
 import { OnOffServer } from '@matter/node/behaviors/on-off';
 import { LevelControlServer } from '@matter/node/behaviors/level-control';
-import { LevelControl } from "@matter/main/clusters";
 
 import { Logger } from "@matter/main";
 
@@ -92,6 +91,19 @@ export abstract class GenericDeviceType {
         }, {} as Record<string, any>) as T;
     }
 
+    protected endPointDefaults() {
+        return {
+            id: this.endpointId,
+            bridgedDeviceBasicInformation: {
+                nodeLabel: this.nodeLabel,
+                productName: this.productName,
+                productLabel: this.productLabel,
+                serialNumber: this.serialNumber,
+                reachable: true,
+            }
+        }
+    }
+    
     protected createOnOffServer(): typeof OnOffServer {
         const parent = this;
         return class extends OnOffServer {
@@ -109,9 +121,9 @@ export abstract class GenericDeviceType {
     protected createLevelControlServer(): typeof LevelControlServer {
         const parent = this;
         return class extends LevelControlServer {
-            override async moveToLevel(request: LevelControl.MoveToLevelRequest) {
-                await parent.sendBridgeEvent("levelControl", "currentLevel", request.level);
-                return super.moveToLevel(request as LevelControl.MoveToLevelRequest);
+            override async moveToLevelLogic(level: number, transitionTime: number | null, withOnOff: boolean){
+                await parent.sendBridgeEvent("levelControl", "currentLevel", level);
+                return super.moveToLevelLogic(level, transitionTime, withOnOff);
             }
         };
     }

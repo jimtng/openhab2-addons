@@ -7,14 +7,7 @@ export class OnOffPlugInDeviceType extends GenericDeviceType {
 
     override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(OnOffPlugInUnitDevice.with(BridgedDeviceBasicInformationServer, this.createOnOffServer()), {
-            id: this.endpointId,
-            bridgedDeviceBasicInformation: {
-                nodeLabel: this.nodeLabel,
-                productName: this.productName,
-                productLabel: this.productLabel,
-                serialNumber: this.serialNumber,
-                reachable: true,
-            },
+            ...this.endPointDefaults(),
             ...clusterValues
         });
         return endpoint

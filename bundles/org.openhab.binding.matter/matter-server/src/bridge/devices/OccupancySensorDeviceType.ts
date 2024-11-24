@@ -7,14 +7,7 @@ export class OccupancySensorDeviceType extends GenericDeviceType {
     
     override createEndpoint(clusterValues: Record<string, any>) {
         const endpoint = new Endpoint(OccupancySensorDevice.with(BridgedDeviceBasicInformationServer), {
-            id: this.endpointId,
-            bridgedDeviceBasicInformation: {
-                nodeLabel: this.nodeLabel,
-                productName: this.productName,
-                productLabel: this.productLabel,
-                serialNumber: this.serialNumber,
-                reachable: true,
-            },
+            ...this.endPointDefaults(),
             ...clusterValues
         });
         return endpoint
