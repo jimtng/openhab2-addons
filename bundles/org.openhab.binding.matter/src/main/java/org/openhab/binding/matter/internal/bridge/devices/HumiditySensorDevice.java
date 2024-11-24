@@ -73,8 +73,8 @@ public class HumiditySensorDevice extends GenericDevice {
         if (humidity instanceof QuantityType quantityType) {
             value = quantityType.toBigDecimal();
         }
-        if (humidity instanceof DecimalType decimalType) {
-            value = decimalType.toBigDecimal();
+        if (humidity instanceof Number number) {
+            value = BigDecimal.valueOf(number.doubleValue());
         }
         return value.setScale(2, RoundingMode.CEILING).multiply(HUMIDITY_MULTIPLIER).intValue();
     }
