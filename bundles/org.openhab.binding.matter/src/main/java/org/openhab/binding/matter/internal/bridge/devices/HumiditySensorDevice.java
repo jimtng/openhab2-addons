@@ -23,6 +23,7 @@ import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.types.State;
 
 /**
@@ -68,10 +69,13 @@ public class HumiditySensorDevice extends GenericDevice {
     }
 
     private int toMatterValue(@Nullable State humidity) {
-        if (humidity instanceof DecimalType decimalType) {
-            BigDecimal value = decimalType.toBigDecimal();
-            return value.setScale(2, RoundingMode.CEILING).multiply(HUMIDITY_MULTIPLIER).intValue();
+        BigDecimal value = new BigDecimal(0);
+        if (humidity instanceof QuantityType quantityType) {
+            value = quantityType.toBigDecimal();
         }
-        return 0;
+        if (humidity instanceof DecimalType decimalType) {
+            value = decimalType.toBigDecimal();
+        }
+        return value.setScale(2, RoundingMode.CEILING).multiply(HUMIDITY_MULTIPLIER).intValue();
     }
 }
