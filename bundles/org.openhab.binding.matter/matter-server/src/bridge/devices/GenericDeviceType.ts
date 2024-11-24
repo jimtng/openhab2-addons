@@ -1,11 +1,9 @@
 import { Endpoint } from "@matter/node";
 import { BridgeController } from "../BridgeController";
-import { Request, MessageType, EventType, BridgeEvent, BridgeAttributeChangedEvent, BridgeEventType } from '../../MessageTypes';
+import { EventType, BridgeEvent, BridgeEventType } from '../../MessageTypes';
 import { OnOffServer } from '@matter/node/behaviors/on-off';
 import { LevelControlServer } from '@matter/node/behaviors/level-control';
 import { LevelControl } from "@matter/main/clusters";
-
-
 
 import { Logger } from "@matter/main";
 

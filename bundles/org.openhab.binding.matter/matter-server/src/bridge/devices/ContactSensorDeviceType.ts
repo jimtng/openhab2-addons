@@ -3,9 +3,6 @@ import { ContactSensorDevice } from "@matter/node/devices/contact-sensor";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
-import { Logger } from"@matter/general";
-
-const logger = Logger.get("ContactSensorDeviceType");
 
 export class ContactSensorDeviceType extends GenericDeviceType {
     
@@ -15,7 +12,6 @@ export class ContactSensorDeviceType extends GenericDeviceType {
                 stateValue : false
             }
         }
-        logger.info(`Creating Contact Sensor Device Endpoint ${JSON.stringify(clusterValues)}`);
         const endpoint = new Endpoint(ContactSensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {

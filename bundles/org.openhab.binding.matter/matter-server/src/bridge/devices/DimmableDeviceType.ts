@@ -1,10 +1,7 @@
 import { Endpoint } from "@matter/node";
 import { DimmableLightDevice } from "@matter/node/devices/dimmable-light";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
-import { Logger } from "@matter/general";
-
-const logger = Logger.get("DimmableDeviceType");
+import { GenericDeviceType } from './GenericDeviceType';
 
 export class DimmableDeviceType extends GenericDeviceType {
 
@@ -20,16 +17,6 @@ export class DimmableDeviceType extends GenericDeviceType {
             },
             ...clusterValues
         });
-        // endpoint.events.onOff.onOff$Changed.on(value => {
-        //     this.sendBridgeEvent("onOff","onOff", value);
-        // });
-        // endpoint.events.onOff.onOff$Changing.on(value => {
-        //     logger.info("onOff$Changing", value)
-        // });
-        // endpoint.events.levelControl.currentLevel$Changed.on(value => {
-        //     this.sendBridgeEvent("levelControl","currentLevel", value);
-        // });
-
         return endpoint;
     }
 

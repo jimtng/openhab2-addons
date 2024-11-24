@@ -1,11 +1,7 @@
 import { Endpoint } from "@matter/node";
 import { HumiditySensorDevice } from "@matter/node/devices/humidity-sensor";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
-import { BridgeController } from "../BridgeController";
-import { Logger } from"@matter/general";
-
-const logger = Logger.get("HumiditySensorType");
+import { GenericDeviceType } from './GenericDeviceType';
 
 export class HumiditySensorType extends GenericDeviceType {
     

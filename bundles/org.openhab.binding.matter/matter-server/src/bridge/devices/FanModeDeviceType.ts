@@ -1,13 +1,9 @@
 import { Endpoint } from "@matter/node";
 import { FanDevice } from "@matter/node/devices/fan";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
-import { BridgeController } from "../BridgeController";
-import { Logger } from "@matter/general";
+import { GenericDeviceType } from './GenericDeviceType';
 import { FanControl } from "@matter/main/clusters";
-//import { FanControl } from "#clusters/fan-control";
 
-const logger = Logger.get("FanModeDeviceType");
 
 export class FanModeDeviceType extends GenericDeviceType {
 

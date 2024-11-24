@@ -3,11 +3,8 @@ import { DoorLockDevice } from "@matter/node/devices/door-lock";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { BridgeController } from "../BridgeController";
-import { Logger } from "@matter/general";
 import { DoorLockServer } from "@matter/main/behaviors";
 import { DoorLock } from "@matter/main/clusters";
-
-const logger = Logger.get("DoorLockDeviceType");
 
 export class DoorLockDeviceType extends GenericDeviceType {
 

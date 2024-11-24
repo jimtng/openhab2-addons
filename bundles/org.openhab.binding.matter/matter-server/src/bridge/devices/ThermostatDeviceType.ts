@@ -3,13 +3,8 @@ import { ThermostatDevice } from "@matter/node/devices/thermostat";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { ThermostatServer } from '@matter/node/behaviors/thermostat';
 import { OnOffServer } from '@matter/node/behaviors/on-off';
-
 import { Thermostat } from '@matter/main/clusters';
-import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
-import { BridgeController } from "../BridgeController";
-import { Logger } from"@matter/general";
-
-const logger = Logger.get("ThermostatDeviceType");
+import { GenericDeviceType } from './GenericDeviceType';
 
 export class ThermostatDeviceType extends GenericDeviceType {
 
@@ -34,9 +29,7 @@ export class ThermostatDeviceType extends GenericDeviceType {
         }
 
         clusterValues.thermostat.controlSequenceOfOperation = controlSequenceOfOperation;
-        
-        logger.debug(`ThermoDevice attributeMap: ${JSON.stringify(clusterValues, null, 2)} features: ${features}`);
-        
+
         const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer,  OnOffServer, ThermostatServer.with(
             ...features
         )), {

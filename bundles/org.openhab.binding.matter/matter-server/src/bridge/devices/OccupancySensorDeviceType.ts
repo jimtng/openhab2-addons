@@ -1,16 +1,11 @@
 import { Endpoint } from "@matter/node";
 import { OccupancySensorDevice } from "@matter/node/devices/occupancy-sensor";
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
-import { BridgeController } from "../BridgeController";
-import { Logger } from"@matter/general";
-
-const logger = Logger.get("OccupancySensorDeviceType");
+import { GenericDeviceType } from './GenericDeviceType';
 
 export class OccupancySensorDeviceType extends GenericDeviceType {
     
     override createEndpoint(clusterValues: Record<string, any>) {
-        logger.info(`Creating Occupancy Sensor Device Endpoint ${JSON.stringify(clusterValues)}`);
         const endpoint = new Endpoint(OccupancySensorDevice.with(BridgedDeviceBasicInformationServer), {
             id: this.endpointId,
             bridgedDeviceBasicInformation: {

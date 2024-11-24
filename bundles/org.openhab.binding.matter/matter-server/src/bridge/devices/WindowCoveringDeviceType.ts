@@ -4,10 +4,6 @@ import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/brid
 import { MovementDirection, MovementType, WindowCoveringServer } from '@matter/node/behaviors/window-covering';
 import { WindowCovering } from '@matter/main/clusters';
 import { GenericDeviceType } from './GenericDeviceType';
-import { BridgeController } from "../BridgeController";
-import { Logger } from "@matter/general";
-
-const logger = Logger.get("WindowCoveringDeviceType");
 
 export class WindowCoveringDeviceType extends GenericDeviceType {
 
@@ -29,9 +25,6 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
             },
             ...clusterValues
         });
-        endpoint.events.windowCovering.currentPositionLiftPercent100ths$Changed.on(value => {
-            logger.debug("currentPositionLiftPercent100ths changed", value);
-        });
         endpoint.events.windowCovering.operationalStatus$Changed.on(value => {
             this.sendBridgeEvent("windowCovering", "operationalStatus", value);
         });
@@ -51,7 +44,6 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
         const parent = this;
         return class extends WindowCoveringServer {
             override async handleMovement(type: MovementType, reversed: boolean, direction: MovementDirection, targetPercent100ths?: number): Promise<void> {
-                logger.debug(`handleMovement: type ${type}, reversed ${reversed}, direction ${direction}, position ${targetPercent100ths}`);
                 if (targetPercent100ths != null) {
                     await parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
                 }
