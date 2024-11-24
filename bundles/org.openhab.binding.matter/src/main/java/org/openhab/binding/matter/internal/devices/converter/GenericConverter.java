@@ -128,7 +128,8 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
         if (value == null) {
             return null;
         }
-        return value.setScale(2, RoundingMode.CEILING).multiply(TEMPERATURE_MULTIPLIER).intValue();
+        // originally this used RoundingMode.CEILING, if there are accuracy problems, we may want to revisit that
+        return value.setScale(2, RoundingMode.HALF_UP).multiply(TEMPERATURE_MULTIPLIER).intValue();
     }
 
     /**

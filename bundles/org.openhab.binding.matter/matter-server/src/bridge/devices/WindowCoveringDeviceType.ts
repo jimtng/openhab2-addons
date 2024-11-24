@@ -52,10 +52,10 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
         return class extends WindowCoveringServer {
             override async handleMovement(type: MovementType, reversed: boolean, direction: MovementDirection, targetPercent100ths?: number): Promise<void> {
                 logger.debug(`handleMovement: type ${type}, reversed ${reversed}, direction ${direction}, position ${targetPercent100ths}`);
-                super.handleMovement(type, reversed, direction, targetPercent100ths);
                 if (targetPercent100ths != null) {
-                    parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
+                    await parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
                 }
+                return super.handleMovement(type, reversed, direction, targetPercent100ths);
             }
         };
     }

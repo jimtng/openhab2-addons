@@ -30,6 +30,7 @@ import org.openhab.core.library.types.HSBType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.types.State;
+import org.openhab.core.util.ColorUtil;
 
 /**
  * The {@link ColorDevice}
@@ -99,7 +100,9 @@ public class ColorDevice extends GenericDevice {
                             TimeUnit.MILLISECONDS);
                     break;
                 case "colorTemperatureMireds":
-                    // todo
+                    HSBType ctHSB = ColorUtil.xyToHsb(ColorUtil.kelvinToXY(1e6 / (Double) data));
+                    lastHSB = new HSBType(ctHSB.getHue(), ctHSB.getSaturation(), lastHSB.getBrightness());
+                    updatePrimaryHSB();
                     break;
                 default:
                     break;

@@ -12,9 +12,12 @@
  */
 package org.openhab.binding.matter.internal.bridge.devices;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -29,6 +32,7 @@ import org.openhab.core.types.State;
  */
 @NonNullByDefault
 public class HumiditySensorDevice extends GenericDevice {
+    private final static BigDecimal HUMIDITY_MULTIPLIER = new BigDecimal(100);
 
     public HumiditySensorDevice(MetadataRegistry metadataRegistry, MatterBridgeClient client, GenericItem item) {
         super(metadataRegistry, client, item);
@@ -50,7 +54,7 @@ public class HumiditySensorDevice extends GenericDevice {
         MetaDataMapping primaryMetadata = metaDataMapping(primaryItem);
         Map<String, Object> attributeMap = primaryMetadata.getAttributeOptions();
         DecimalType state = primaryItem.getStateAs(DecimalType.class);
-        attributeMap.put("relativeHumidityMeasurement.measuredValue", state == null ? 0 : state.intValue() * 100);
+        attributeMap.put("relativeHumidityMeasurement.measuredValue", toMatterValue(state));
         return new MatterDeviceOptions(attributeMap, primaryMetadata.label);
     }
 
@@ -60,9 +64,14 @@ public class HumiditySensorDevice extends GenericDevice {
     }
 
     public void updateState(Item item, State state) {
-        if (state instanceof DecimalType) {
-            DecimalType value = (DecimalType) state;
-            setEndpointState("relativeHumidityMeasurement", "measuredValue", value.intValue() * 100);
+        setEndpointState("relativeHumidityMeasurement", "measuredValue", toMatterValue(state));
+    }
+
+    private int toMatterValue(@Nullable State humidity) {
+        if (humidity instanceof DecimalType decimalType) {
+            BigDecimal value = decimalType.toBigDecimal();
+            return value.setScale(2, RoundingMode.CEILING).multiply(HUMIDITY_MULTIPLIER).intValue();
         }
+        return 0;
     }
 }
