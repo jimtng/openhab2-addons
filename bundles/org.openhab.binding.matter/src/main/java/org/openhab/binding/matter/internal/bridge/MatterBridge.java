@@ -278,7 +278,7 @@ public class MatterBridge implements MatterClientListener {
             if (resetBridge) {
                 resetBridge = false;
                 paramsMap.put("resetBridge", "true");
-                updateResetConfig();
+                updateConfig(Map.of("resetBridge", false));
             }
 
             client.addListener(this);
@@ -493,10 +493,6 @@ public class MatterBridge implements MatterClientListener {
         }
     }
 
-    private void updateResetConfig() {
-        updateConfig(Map.of("resetBridge", false));
-    }
-
     private void updateConfig(Map<String, Object> entires) {
         try {
             org.osgi.service.cm.Configuration config = configAdmin.getConfiguration(MatterBridge.CONFIG_PID);
@@ -505,7 +501,7 @@ public class MatterBridge implements MatterClientListener {
                 return;
             }
             entires.forEach((k, v) -> props.put(k, v));
-            // id this updates, it will trigger a @Modified call
+            // if this updates, it will trigger a @Modified call
             config.updateIfDifferent(props);
         } catch (IOException e) {
             logger.debug("Could not get pairing codes", e);

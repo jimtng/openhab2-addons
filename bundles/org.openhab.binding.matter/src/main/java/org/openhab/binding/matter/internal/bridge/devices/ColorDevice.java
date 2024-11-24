@@ -13,8 +13,13 @@
 package org.openhab.binding.matter.internal.bridge.devices;
 
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -33,6 +38,9 @@ import org.openhab.core.types.State;
  */
 @NonNullByDefault
 public class ColorDevice extends GenericDevice {
+    private ScheduledExecutorService colorUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
+    private @Nullable ScheduledFuture<?> colorUpdateTimer = null;
+    private HSBType lastHSB = new HSBType();
 
     public ColorDevice(MetadataRegistry metadataRegistry, MatterBridgeClient client, GenericItem item) {
         super(metadataRegistry, client, item);
@@ -52,6 +60,7 @@ public class ColorDevice extends GenericDevice {
         if (primaryItem instanceof ColorItem colorItem) {
             HSBType hsbType = colorItem.getStateAs(HSBType.class);
             if (hsbType != null) {
+                lastHSB = hsbType;
                 Float currentHue = toHue(hsbType.getHue());
                 Float currentSaturation = toSaturation(hsbType.getSaturation());
                 Integer currentLevel = toBrightness(hsbType.getBrightness());
@@ -67,48 +76,50 @@ public class ColorDevice extends GenericDevice {
     @Override
     public void dispose() {
         primaryItem.removeStateChangeListener(this);
+        if (colorUpdateTimer != null) {
+            colorUpdateTimer.cancel(true);
+        }
     }
 
     @Override
     public void handleMatterEvent(String clusterName, String attributeName, Object data) {
         if (primaryItem instanceof ColorItem colorItem) {
-            HSBType hsb = colorItem.getStateAs(HSBType.class);
-            if (hsb != null) {
-                switch (attributeName) {
-                    case "onOff":
-                        colorItem.send(OnOffType.from(Boolean.valueOf(data.toString())));
-                        // stop processing by returning
-                        break;
-                    case "currentHue":
-                    case "currentSaturation":
-                        // ignore 0 values for these
-                        if ((Double) data == 0) {
-                            break;
-                        }
-                    case "currentLevel":
-                        colorItem.send(updateHSB(hsb, clusterName, attributeName, data));
-                        break;
-                    case "colorTemperatureMireds":
-                        break;
-                    default:
-                        break;
-                }
+            switch (attributeName) {
+                case "onOff":
+                    colorItem.send(OnOffType.from(Boolean.valueOf(data.toString())));
+                    break;
+                case "currentHue":
+                case "currentSaturation":
+                case "currentLevel":
+                    updateHSB(colorItem, clusterName, attributeName, data);
+                    if (colorUpdateTimer != null) {
+                        colorUpdateTimer.cancel(true);
+                    }
+                    colorUpdateTimer = colorUpdateScheduler.schedule(() -> updatePrimaryHSB(), 500,
+                            TimeUnit.MILLISECONDS);
+                    break;
+                case "colorTemperatureMireds":
+                    // todo
+                    break;
+                default:
+                    break;
             }
         }
     }
 
-    private HSBType updateHSB(HSBType hsb, String clusterName, String attributeName, Object data) {
+    private synchronized void updateHSB(ColorItem colorItem, String clusterName, String attributeName, Object data) {
+        HSBType hsb = this.lastHSB;
         DecimalType h = hsb.getHue();
         PercentType s = hsb.getSaturation();
         PercentType b = hsb.getBrightness();
         Double value = (Double) data;
         switch (attributeName) {
             case "currentHue":
-                float hueValue = value.floatValue() * 360.0f / 254.0f;
+                float hueValue = value == 0 ? 0.0f : value.floatValue() * 360.0f / 254.0f;
                 h = new DecimalType(Float.valueOf(hueValue).toString());
                 break;
             case "currentSaturation":
-                float saturationValue = value.floatValue() * 100.0f / 254.0f;
+                float saturationValue = value == 0 ? 0.0f : value.floatValue() / 254.0f * 100.0f;
                 s = new PercentType(Float.valueOf(saturationValue).toString());
             case "currentLevel":
                 b = levelToPercent(value.intValue());
@@ -116,11 +127,12 @@ public class ColorDevice extends GenericDevice {
             default:
                 break;
         }
-        return new HSBType(h, s, b);
+        lastHSB = new HSBType(h, s, b);
     }
 
     public void updateState(Item item, State state) {
         if (state instanceof HSBType hsb) {
+            lastHSB = hsb;
             setEndpointState("levelControl", "currentLevel", toBrightness(hsb.getBrightness()));
             setEndpointState("onOff", "onOff", hsb.getBrightness().intValue() > 0);
             setEndpointState("colorControl", "currentHue", toHue(hsb.getHue()));
@@ -130,6 +142,12 @@ public class ColorDevice extends GenericDevice {
             setEndpointState("levelControl", "currentLevel", toBrightness(percentType));
         } else if (state instanceof OnOffType onOffType) {
             setEndpointState("onOff", "onOff", onOffType == OnOffType.ON ? true : false);
+        }
+    }
+
+    private void updatePrimaryHSB() {
+        if (primaryItem instanceof ColorItem colorItem) {
+            colorItem.send(lastHSB);
         }
     }
 

@@ -36,7 +36,7 @@ export class ColorDeviceType extends GenericDeviceType {
             this.sendBridgeEvent("colorControl", "currentHue", value);
         });
         endpoint.events.colorControl.currentSaturation$Changed.on(value => {
-            this.sendBridgeEvent("colorControl", "currentHue", value);
+            this.sendBridgeEvent("colorControl", "currentSaturation", value);
         });
         endpoint.events.colorControl.colorTemperatureMireds$Changing.on(value => {
             this.sendBridgeEvent("colorControl", "colorTemperatureMireds", value);
