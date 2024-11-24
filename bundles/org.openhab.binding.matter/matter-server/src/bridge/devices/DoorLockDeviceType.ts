@@ -5,20 +5,18 @@ import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as n
 import { BridgeController } from "../BridgeController";
 import { DoorLockServer } from "@matter/main/behaviors";
 import { DoorLock } from "@matter/main/clusters";
+import LockState = DoorLock.LockState;
+import { MaybePromise } from "@matter/main";
 
 export class DoorLockDeviceType extends GenericDeviceType {
 
     override createEndpoint(clusterValues: Record<string, any>) {
-        const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer, DoorLockServer.with(
-            DoorLock.Feature.PinCredential
+        const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer, this.createDoorLockServer().with(
+            DoorLock.Feature.CredentialOverTheAirAccess
         )), {
             ...this.endPointDefaults(),
             ...clusterValues
         });
-        endpoint.events.doorLock.lockState$Changed.on(value => {
-            this.sendBridgeEvent("doorLock", "lockState", value);
-        });
-
         return endpoint
     }
 
@@ -26,14 +24,28 @@ export class DoorLockDeviceType extends GenericDeviceType {
         return {
             doorLock:  {
                 lockState: 0,
-                lockType: 0,
+                lockType: 2,
                 actuatorEnabled: true,
                 doorState: 1,
                 maxPinCodeLength: 10,
                 minPinCodeLength: 1,
                 wrongCodeEntryLimit: 5,
-                userCodeTemporaryDisableTime: 10
+                userCodeTemporaryDisableTime: 10,
+                operatingMode: 0
             }
         }
+    }
+
+    protected createDoorLockServer(): typeof DoorLockServer {
+        const parent = this;
+        return class extends DoorLockServer {
+            override async lockDoor() {
+                await parent.sendBridgeEvent("doorLock", "lockState", LockState.Locked);
+            }
+        
+            override async unlockDoor() {
+                await parent.sendBridgeEvent("doorLock", "lockState", LockState.Unlocked);
+            }
+        };
     }
 }

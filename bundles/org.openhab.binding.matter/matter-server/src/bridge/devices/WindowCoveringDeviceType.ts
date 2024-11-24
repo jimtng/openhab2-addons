@@ -40,7 +40,7 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
                 if (targetPercent100ths != null) {
                     await parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
                 }
-                return super.handleMovement(type, reversed, direction, targetPercent100ths);
+                //return super.handleMovement(type, reversed, direction, targetPercent100ths);
             }
         };
     }

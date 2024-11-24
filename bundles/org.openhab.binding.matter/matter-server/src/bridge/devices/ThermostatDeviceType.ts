@@ -30,18 +30,12 @@ export class ThermostatDeviceType extends GenericDeviceType {
 
         clusterValues.thermostat.controlSequenceOfOperation = controlSequenceOfOperation;
 
-        const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer,  OnOffServer, ThermostatServer.with(
+        const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer,  this.createOnOffServer(), ThermostatServer.with(
             ...features
         )), {
             ...this.endPointDefaults(),
             ...clusterValues
 
-        });
-        endpoint.events.thermostat.localTemperature$Changed.on((value) => {
-            this.sendBridgeEvent('thermostat','localTemperature', value);
-        });
-        endpoint.events.thermostat.outdoorTemperature$Changed?.on((value) => {
-            this.sendBridgeEvent('thermostat','outdoorTemperature', value);
         });
         endpoint.events.thermostat.occupiedHeatingSetpoint$Changed?.on((value) => {
             this.sendBridgeEvent('thermostat','occupiedHeatingSetpoint', value);
@@ -51,12 +45,6 @@ export class ThermostatDeviceType extends GenericDeviceType {
         });
         endpoint.events.thermostat.systemMode$Changed.on((value) => {
             this.sendBridgeEvent('thermostat','systemMode', value);
-        });
-        endpoint.events.thermostat.thermostatRunningMode$Changed?.on((value) => {
-            this.sendBridgeEvent('thermostat','thermostatRunningMode', value);
-        });
-        endpoint.events.onOff.onOff$Changed.on((value) => {
-            this.sendBridgeEvent('onOff','onOff', value);
         });
         return endpoint;
     }
@@ -83,5 +71,4 @@ export class ThermostatDeviceType extends GenericDeviceType {
             }
         }
     }
-
 }

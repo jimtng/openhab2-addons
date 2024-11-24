@@ -116,21 +116,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     @Override
     public void initialize() {
         logger.debug("initialize");
-        String folderName = OpenHAB.getUserDataFolder() + File.separator + "matter";
-        File folder = new File(folderName);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        String storagePath = folder.getAbsolutePath();
-        String controllerName = "controller-" + getThing().getUID().getId();
-
-        logger.debug("matter config: {}", storagePath);
-        final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
-        checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
-        scheduler.execute(() -> {
-            client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
-            running = true;
-        });
+        connect();
     }
 
     @Override
@@ -267,7 +253,31 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     public void onReady() {
         ready = true;
         updateStatus(ThingStatus.ONLINE);
+        cancelReconnect();
         linkedNodes.forEach(nodeId -> updateNode(nodeId));
+    }
+
+    private void connect() {
+        logger.debug("connect");
+        if (client.isConnected()) {
+            logger.debug("Client already connected");
+            return;
+        }
+        String folderName = OpenHAB.getUserDataFolder() + File.separator + "matter";
+        File folder = new File(folderName);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        String storagePath = folder.getAbsolutePath();
+        String controllerName = "controller-" + getThing().getUID().getId();
+
+        logger.debug("matter config: {}", storagePath);
+        final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
+        checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
+        scheduler.execute(() -> {
+            client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
+            running = true;
+        });
     }
 
     public MatterControllerClient getClient() {
@@ -339,11 +349,16 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     }
 
     private synchronized void reconnect() {
+        cancelReconnect();
+        this.reconnectFuture = scheduler.schedule(this::connect, 30, TimeUnit.SECONDS);
+    }
+
+    private void cancelReconnect() {
         ScheduledFuture<?> reconnectFuture = this.reconnectFuture;
         if (reconnectFuture != null) {
             reconnectFuture.cancel(true);
         }
-        this.reconnectFuture = scheduler.schedule(this::initialize, 30, TimeUnit.SECONDS);
+        this.reconnectFuture = null;
     }
 
     protected CompletableFuture<Void> updateNode(BigInteger id) {
