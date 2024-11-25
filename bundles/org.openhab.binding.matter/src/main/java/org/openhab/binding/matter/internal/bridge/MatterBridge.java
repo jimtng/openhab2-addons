@@ -414,7 +414,7 @@ public class MatterBridge implements MatterClientListener {
                         case "ContactSensor":
                             device = new ContactSensorDevice(metadataRegistry, client, item);
                             break;
-                        case "Color":
+                        case "ColorLight":
                             device = new ColorDevice(metadataRegistry, client, item);
                             break;
                         default:

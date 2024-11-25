@@ -159,7 +159,7 @@ export class DeviceNode {
             case "FanMode":
                 device = new FanModeDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
-            case "Color":
+            case "ColorLight":
                 device = new ColorDeviceType(this.bridgeController, attributeMap, id, nodeLabel, productName, productLabel, serialNumber);
                 break;
             default:

@@ -49,7 +49,7 @@ public class ColorDevice extends GenericDevice {
 
     @Override
     public String deviceType() {
-        return "Color";
+        return "ColorLight";
     }
 
     @Override
