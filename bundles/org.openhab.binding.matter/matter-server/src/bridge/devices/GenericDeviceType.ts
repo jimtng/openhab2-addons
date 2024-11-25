@@ -2,8 +2,8 @@ import { Endpoint } from "@matter/main";
 import { BridgeController } from "../BridgeController";
 import { EventType, BridgeEvent, BridgeEventType } from '../../MessageTypes';
 import { OnOffServer } from '@matter/node/behaviors/on-off';
-import { LevelControlServer } from '@matter/node/behaviors/level-control';
-
+import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
+import { FixedLabelServer , LevelControlServer} from "@matter/main/behaviors";
 import { Logger } from "@matter/main";
 
 const logger = Logger.get("GenericDevice");
@@ -14,17 +14,18 @@ export abstract class GenericDeviceType {
     endpoint: Endpoint;
 
     constructor(protected bridgeController: BridgeController, protected attributeMap: Record<string, any>, protected endpointId: string, protected nodeLabel: string, protected productName: string, protected productLabel: string, protected serialNumber: string) {
-        this.nodeLabel = this.truncateString(nodeLabel);
-        this.productLabel = this.truncateString(productLabel);
-        this.productName = this.truncateString(productName);
-        this.serialNumber = this.truncateString(serialNumber);
-        this.endpoint = this.createEndpoint(this.mergeWithDefaults(this.defaultClusterValues(), attributeMap));
+        this.nodeLabel = this.#truncateString(nodeLabel);
+        this.productLabel = this.#truncateString(productLabel);
+        this.productName = this.#truncateString(productName);
+        this.serialNumber = this.#truncateString(serialNumber);
+        const attributes = this.#mergeWithDefaults(this.defaultClusterValues(), attributeMap);
+        this.endpoint = this.createEndpoint(this.#generateAttributes(this.defaultClusterValues(), attributeMap));
     }
 
     abstract defaultClusterValues(): Record<string, any>;
     abstract createEndpoint(clusterValues: Record<string, any>): Endpoint;
 
-    async updateState(clusterName: string, attributeName: string, attributeValue: any) {
+    public async updateState(clusterName: string, attributeName: string, attributeValue: any) {
         const args = {} as { [key: string]: any }
         args[clusterName] = {} as { [key: string]: any }
         args[clusterName][attributeName] = attributeValue
@@ -36,7 +37,7 @@ export abstract class GenericDeviceType {
         }, 100);
     }
 
-    sendBridgeEvent(clusterName: string, attributeName: string, attributeValue: any) {
+    protected sendBridgeEvent(clusterName: string, attributeName: string, attributeValue: any) {
         if (this.updateLocks.has(`${clusterName}.${attributeName}`)) {
             logger.debug(`skipping sending bridge event for ${clusterName}.${attributeName} = ${attributeValue}`);
             return;
@@ -59,36 +60,9 @@ export abstract class GenericDeviceType {
         this.sendEvent(EventType.BridgeEvent, be)
     }
 
-    sendEvent(eventName: string, data: any) {
+    protected sendEvent(eventName: string, data: any) {
         logger.debug(`Sending event: ${eventName} with data: ${data}`);
         this.bridgeController.ws.sendEvent(eventName, data)
-    }
-
-    truncateString(str: string, maxLength: number = 32): string {
-        return str.slice(0, maxLength);
-    }
-
-    mergeWithDefaults<T extends Record<string, any>, U extends Partial<T>>(defaults: T, overrides: U): T {
-        function isPlainObject(value: any): value is Record<string, any> {
-            return value && typeof value === 'object' && !Array.isArray(value);
-        }
-        return Object.keys(defaults).reduce((result, key) => {
-            const defaultValue = defaults[key];
-            const overrideValue = overrides[key];
-
-            // If both defaultValue and overrideValue are objects, merge them recursively
-            if (
-                isPlainObject(defaultValue) &&
-                isPlainObject(overrideValue)
-            ) {
-                result[key] = this.mergeWithDefaults(defaultValue, overrideValue);
-            } else {
-                // Otherwise, use the override value if it exists, else the default value
-                result[key] = key in overrides ? overrideValue : defaultValue;
-            }
-
-            return result;
-        }, {} as Record<string, any>) as T;
     }
 
     protected endPointDefaults() {
@@ -125,6 +99,53 @@ export abstract class GenericDeviceType {
                 await parent.sendBridgeEvent("levelControl", "currentLevel", level);
             }
         };
+    }
+
+    protected defaultClusterServers() {
+        return [
+            BridgedDeviceBasicInformationServer,
+            FixedLabelServer
+        ]
+    }
+
+    #truncateString(str: string, maxLength: number = 32): string {
+        return str.slice(0, maxLength);
+    }
+
+    #generateAttributes<T extends Record<string, any>, U extends Partial<T>>(defaults: T, overrides: U): T {
+        const alwaysAdd = ["fixedLabel"]
+        let entries = this.#mergeWithDefaults(defaults, overrides);
+        // Ensure entries include the values from overrides for the keys in alwaysAdd
+        alwaysAdd.forEach((key) => {
+            if (key in overrides) {
+                entries[key as keyof T] = overrides[key as keyof T]!;
+            }
+        });
+        return entries;
+    }
+
+
+    #mergeWithDefaults<T extends Record<string, any>, U extends Partial<T>>(defaults: T, overrides: U): T {
+        function isPlainObject(value: any): value is Record<string, any> {
+            return value && typeof value === 'object' && !Array.isArray(value);
+        }
+        return Object.keys(defaults).reduce((result, key) => {
+            const defaultValue = defaults[key];
+            const overrideValue = overrides[key];
+
+            // If both defaultValue and overrideValue are objects, merge them recursively
+            if (
+                isPlainObject(defaultValue) &&
+                isPlainObject(overrideValue)
+            ) {
+                result[key] = this.#mergeWithDefaults(defaultValue, overrideValue);
+            } else {
+                // Otherwise, use the override value if it exists, else the default value
+                result[key] = key in overrides ? overrideValue : defaultValue;
+            }
+
+            return result;
+        }, {} as Record<string, any>) as T;
     }
 
 }

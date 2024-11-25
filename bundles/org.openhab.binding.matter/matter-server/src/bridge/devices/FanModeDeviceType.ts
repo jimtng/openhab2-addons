@@ -1,6 +1,5 @@
 import { Endpoint } from "@matter/node";
 import { FanDevice } from "@matter/node/devices/fan";
-import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { GenericDeviceType } from './GenericDeviceType';
 import { FanControl } from "@matter/main/clusters";
 
@@ -9,7 +8,7 @@ export class FanModeDeviceType extends GenericDeviceType {
 
     override createEndpoint(clusterValues: Record<string, any>) {
 
-        const endpoint = new Endpoint(FanDevice.with(BridgedDeviceBasicInformationServer), {
+        const endpoint = new Endpoint(FanDevice.with(...this.defaultClusterServers()), {
             ...this.endPointDefaults(),
             ...clusterValues
         });

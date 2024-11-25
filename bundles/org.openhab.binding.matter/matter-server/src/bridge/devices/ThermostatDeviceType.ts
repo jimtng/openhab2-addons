@@ -1,8 +1,6 @@
 import { Endpoint } from "@matter/node";
 import { ThermostatDevice } from "@matter/node/devices/thermostat";
-import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { ThermostatServer } from '@matter/node/behaviors/thermostat';
-import { OnOffServer } from '@matter/node/behaviors/on-off';
 import { Thermostat } from '@matter/main/clusters';
 import { GenericDeviceType } from './GenericDeviceType';
 
@@ -30,9 +28,9 @@ export class ThermostatDeviceType extends GenericDeviceType {
 
         clusterValues.thermostat.controlSequenceOfOperation = controlSequenceOfOperation;
 
-        const endpoint = new Endpoint(ThermostatDevice.with(BridgedDeviceBasicInformationServer,  this.createOnOffServer(), ThermostatServer.with(
+        const endpoint = new Endpoint(ThermostatDevice.with(this.createOnOffServer(), ThermostatServer.with(
             ...features
-        )), {
+        ), ...this.defaultClusterServers()), {
             ...this.endPointDefaults(),
             ...clusterValues
 

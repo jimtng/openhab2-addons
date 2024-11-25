@@ -1,19 +1,16 @@
 import { Endpoint } from "@matter/node";
 import { DoorLockDevice } from "@matter/node/devices/door-lock";
-import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
-import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
-import { BridgeController } from "../BridgeController";
+import { GenericDeviceType } from './GenericDeviceType';
 import { DoorLockServer } from "@matter/main/behaviors";
 import { DoorLock } from "@matter/main/clusters";
 import LockState = DoorLock.LockState;
-import { MaybePromise } from "@matter/main";
 
 export class DoorLockDeviceType extends GenericDeviceType {
 
     override createEndpoint(clusterValues: Record<string, any>) {
-        const endpoint = new Endpoint(DoorLockDevice.with(BridgedDeviceBasicInformationServer, this.createDoorLockServer().with(
+        const endpoint = new Endpoint(DoorLockDevice.with(this.createDoorLockServer().with(
             DoorLock.Feature.CredentialOverTheAirAccess
-        )), {
+        ), ...this.defaultClusterServers()), {
             ...this.endPointDefaults(),
             ...clusterValues
         });

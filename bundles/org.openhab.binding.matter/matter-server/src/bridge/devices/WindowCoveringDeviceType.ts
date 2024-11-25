@@ -1,6 +1,5 @@
 import { Endpoint } from "@matter/node";
 import { WindowCoveringDevice } from "@matter/node/devices/window-covering";
-import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { MovementDirection, MovementType, WindowCoveringServer } from '@matter/node/behaviors/window-covering';
 import { WindowCovering } from '@matter/main/clusters';
 import { GenericDeviceType } from './GenericDeviceType';
@@ -12,9 +11,9 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
         features.push(WindowCovering.Feature.Lift);
         features.push(WindowCovering.Feature.PositionAwareLift);
 
-        const endpoint = new Endpoint(WindowCoveringDevice.with(BridgedDeviceBasicInformationServer, this.createWindowCoveringServer().with(
+        const endpoint = new Endpoint(WindowCoveringDevice.with(this.createWindowCoveringServer().with(
             ...features,
-        )), {
+        ), ...this.defaultClusterServers()), {
             ...this.endPointDefaults(),
             ...clusterValues
         });
@@ -40,7 +39,8 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
                 if (targetPercent100ths != null) {
                     await parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
                 }
-                //return super.handleMovement(type, reversed, direction, targetPercent100ths);
+                //let the bridge set this target locally, openHAB will set the currentPositionLiftPercent100ths as shade values change
+                return super.handleMovement(type, reversed, direction, targetPercent100ths);
             }
         };
     }

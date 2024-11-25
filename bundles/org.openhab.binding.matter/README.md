@@ -268,8 +268,6 @@ sitemap home label="Home"
 
 # Matter Bridge
 
-**EXPERIMENTAL**
-
 openHAB can also expose Items and Item groups as Matter devices to 3rd party Matter clients like Google Home, Apple Home and Amazon Alexa. This allows local control for those ecosystems and can be used instead of cloud based integrations for features like voice assistants. 
 
 ## Configuration
@@ -295,7 +293,12 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 
 ### Global Options
 
-By default, the Item label is used as the Matter label but can be overridden by adding `[label="My Custom Label"]` as an option, either by itself or part of other options required for a device.
+* Endpoint Labels
+* *  By default, the Item label is used as the Matter label but can be overridden by adding a `label` key as a metadata option, either by itself or part of other options required for a device.
+* *  Example: `[label="My Custom Label"]`
+* Fixed Labels
+* * Matter has a concept of "Fixed Labels" which allows device to expose arbitrary label names and values which can be used by client for tasks like grouping devices in rooms.
+* * Example: `[fixedLabels="room=Office, floor=1"]` 
 
 ### Thermostat member tags
 
@@ -329,7 +332,7 @@ The following attributes can be set in the options of any thermostat member or o
 ### Example
 
 ```perl
-Dimmer                TestDimmer                "Test Dimmer [%d%%]"                                                       {matter="DimmableLight" [label="My Custom Dimmer"]}
+Dimmer                TestDimmer                "Test Dimmer [%d%%]"                                                       {matter="DimmableLight" [label="My Custom Dimmer", fixedLabels="room=Bedroom 1, floor=2, direction=up, customLabel=Custom Value"]}
 
 Group                 Test_HVAC                 "Thermostat"                              ["HVAC"]                         {matter="Thermostat" [thermostat.minHeatSetpointLimit=0, thermostat.maxHeatSetpointLimit=3500] }
 Number:Temperature    Test_HVAC_Temperature     "Temperature [%d °F]"      (Test_HVAC)    ["Measurement","Temperature"]    {matter="thermostat.localTemperature"}

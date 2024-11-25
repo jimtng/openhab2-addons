@@ -176,15 +176,22 @@ public abstract class GenericDevice implements StateChangeListener {
         Map<String, Object> config = Map.of();
         if (metadata != null) {
             attributeList = Arrays.asList(metadata.getValue().split(","));
-            config = metadata.getConfiguration();
+            config = new HashMap<>(metadata.getConfiguration());
             if (config.get("label") instanceof String customLabel) {
                 label = customLabel;
+            }
+
+            // convert the value of fixed labels into a cluster attribute
+            if (config.get("fixedLabels") instanceof String fixedLabels) {
+                List<KeyValue> labelList = parseFixedLabels(fixedLabels);
+                config.put("fixedLabel.labelList", labelList);
             }
         }
 
         if (label == null) {
             label = item.getName();
         }
+
         return new MetaDataMapping(attributeList, config, label);
     }
 
@@ -199,6 +206,7 @@ public abstract class GenericDevice implements StateChangeListener {
             this.label = label;
         }
 
+        // this parses any foo.bar=
         public Map<String, Object> getAttributeOptions() {
             return config.entrySet().stream().filter(entry -> entry.getKey().contains("."))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -234,5 +242,23 @@ public abstract class GenericDevice implements StateChangeListener {
             }
         });
         return returnMap;
+    }
+
+    private List<KeyValue> parseFixedLabels(String labels) {
+        Map<String, String> keyValueMap = Arrays.stream(labels.split(", ")).map(pair -> pair.split("=", 2))
+                .filter(parts -> parts.length == 2)
+                .collect(Collectors.toMap(parts -> parts[0].trim(), parts -> parts[1].trim()));
+        return keyValueMap.entrySet().stream().map(entry -> new KeyValue(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    class KeyValue {
+        public final String label;
+        public final String value;
+
+        public KeyValue(String label, String value) {
+            this.label = label;
+            this.value = value;
+        }
     }
 }
