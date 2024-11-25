@@ -100,7 +100,8 @@ public class ColorDevice extends GenericDevice {
                             TimeUnit.MILLISECONDS);
                     break;
                 case "colorTemperatureMireds":
-                    HSBType ctHSB = ColorUtil.xyToHsb(ColorUtil.kelvinToXY(1e6 / (Double) data));
+                    Double kelvin = 1e6 / (Double) data;
+                    HSBType ctHSB = ColorUtil.xyToHsb(ColorUtil.kelvinToXY(Math.max(1000, Math.min(kelvin, 10000))));
                     lastHSB = new HSBType(ctHSB.getHue(), ctHSB.getSaturation(), lastHSB.getBrightness());
                     updatePrimaryHSB();
                     break;
