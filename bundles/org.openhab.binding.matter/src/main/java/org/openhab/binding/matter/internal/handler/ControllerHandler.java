@@ -71,7 +71,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     private @Nullable MatterDiscoveryService discoveryService;
     private MatterControllerClient client;
     private @Nullable ScheduledFuture<?> reconnectFuture;
-    private boolean running = true;
+    private boolean running = false;
     private boolean ready = false;
     private @Nullable ScheduledFuture<?> checkFuture;
     private final MatterWebsocketService websocketService;
@@ -124,10 +124,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         logger.debug("dispose");
         ready = false;
         running = false;
-        ScheduledFuture<?> reconnectFuture = this.reconnectFuture;
-        if (reconnectFuture != null) {
-            reconnectFuture.cancel(true);
-        }
+        cancelReconnect();
         ScheduledFuture<?> checkFuture = this.checkFuture;
         if (checkFuture != null) {
             checkFuture.cancel(true);
@@ -245,7 +242,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         if (!running) {
             return;
         }
-        client.disconnect();
         setOffline(reason);
     }
 
@@ -302,7 +298,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         }).exceptionally(e -> {
             logger.debug("Error communicating with controller", e);
-            setOffline(e.getLocalizedMessage());
             return null;
         }).whenComplete((nodeIds, e) -> {
             logger.debug("refresh done");

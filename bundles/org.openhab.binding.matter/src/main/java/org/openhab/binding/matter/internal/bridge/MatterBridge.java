@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.devices.*;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
-import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.client.model.ws.*;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
@@ -237,7 +236,7 @@ public class MatterBridge implements MatterClientListener {
                     break;
                 case "commissioningWindowClosed":
                     commissioningWindowOpen = false;
-                    updatePairingCodes(null, null);
+                    updateConfig(Map.of("openCommissioningWindow", false));
                     break;
                 default:
             }
@@ -443,53 +442,38 @@ public class MatterBridge implements MatterClientListener {
         try {
             client.startBridge().get();
             bridgeInitialized = true;
-            manageCommissioningWindow();
+            updatePairingCodes();
         } catch (InterruptedException | ExecutionException e) {
             logger.debug("Could not start bridge", e);
         }
     }
 
     private void manageCommissioningWindow() {
-        try {
-            PairingCodes codes = client.getPairingCodes().get();
-            if (codes.manualPairingCode != null && codes.qrPairingCode != null) {
-                commissioningWindowOpen = true;
-                updatePairingCodes(codes.qrPairingCode, codes.manualPairingCode);
-                return;
-            }
-        } catch (CancellationException | InterruptedException | ExecutionException e) {
-            logger.debug("Could not query codes", e);
-        }
-
         if (settings.openCommissioningWindow && !commissioningWindowOpen) {
             try {
-                Map<String, String> map = client.openCommissioningWindow().get();
+                client.openCommissioningWindow().get();
                 commissioningWindowOpen = true;
-                updatePairingCodes(map.get("qrPairingCode"), map.get("manualPairingCode"));
             } catch (CancellationException | InterruptedException | ExecutionException e) {
                 logger.debug("Could not open commissioning window", e);
-                updatePairingCodes(null, null);
             }
         } else if (!settings.openCommissioningWindow && commissioningWindowOpen) {
             try {
                 client.closeCommissioningWindow().get();
                 commissioningWindowOpen = false;
-                updatePairingCodes(null, null);
             } catch (CancellationException | InterruptedException | ExecutionException e) {
                 logger.debug("Could not close commissioning window", e);
             }
         }
     }
 
-    private void updatePairingCodes(@Nullable String qrPairingCode, @Nullable String manualPairingCode) {
-        if (manualPairingCode != null && qrPairingCode != null) {
-            updateConfig(Map.of("manualPairingCode", manualPairingCode, "qrCode", qrPairingCode,
-                    "openCommissioningWindow", true));
-        } else {
-            updateConfig(Map.of("manualPairingCode",
-                    "Enable \"Allow Commissioning\" and save configuration to enable commissioning", "qrCode", "",
-                    "openCommissioningWindow", false));
-
+    private void updatePairingCodes() {
+        try {
+            BridgeCommissionState state = client.getCommissioningState().get();
+            updateConfig(Map.of("manualPairingCode", state.pairingCodes.manualPairingCode, "qrCode",
+                    state.pairingCodes.qrPairingCode, "openCommissioningWindow", state.commissioningWindowOpen));
+            commissioningWindowOpen = state.commissioningWindowOpen;
+        } catch (CancellationException | InterruptedException | ExecutionException e) {
+            logger.debug("Could not query codes", e);
         }
     }
 

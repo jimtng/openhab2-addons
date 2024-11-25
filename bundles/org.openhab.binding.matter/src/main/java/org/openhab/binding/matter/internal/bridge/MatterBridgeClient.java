@@ -1,33 +1,19 @@
 package org.openhab.binding.matter.internal.bridge;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
-import org.openhab.binding.matter.internal.client.model.PairingCodes;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeCommissionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 @NonNullByDefault
 public class MatterBridgeClient extends MatterWebsocketClient {
     private static final Logger logger = LoggerFactory.getLogger(MatterBridgeClient.class);
-
-    public CompletableFuture<PairingCodes> getPairingCodes() {
-        CompletableFuture<JsonElement> future = sendMessage("bridge", "getPairingCodes", new Object[0]);
-        return future.thenApply(obj -> {
-            PairingCodes codes = gson.fromJson(obj, PairingCodes.class);
-            if (codes == null) {
-                throw new IllegalStateException("Could not deserialize pairing codes");
-            }
-            return codes;
-        });
-    }
 
     public CompletableFuture<String> addEndpoint(String deviceType, String id, String nodeLabel, String productName,
             String productLabel, String serialNumber, Map<String, Map<String, Object>> attributeMap) {
@@ -59,19 +45,21 @@ public class MatterBridgeClient extends MatterWebsocketClient {
         });
     }
 
-    public CompletableFuture<Map<String, String>> openCommissioningWindow() {
-        CompletableFuture<JsonElement> future = sendMessage("bridge", "openCommissioningWindow", new Object[0]);
+    public CompletableFuture<BridgeCommissionState> getCommissioningState() {
+        CompletableFuture<JsonElement> future = sendMessage("bridge", "getCommissioningState", new Object[0]);
         return future.thenApply(obj -> {
-            if (obj.isJsonObject()) {
-                JsonObject jsonObject = obj.getAsJsonObject();
-                Type mapType = new TypeToken<Map<String, Object>>() {
-                }.getType();
-                Map<String, String> map = gson.fromJson(jsonObject, mapType);
-                if (map != null) {
-                    return map;
-                }
+            BridgeCommissionState state = gson.fromJson(obj, BridgeCommissionState.class);
+            if (state == null) {
+                throw new IllegalStateException("Could not deserialize commissioning state");
             }
-            return Map.of();
+            return state;
+        });
+    }
+
+    public CompletableFuture<Void> openCommissioningWindow() {
+        CompletableFuture<JsonElement> future = sendMessage("bridge", "openCommissioningWindow", new Object[0]);
+        return future.thenAccept(obj -> {
+            // Do nothing, just to complete the future
         });
     }
 

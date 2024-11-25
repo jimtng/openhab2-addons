@@ -103,16 +103,13 @@ export class DeviceNode {
         this.devices.clear();
     }
 
-    getPairingCodes() {
-        if (this.server.state.commissioning.commissioned && !this.inCommission) {
-            return {
-                manualPairingCode: null,
-                qrPairingCode: null
-            }
-        }
+    getCommissioningState() {
         return {
-            manualPairingCode: this.server.state.commissioning.pairingCodes.manualPairingCode,
-            qrPairingCode: this.server.state.commissioning.pairingCodes.qrPairingCode
+            pairingCodes: {
+                manualPairingCode: this.server.state.commissioning.pairingCodes.manualPairingCode,
+                qrPairingCode: this.server.state.commissioning.pairingCodes.qrPairingCode
+            },
+            commissioningWindowOpen : !this.server.state.commissioning.commissioned || this.inCommission
         }
     }
 
@@ -213,10 +210,6 @@ export class DeviceNode {
         });
         this.inCommission = true;
         logger.debug('basic commissioning window open')
-        return {
-            manualPairingCode: this.server.state.commissioning.pairingCodes.manualPairingCode,
-            qrPairingCode: this.server.state.commissioning.pairingCodes.qrPairingCode
-        }
     }
 
     async closeCommissioningWindow() {
