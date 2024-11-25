@@ -294,11 +294,11 @@ Pairing codes and other options can be found in the MainUI under "Settings -> Ad
 ### Global Options
 
 * Endpoint Labels
-* *  By default, the Item label is used as the Matter label but can be overridden by adding a `label` key as a metadata option, either by itself or part of other options required for a device.
-* *  Example: `[label="My Custom Label"]`
+  *  By default, the Item label is used as the Matter label but can be overridden by adding a `label` key as a metadata option, either by itself or part of other options required for a device.
+  * Example: `[label="My Custom Label"]`
 * Fixed Labels
-* * Matter has a concept of "Fixed Labels" which allows device to expose arbitrary label names and values which can be used by client for tasks like grouping devices in rooms.
-* * Example: `[fixedLabels="room=Office, floor=1"]` 
+  * Matter has a concept of "Fixed Labels" which allows devices to expose arbitrary label names and values which can be used by clients for tasks like grouping devices in rooms.
+  * Example: `[fixedLabels="room=Office, floor=1"]` 
 
 ### Thermostat member tags
 
