@@ -26,7 +26,8 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
     override defaultClusterValues() {
         return {
             windowCovering: {
-                currentPositionLiftPercent100ths: 0
+                currentPositionLiftPercent100ths: 0,
+                liftEncoderControlled: true
             }
         }
     }
@@ -39,8 +40,13 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
                 if (targetPercent100ths != null) {
                     await parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
                 }
-                //let the bridge set this target locally, openHAB will set the currentPositionLiftPercent100ths as shade values change
-                return super.handleMovement(type, reversed, direction, targetPercent100ths);
+            }
+            override async handleStopMovement() {
+                await parent.sendBridgeEvent("windowCovering", "operationalStatus", {
+                    global: WindowCovering.MovementStatus.Stopped,
+                    lift: WindowCovering.MovementStatus.Stopped,
+                    tilt: WindowCovering.MovementStatus.Stopped
+                });
             }
         };
     }

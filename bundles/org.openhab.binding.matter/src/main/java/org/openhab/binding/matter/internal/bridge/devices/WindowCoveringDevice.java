@@ -17,16 +17,17 @@ import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.WindowCoveringCluster;
 import org.openhab.core.items.*;
 import org.openhab.core.library.items.DimmerItem;
 import org.openhab.core.library.items.RollershutterItem;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.items.SwitchItem;
-import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.OpenClosedType;
-import org.openhab.core.library.types.PercentType;
-import org.openhab.core.library.types.StringType;
+import org.openhab.core.library.types.*;
 import org.openhab.core.types.State;
+
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 /**
  * The {@link WindowCoveringDevice}
@@ -35,6 +36,7 @@ import org.openhab.core.types.State;
  */
 @NonNullByDefault
 public class WindowCoveringDevice extends GenericDevice {
+    private final Gson gson = new Gson();
 
     public WindowCoveringDevice(MetadataRegistry metadataRegistry, MatterBridgeClient client, GenericItem item) {
         super(metadataRegistry, client, item);
@@ -72,6 +74,18 @@ public class WindowCoveringDevice extends GenericDevice {
             case "currentPositionLiftPercentage":
                 percentType = new PercentType(((Double) data).intValue());
                 break;
+            case "operationalStatus":
+                if (data instanceof LinkedTreeMap treeMap) {
+                    @SuppressWarnings("unchecked")
+                    LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) treeMap;
+                    if (map.get("global") instanceof Integer value) {
+                        if (WindowCoveringCluster.MovementStatus.STOPPED.getValue().equals(value)
+                                && primaryItem instanceof RollershutterItem rollerShutterItem) {
+                            rollerShutterItem.send(StopMoveType.STOP);
+                        }
+                    }
+                }
+                return;
             default:
                 break;
         }
@@ -85,7 +99,13 @@ public class WindowCoveringDevice extends GenericDevice {
             } else if (primaryItem instanceof DimmerItem dimmerItem) {
                 dimmerItem.send(percentType);
             } else if (primaryItem instanceof RollershutterItem rollerShutterItem) {
-                rollerShutterItem.send(percentType);
+                if (percentType.intValue() == 100) {
+                    rollerShutterItem.send(UpDownType.DOWN);
+                } else if (percentType.intValue() == 0) {
+                    rollerShutterItem.send(UpDownType.UP);
+                } else {
+                    rollerShutterItem.send(percentType);
+                }
             } else if (primaryItem instanceof SwitchItem switchItem) {
                 String value = open ? "ON" : "OFF";
                 if (primaryItemMetadata != null) {
