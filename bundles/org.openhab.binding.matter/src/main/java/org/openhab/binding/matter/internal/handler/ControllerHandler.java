@@ -71,7 +71,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     private @Nullable MatterDiscoveryService discoveryService;
     private MatterControllerClient client;
     private @Nullable ScheduledFuture<?> reconnectFuture;
-    private boolean running = false;
     private boolean ready = false;
     private @Nullable ScheduledFuture<?> checkFuture;
     private final MatterWebsocketService websocketService;
@@ -123,7 +122,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     public void dispose() {
         logger.debug("dispose");
         ready = false;
-        running = false;
+        client.removeListener(this);
         cancelReconnect();
         ScheduledFuture<?> checkFuture = this.checkFuture;
         if (checkFuture != null) {
@@ -239,9 +238,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
 
     @Override
     public void onDisconnect(String reason) {
-        if (!running) {
-            return;
-        }
         setOffline(reason);
     }
 
@@ -272,7 +268,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
         scheduler.execute(() -> {
             client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
-            running = true;
         });
     }
 
