@@ -40,6 +40,7 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
                 if (targetPercent100ths != null) {
                     await parent.sendBridgeEvent("windowCovering", "targetPositionLiftPercent100ths", targetPercent100ths);
                 }
+                super.handleMovement(type, reversed, direction, targetPercent100ths);
             }
             override async handleStopMovement() {
                 await parent.sendBridgeEvent("windowCovering", "operationalStatus", {
@@ -47,6 +48,7 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
                     lift: WindowCovering.MovementStatus.Stopped,
                     tilt: WindowCovering.MovementStatus.Stopped
                 });
+                super.handleStopMovement();
             }
         };
     }

@@ -134,6 +134,10 @@ public class MatterBindingConstants {
 
     public static final ChannelTypeUID CHANNEL_MODESELECT_MODE = new ChannelTypeUID("matter:modeselect-mode");
 
+    public static final String CHANNEL_LABEL_BOOLEANSTATE_STATEVALUE = "State Value";
+    public static final ChannelTypeUID CHANNEL_BOOLEANSTATE_STATEVALUE = new ChannelTypeUID(
+            "matter:booleanstate-statevalue");
+
     public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCH = new ChannelTypeUID("matter:switch-switch");
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCHLATECHED = new ChannelTypeUID(
