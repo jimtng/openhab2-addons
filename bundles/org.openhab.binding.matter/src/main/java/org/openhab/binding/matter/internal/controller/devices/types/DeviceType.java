@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.types;
+package org.openhab.binding.matter.internal.controller.devices.types;
 
 import java.util.*;
 
@@ -21,12 +21,12 @@ import org.openhab.binding.matter.internal.client.EventTriggeredListener;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
-import org.openhab.binding.matter.internal.devices.converter.ConverterRegistry;
-import org.openhab.binding.matter.internal.devices.converter.GenericConverter;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.controller.devices.converter.ConverterRegistry;
+import org.openhab.binding.matter.internal.controller.devices.converter.GenericConverter;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.binding.builder.ThingBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 import org.slf4j.Logger;
@@ -57,16 +57,18 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
     private final Logger logger = LoggerFactory.getLogger(DeviceType.class);
 
     protected Integer deviceType;
-    protected EndpointHandler handler;
+    protected Integer endpointNumber;
+    protected MatterBaseThingHandler handler;
 
     protected Map<ChannelUID, GenericConverter<? extends BaseCluster>> channelUIDToConverters = new HashMap<>();
     protected Map<ChannelUID, @Nullable StateDescription> channelUIDToStateDescription = new HashMap<>();
 
     protected Map<Integer, GenericConverter<? extends BaseCluster>> clusterToConverters = new HashMap<>();
 
-    public DeviceType(Integer deviceType, EndpointHandler handler) {
+    public DeviceType(Integer deviceType, MatterBaseThingHandler handler, Integer endpointNumber) {
         this.deviceType = deviceType;
         this.handler = handler;
+        this.endpointNumber = endpointNumber;
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {
@@ -116,15 +118,18 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
      * 
      * @param clusters
      */
-    public final void createChannels(Map<String, BaseCluster> clusters) {
-        List<Channel> existingChannels = new ArrayList<>(handler.getThing().getChannels());
+    public final List<Channel> createChannels(Integer endpointNumber, Map<String, BaseCluster> clusters,
+            ChannelGroupUID channelGroupUID) {
+        logger.debug("createChannels {}", endpointNumber);
+        // List<Channel> existingChannels = new ArrayList<>(handler.getThing().getChannels());
+        List<Channel> existingChannels = new ArrayList<>();
+        String label = "";
         clusters.forEach((clusterName, cluster) -> {
             logger.debug("Creating channels for cluster: " + clusterName);
-            GenericConverter<? extends BaseCluster> converter = createConverter(cluster, clusters);
+            GenericConverter<? extends BaseCluster> converter = createConverter(cluster, clusters, label);
             if (converter != null) {
                 logger.debug("Converter found for cluster: " + clusterName);
-                Map<Channel, @Nullable StateDescription> converterChannels = converter
-                        .createChannels(handler.getThing().getUID());
+                Map<Channel, @Nullable StateDescription> converterChannels = converter.createChannels(channelGroupUID);
                 for (Channel channel : converterChannels.keySet()) {
                     channelUIDToConverters.put(channel.getUID(), converter);
                     channelUIDToStateDescription.put(channel.getUID(), converterChannels.get(channel));
@@ -139,9 +144,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
                 }
             }
         });
-        ThingBuilder thingBuilder = handler.editThing();
-        thingBuilder.withChannels(existingChannels);
-        handler.updateThing(thingBuilder.build());
+        return existingChannels;
     }
 
     public Map<ChannelUID, @Nullable StateDescription> getStateDescriptions() {
@@ -150,7 +153,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
 
     // This method is designed to be overridden in subclasses
     protected @Nullable GenericConverter<? extends BaseCluster> createConverter(BaseCluster cluster,
-            Map<String, BaseCluster> allClusters) {
-        return ConverterRegistry.createConverter(cluster, handler);
+            Map<String, BaseCluster> allClusters, String labelPrefix) {
+        return ConverterRegistry.createConverter(cluster, handler, endpointNumber, labelPrefix);
     }
 }

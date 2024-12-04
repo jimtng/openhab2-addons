@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_LEVEL_LEVEL;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LEVEL_LEVEL;
@@ -25,12 +25,12 @@ import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster.OptionsBitmap;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -46,14 +46,15 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
 
     private final Logger logger = LoggerFactory.getLogger(LevelControlConverter.class);
 
-    public LevelControlConverter(LevelControlCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public LevelControlConverter(LevelControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
 
         Channel channel = ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_LEVEL_LEVEL.getId()), ITEM_TYPE_DIMMER)
-                .withType(CHANNEL_LEVEL_LEVEL).withLabel(CHANNEL_LABEL_LEVEL_LEVEL).build();
+                .withType(CHANNEL_LEVEL_LEVEL).withLabel(formatLabel(CHANNEL_LABEL_LEVEL_LEVEL)).build();
         return Collections.singletonMap(channel, null);
     }
 
@@ -61,11 +62,11 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
         if (command instanceof OnOffType onOffType) {
             ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(onOffType == OnOffType.OFF ? 0 : 100,
                     0, new OptionsBitmap(true, true), new OptionsBitmap(true, true));
-            handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
+            handler.sendClusterCommand(endpointNumber, LevelControlCluster.CLUSTER_NAME, levelCommand);
         } else if (command instanceof PercentType percentType) {
             ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(percentToLevel(percentType), 0,
                     new OptionsBitmap(true, true), new OptionsBitmap(true, true));
-            handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
+            handler.sendClusterCommand(endpointNumber, LevelControlCluster.CLUSTER_NAME, levelCommand);
         }
     }
 

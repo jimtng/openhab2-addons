@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
@@ -34,16 +34,12 @@ import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControl
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster.OptionsBitmap;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
-import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.HSBType;
-import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.PercentType;
-import org.openhab.core.library.types.QuantityType;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
+import org.openhab.core.library.types.*;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -80,21 +76,23 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     private OptionsBitmap optionsBitmap = new OptionsBitmap(true, true);
     private ScheduledExecutorService colorUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public ColorControlConverter(ColorControlCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public ColorControlConverter(ColorControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
     @Override
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Map<Channel, @Nullable StateDescription> map = new HashMap<>();
 
         map.put(ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_COLOR_COLOR.getId()), ITEM_TYPE_COLOR)
-                .withType(CHANNEL_COLOR_COLOR).withLabel(CHANNEL_LABEL_COLOR_COLOR).build(), null);
+                .withType(CHANNEL_COLOR_COLOR).withLabel(formatLabel(CHANNEL_LABEL_COLOR_COLOR)).build(), null);
 
         // see Matter spec 3.2.6.1. For more information on color temperature
         if (cluster.featureMap.colorTemperature) {
             map.put(ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_COLOR_TEMPERATURE.getId()), ITEM_TYPE_DIMMER)
-                    .withType(CHANNEL_COLOR_TEMPERATURE).withLabel(CHANNEL_LABEL_COLOR_TEMPERATURE).build(), null);
+                    .withType(CHANNEL_COLOR_TEMPERATURE).withLabel(formatLabel(CHANNEL_LABEL_COLOR_TEMPERATURE))
+                    .build(), null);
 
             Optional.ofNullable(cluster.colorTempPhysicalMinMireds)
                     .ifPresent(temp -> colorTempPhysicalMinMireds = temp);
@@ -109,8 +107,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             map.put(ChannelBuilder
                     .create(new ChannelUID(thingUID, CHANNEL_COLOR_TEMPERATURE_ABS.getId()),
                             ITEM_TYPE_NUMBER_TEMPERATURE)
-                    .withType(CHANNEL_COLOR_TEMPERATURE_ABS).withLabel(CHANNEL_LABEL_COLOR_TEMPERATURE_ABS).build(),
-                    stateDescription);
+                    .withType(CHANNEL_COLOR_TEMPERATURE_ABS).withLabel(formatLabel(CHANNEL_LABEL_COLOR_TEMPERATURE_ABS))
+                    .build(), stateDescription);
         }
         return map;
     }
@@ -123,7 +121,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(percentToLevel(brightness), 0,
                     optionsBitmap, optionsBitmap);
 
-            handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
+            handler.sendClusterCommand(endpointNumber, LevelControlCluster.CLUSTER_NAME, levelCommand);
 
             if (supportsHue) {
                 changeColorHueSaturation(color);
@@ -132,7 +130,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             }
         } else if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
-            handler.sendClusterCommand(OnOffCluster.CLUSTER_NAME, onOffCommand);
+            handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
             // ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(
             // percentToLevel(onOffType == OnOffType.OFF ? new PercentType(0) : lastHSB.getBrightness()), 0,
             // new OptionsBitmap(true, true), new OptionsBitmap(true, true));
@@ -141,24 +139,24 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE.getId())) {
                 ClusterCommand tempCommand = ColorControlCluster
                         .moveToColorTemperature(percentTypeToMireds(percentType), 0, optionsMask, optionsMask);
-                handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME, tempCommand);
+                handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME, tempCommand);
             } else {
                 ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(percentToLevel(percentType), 0,
                         optionsBitmap, optionsBitmap);
-                handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
+                handler.sendClusterCommand(endpointNumber, LevelControlCluster.CLUSTER_NAME, levelCommand);
             }
         } else if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
                 && command instanceof DecimalType decimal) {
             ClusterCommand tempCommand = ColorControlCluster.moveToColorTemperature(decimal.intValue(), 0, optionsMask,
                     optionsMask);
-            handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME, tempCommand);
+            handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME, tempCommand);
         } else if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
                 && command instanceof QuantityType<?> quantity) {
             quantity = quantity.toInvertibleUnit(Units.MIRED);
             if (quantity != null) {
                 ClusterCommand tempCommand = ColorControlCluster.moveToColorTemperature(quantity.intValue(), 0,
                         optionsMask, optionsMask);
-                handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME, tempCommand);
+                handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME, tempCommand);
             }
         }
     }
@@ -214,10 +212,10 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         super.updateCluster(cluster);
         lastColorMode = cluster.colorMode;
         supportsHue = cluster.featureMap.hueSaturation;
-        lastX = cluster.currentX;
-        lastY = cluster.currentY;
-        lastHue = cluster.currentHue;
-        lastSaturation = cluster.currentSaturation;
+        lastX = cluster.currentX != null ? cluster.currentX : 0;
+        lastY = cluster.currentY != null ? cluster.currentY : 0;
+        lastHue = cluster.currentHue != null ? cluster.currentHue : 0;
+        lastSaturation = cluster.currentSaturation != null ? cluster.currentSaturation : 0;
         supportsColorTemperature = cluster.featureMap.colorTemperature;
         lastColorTemperatureMireds = cluster.colorTemperatureMireds;
         Optional.ofNullable(cluster.colorTempPhysicalMaxMireds).ifPresent(temp -> colorTempPhysicalMaxMireds = temp);
@@ -329,7 +327,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     private void changeColorHueSaturation(HSBType color) {
         int hue = (int) (color.getHue().floatValue() * 254.0f / 360.0f + 0.5f);
         int saturation = percentToLevel(color.getSaturation());
-        handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME,
+        handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME,
                 ColorControlCluster.moveToHueAndSaturation(hue, saturation, 0, optionsMask, optionsMask));
     }
 
@@ -337,7 +335,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         PercentType xy[] = color.toXY();
         int x = (int) (xy[0].floatValue() / 100.0f * 65536.0f + 0.5f); // up to 65279
         int y = (int) (xy[1].floatValue() / 100.0f * 65536.0f + 0.5f); // up to 65279
-        handler.sendClusterCommand(ColorControlCluster.CLUSTER_NAME,
+        handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME,
                 ColorControlCluster.moveToColor(x, y, 0, optionsMask, optionsMask));
     }
 

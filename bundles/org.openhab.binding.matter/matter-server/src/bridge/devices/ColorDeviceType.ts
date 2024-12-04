@@ -3,16 +3,16 @@ import { ExtendedColorLightDevice } from "@matter/node/devices/extended-color-li
 import { BridgedDeviceBasicInformationServer } from "@matter/node/behaviors/bridged-device-basic-information";
 import { GenericDeviceType } from './GenericDeviceType'; // Adjust the path as needed
 import { ColorControlServer } from "@matter/main/behaviors";
-import { ColorControl } from "@matter/main/clusters";
+import { ColorControl, LevelControl, OnOff } from "@matter/main/clusters";
 
 export class ColorDeviceType extends GenericDeviceType {
 
     override createEndpoint(clusterValues: Record<string, any>) {
-        const endpoint = new Endpoint(ExtendedColorLightDevice.with(this.createOnOffServer(), this.createLevelControlServer(),
-            this.createColorControlServer().with(
-                ColorControl.Feature.HueSaturation,
-                ColorControl.Feature.ColorTemperature
-            ), ...this.defaultClusterServers()), {
+        const endpoint = new Endpoint(ExtendedColorLightDevice.with(
+            this.createOnOffServer().with(OnOff.Feature.Lighting),
+            this.createLevelControlServer().with(LevelControl.Feature.Lighting),
+            this.createColorControlServer().with(ColorControl.Feature.HueSaturation, ColorControl.Feature.ColorTemperature),
+            ...this.defaultClusterServers()), {
             ...this.endPointDefaults(),
             ...clusterValues
         });

@@ -10,19 +10,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.client.model;
+package org.openhab.binding.matter.internal.config;
 
-import java.util.List;
-import java.util.Map;
-
-import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * @author Dan Cunningham
+ * The {@link EndpointConfiguration} class contains fields mapping thing configuration parameters.
  *
+ * @author Dan Cunningham - Initial contribution
  */
-public class Endpoint {
-    public Integer number;
-    public Map<String, BaseCluster> clusters;
-    public List<Endpoint> children;
+@NonNullByDefault
+public class NodeConfiguration {
+
+    public String nodeId = "0";
 }

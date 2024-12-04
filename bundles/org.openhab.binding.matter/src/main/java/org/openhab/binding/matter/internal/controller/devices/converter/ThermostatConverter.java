@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
@@ -24,11 +24,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ThermostatCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -45,16 +45,18 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
 
     private final Logger logger = LoggerFactory.getLogger(ThermostatConverter.class);
 
-    public ThermostatConverter(ThermostatCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public ThermostatConverter(ThermostatCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Map<Channel, @Nullable StateDescription> channels = new HashMap<>();
 
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_SYSTEMMODE.getId()), ITEM_TYPE_NUMBER)
-                .withType(CHANNEL_THERMOSTAT_SYSTEMMODE).withLabel(CHANNEL_LABEL_THERMOSTAT_SYSTEMMODE).build();
+                .withType(CHANNEL_THERMOSTAT_SYSTEMMODE).withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_SYSTEMMODE))
+                .build();
 
         List<StateOption> modeOptions = new ArrayList<>();
 
@@ -91,8 +93,8 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
             Channel tempChannel = ChannelBuilder
                     .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_LOCALTEMPERATURE.getId()),
                             ITEM_TYPE_NUMBER_TEMPERATURE)
-                    .withType(CHANNEL_THERMOSTAT_LOCALTEMPERATURE).withLabel(CHANNEL_LABEL_THERMOSTAT_LOCALTEMPERATURE)
-                    .build();
+                    .withType(CHANNEL_THERMOSTAT_LOCALTEMPERATURE)
+                    .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_LOCALTEMPERATURE)).build();
 
             StateDescription stateDescription = StateDescriptionFragmentBuilder.create().withPattern("%.1f %unit%")
                     .build().toStateDescription();
@@ -103,7 +105,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
                     .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_OUTDOORTEMPERATURE.getId()),
                             ITEM_TYPE_NUMBER_TEMPERATURE)
                     .withType(CHANNEL_THERMOSTAT_OUTDOORTEMPERATURE)
-                    .withLabel(CHANNEL_LABEL_THERMOSTAT_OUTDOORTEMPERATURE).build();
+                    .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_OUTDOORTEMPERATURE)).build();
             StateDescription stateDescription = StateDescriptionFragmentBuilder.create().withPattern("%.1f %unit%")
                     .build().toStateDescription();
             channels.put(tempChannel, stateDescription);
@@ -112,8 +114,8 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
             Channel tempChannel = ChannelBuilder
                     .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_OCCUPIEDHEATING.getId()),
                             ITEM_TYPE_NUMBER_TEMPERATURE)
-                    .withType(CHANNEL_THERMOSTAT_OCCUPIEDHEATING).withLabel(CHANNEL_LABEL_THERMOSTAT_OCCUPIEDHEATING)
-                    .build();
+                    .withType(CHANNEL_THERMOSTAT_OCCUPIEDHEATING)
+                    .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_OCCUPIEDHEATING)).build();
             StateDescription stateDescription = StateDescriptionFragmentBuilder.create()
                     .withMinimum(valueToTemperature(cluster.absMinHeatSetpointLimit).toBigDecimal())
                     .withMaximum(valueToTemperature(cluster.absMaxHeatSetpointLimit).toBigDecimal())
@@ -125,8 +127,8 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
             Channel tempChannel = ChannelBuilder
                     .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_OCCUPIEDCOOLING.getId()),
                             ITEM_TYPE_NUMBER_TEMPERATURE)
-                    .withType(CHANNEL_THERMOSTAT_OCCUPIEDCOOLING).withLabel(CHANNEL_LABEL_THERMOSTAT_OCCUPIEDCOOLING)
-                    .build();
+                    .withType(CHANNEL_THERMOSTAT_OCCUPIEDCOOLING)
+                    .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_OCCUPIEDCOOLING)).build();
             StateDescription stateDescription = StateDescriptionFragmentBuilder.create()
                     .withMinimum(valueToTemperature(cluster.absMinCoolSetpointLimit).toBigDecimal())
                     .withMaximum(valueToTemperature(cluster.absMaxCoolSetpointLimit).toBigDecimal())
@@ -140,7 +142,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
                         .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_UNOCCUPIEDHEATING.getId()),
                                 ITEM_TYPE_NUMBER_TEMPERATURE)
                         .withType(CHANNEL_THERMOSTAT_UNOCCUPIEDHEATING)
-                        .withLabel(CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDHEATING).build();
+                        .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDHEATING)).build();
                 StateDescription stateDescription = StateDescriptionFragmentBuilder.create()
                         .withMinimum(valueToTemperature(cluster.absMinHeatSetpointLimit).toBigDecimal())
                         .withMaximum(valueToTemperature(cluster.absMaxHeatSetpointLimit).toBigDecimal())
@@ -153,7 +155,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
                         .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_UNOCCUPIEDCOOLING.getId()),
                                 ITEM_TYPE_NUMBER_TEMPERATURE)
                         .withType(CHANNEL_THERMOSTAT_UNOCCUPIEDCOOLING)
-                        .withLabel(CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDCOOLING).build();
+                        .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDCOOLING)).build();
                 StateDescription stateDescription = StateDescriptionFragmentBuilder.create()
                         .withMinimum(valueToTemperature(cluster.absMinCoolSetpointLimit).toBigDecimal())
                         .withMaximum(valueToTemperature(cluster.absMaxCoolSetpointLimit).toBigDecimal())
@@ -165,7 +167,8 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
         if (cluster.thermostatRunningMode != null) {
             Channel tempChannel = ChannelBuilder
                     .create(new ChannelUID(thingUID, CHANNEL_THERMOSTAT_RUNNINGMODE.getId()), ITEM_TYPE_NUMBER)
-                    .withType(CHANNEL_THERMOSTAT_RUNNINGMODE).withLabel(CHANNEL_LABEL_THERMOSTAT_RUNNINGMODE).build();
+                    .withType(CHANNEL_THERMOSTAT_RUNNINGMODE)
+                    .withLabel(formatLabel(CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDCOOLING)).build();
             List<StateOption> options = new ArrayList<>();
             options.add(new StateOption(ThermostatCluster.ThermostatRunningModeEnum.OFF.value.toString(),
                     ThermostatCluster.ThermostatRunningModeEnum.OFF.label));
@@ -184,16 +187,16 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
     public void handleCommand(ChannelUID channelUID, Command command) {
         String id = channelUID.getId();
         if (id.equals(CHANNEL_THERMOSTAT_SYSTEMMODE.getId())) {
-            handler.writeAttribute(ThermostatCluster.CLUSTER_NAME, "systemMode", command.toString());
+            handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "systemMode", command.toString());
             return;
         }
         if (id.equals(CHANNEL_THERMOSTAT_OCCUPIEDHEATING.getId())) {
-            handler.writeAttribute(ThermostatCluster.CLUSTER_NAME, "occupiedHeatingSetpoint",
+            handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "occupiedHeatingSetpoint",
                     String.valueOf(temperatureToValue(command)));
             return;
         }
         if (id.equals(CHANNEL_THERMOSTAT_OCCUPIEDCOOLING.getId())) {
-            handler.writeAttribute(ThermostatCluster.CLUSTER_NAME, "occupiedCoolingSetpoint",
+            handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "occupiedCoolingSetpoint",
                     String.valueOf(temperatureToValue(command)));
             return;
         }

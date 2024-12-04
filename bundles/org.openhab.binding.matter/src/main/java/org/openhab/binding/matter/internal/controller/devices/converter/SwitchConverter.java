@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_SWITCH;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_SWITCH;
@@ -26,11 +26,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.SwitchCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
@@ -47,14 +47,15 @@ import com.google.gson.Gson;
 public class SwitchConverter extends GenericConverter<SwitchCluster> {
     private Gson gson = new Gson();
 
-    public SwitchConverter(SwitchCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public SwitchConverter(SwitchCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_SWITCH_SWITCH.getId()), ITEM_TYPE_NUMBER)
-                .withType(CHANNEL_SWITCH_SWITCH).withLabel(CHANNEL_LABEL_SWITCH_SWITCH).build();
+                .withType(CHANNEL_SWITCH_SWITCH).withLabel(formatLabel(CHANNEL_LABEL_SWITCH_SWITCH)).build();
 
         List<StateOption> options = new ArrayList<>();
         for (int i = 0; i < cluster.numberOfPositions; i++) {
@@ -75,7 +76,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         switch (message.path.attributeName) {
             case "currentPosition":
                 cluster.currentPosition = numberValue;
-                handler.updateState(CHANNEL_SWITCH_SWITCH.getId(), new DecimalType(numberValue));
+                updateState(CHANNEL_SWITCH_SWITCH, new DecimalType(numberValue));
                 break;
         }
     }
@@ -85,7 +86,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         // TODO: check if there are any switch events that actually have more then one event data, I don't think there
         // are.
         String eventData = message.events.length >= 0 ? gson.toJson(message.events[0].data) : "{}";
-        handler.triggerChannel(new ChannelTypeUID("matter:switch-" + eventName).getId(), eventData);
+        triggerChannel(new ChannelTypeUID("matter:switch-" + eventName), eventData);
     }
 
     public void updateCluster(SwitchCluster cluster) {

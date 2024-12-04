@@ -30,8 +30,13 @@ public class MatterBindingConstants {
     // List of all Thing Type UIDs
     // public static final ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
     public static final ThingTypeUID THING_TYPE_CONTROLLER = new ThingTypeUID(BINDING_ID, "controller");
-    // public static final ThingTypeUID THING_TYPE_NODE = new ThingTypeUID(BINDING_ID, "node");
-    public static final ThingTypeUID THING_TYPE_ENDPOINT = new ThingTypeUID(BINDING_ID, "endpoint");
+    public static final ThingTypeUID THING_TYPE_NODE = new ThingTypeUID(BINDING_ID, "node");
+
+    // Most endpoints are represented as channel groups on Nodes, bridges for now can be represented as standalone
+    // endpoint things
+    public static final ThingTypeUID THING_TYPE_BRIDGE_ENDPOINT = new ThingTypeUID(BINDING_ID, "bridge-endpoint");
+
+    // public static final ThingTypeUID THING_TYPE_ENDPOINT = new ThingTypeUID(BINDING_ID, "endpoint");
 
     // List of all Channel ids
     public static final String CHANNEL_PAIR_CODE = "pair_code";
@@ -138,6 +143,10 @@ public class MatterBindingConstants {
     public static final ChannelTypeUID CHANNEL_BOOLEANSTATE_STATEVALUE = new ChannelTypeUID(
             "matter:booleanstate-statevalue");
 
+    public static final String CHANNEL_LABEL_WIFINETWORKDIAGNOSTICS_RSSI = "Signal Strength";
+    public static final ChannelTypeUID CHANNEL_WIFINETWORKDIAGNOSTICS_RSSI = new ChannelTypeUID(
+            "matter:wififnetworkdiagnostics-rssi");
+
     public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCH = new ChannelTypeUID("matter:switch-switch");
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCHLATECHED = new ChannelTypeUID(
@@ -158,6 +167,7 @@ public class MatterBindingConstants {
     public static final String ITEM_TYPE_NUMBER_PRESSURE = "Number:Pressure";
     public static final String ITEM_TYPE_NUMBER_TEMPERATURE = "Number:Temperature";
     public static final String ITEM_TYPE_NUMBER_ILLUMINANCE = "Number:Illuminance";
+    public static final String ITEM_TYPE_NUMBER_POWER = "Number:Power";
 
     public static final String ITEM_TYPE_ROLLERSHUTTER = "Rollershutter";
     public static final String ITEM_TYPE_SWITCH = "Switch";

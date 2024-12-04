@@ -10,9 +10,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.types;
+package org.openhab.binding.matter.internal.controller.devices.types;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LEVEL_LEVEL;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ONOFF_ONOFF;
 
 import java.util.Map;
 
@@ -25,9 +26,9 @@ import org.openhab.binding.matter.internal.client.model.cluster.gen.DeviceTypes;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.devices.converter.ColorControlConverter;
-import org.openhab.binding.matter.internal.devices.converter.GenericConverter;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.controller.devices.converter.ColorControlConverter;
+import org.openhab.binding.matter.internal.controller.devices.converter.GenericConverter;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.thing.ChannelUID;
@@ -52,8 +53,8 @@ public class LightingType extends DeviceType {
     private PercentType initLevel = new PercentType(0);
     private OnOffType lastOnOff = OnOffType.OFF;
 
-    public LightingType(Integer deviceType, EndpointHandler handler) {
-        super(deviceType, handler);
+    public LightingType(Integer deviceType, MatterBaseThingHandler handler, Integer endpointNumber) {
+        super(deviceType, handler, endpointNumber);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class LightingType extends DeviceType {
         // we want OnOff commands to always use OnOff cluster (not levelcontrol)
         if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
-            handler.sendClusterCommand(OnOffCluster.CLUSTER_NAME, onOffCommand);
+            handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
         } else {
             super.handleCommand(channelUID, command);
         }
@@ -128,7 +129,7 @@ public class LightingType extends DeviceType {
 
     @Override
     protected @Nullable GenericConverter<? extends BaseCluster> createConverter(BaseCluster cluster,
-            Map<String, BaseCluster> allClusters) {
+            Map<String, BaseCluster> allClusters, String labelPrefix) {
         logger.debug("checking converter for cluster: {}", cluster.getClass().getSimpleName());
         if (cluster instanceof OnOffCluster) {
             // don't add a switch to dimmable devices or color devices
@@ -145,7 +146,7 @@ public class LightingType extends DeviceType {
             }
         }
 
-        return super.createConverter(cluster, allClusters);
+        return super.createConverter(cluster, allClusters, labelPrefix);
     }
 
     private void updateChannel(Integer clusterId, ChannelTypeUID channelTypeUID, State state) {

@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.types;
+package org.openhab.binding.matter.internal.controller.devices.types;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.DeviceTypes;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class DeviceTypeRegistry {
     private static final Logger logger = LoggerFactory.getLogger(DeviceTypeRegistry.class);
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static final Map<Integer, Class<? extends DeviceType>> deviceTypes = new HashMap();
 
     static {
@@ -55,17 +56,20 @@ public class DeviceTypeRegistry {
      * @param handler
      * @return
      */
-    public static DeviceType createDeviceType(Integer deviceTypeId, EndpointHandler handler) {
+    @SuppressWarnings("null")
+    public static DeviceType createDeviceType(Integer deviceTypeId, MatterBaseThingHandler handler,
+            Integer endpointNumber) {
         Class<? extends DeviceType> clazz = deviceTypes.get(deviceTypeId);
         if (clazz != null) {
             try {
-                Class<?>[] constructorParameterTypes = new Class<?>[] { Integer.class, EndpointHandler.class };
+                Class<?>[] constructorParameterTypes = new Class<?>[] { Integer.class, MatterBaseThingHandler.class,
+                        Integer.class };
                 Constructor<? extends DeviceType> constructor = clazz.getConstructor(constructorParameterTypes);
-                return constructor.newInstance(deviceTypeId, handler);
+                return constructor.newInstance(deviceTypeId, handler, endpointNumber);
             } catch (Exception e) {
                 logger.debug("Could not create device type", e);
             }
         }
-        return new GenericType(0, handler);
+        return new GenericType(0, handler, endpointNumber);
     }
 }

@@ -108,6 +108,11 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
 
     @Override
     public void onNodeReady(int port) {
+        logger.debug("onNodeReady port {}", port);
+        if (isConnected()) {
+            logger.debug("Already connected, aborting !");
+            return;
+        }
         try {
             connectWebsocket("localhost", port);
         } catch (Exception e) {
@@ -357,38 +362,58 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
             JsonObject jsonObjectNode = json.getAsJsonObject();
             Node node = new Node();
             node.id = jsonObjectNode.get("id").getAsBigInteger();
-            node.endpoints = new HashMap<>();
-            JsonObject endpointsJson = jsonObjectNode.get("endpoints").getAsJsonObject();
-            Set<Map.Entry<String, JsonElement>> endpointEntries = endpointsJson.entrySet();
-            for (Map.Entry<String, JsonElement> endpointEntry : endpointEntries) {
-                JsonObject jsonObjectElement = endpointEntry.getValue().getAsJsonObject();
-                Endpoint endpoint = new Endpoint();
-                endpoint.number = jsonObjectElement.get("number").getAsInt();
-                endpoint.clusters = new HashMap<>();
-                JsonObject clustersJson = jsonObjectElement.get("clusters").getAsJsonObject();
-                Set<Map.Entry<String, JsonElement>> clusterEntries = clustersJson.entrySet();
-                for (Map.Entry<String, JsonElement> clusterEntry : clusterEntries) {
-                    String clusterName = clusterEntry.getKey();
-                    JsonElement clusterElement = clusterEntry.getValue();
-                    logger.trace("Cluster {}", clusterEntry);
-                    try {
-                        Class<?> clazz = Class
-                                .forName(BaseCluster.class.getPackageName() + ".gen." + clusterName + "Cluster");
-                        if (BaseCluster.class.isAssignableFrom(clazz)) {
-                            BaseCluster cluster = context.deserialize(clusterElement, clazz);
-                            deserializeFields(cluster, clusterElement, clazz, context);
-                            endpoint.clusters.put(clusterName, cluster);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        logger.debug("Cluster not found: {} ", clusterName);
-                    } catch (JsonSyntaxException | IllegalArgumentException | SecurityException
-                            | IllegalAccessException e) {
-                        logger.debug("Exception for cluster {}", clusterName, e);
-                    }
-                }
-                node.endpoints.put(endpoint.number, endpoint);
-            }
+
+            // Deserialize root endpoint
+            JsonObject rootEndpointJson = jsonObjectNode.getAsJsonObject("rootEndpoint");
+            Endpoint rootEndpoint = deserializeEndpoint(rootEndpointJson, context);
+            node.rootEndpoint = rootEndpoint;
+
             return node;
+        }
+
+        private Endpoint deserializeEndpoint(JsonObject endpointJson, JsonDeserializationContext context) {
+            Endpoint endpoint = new Endpoint();
+            endpoint.number = endpointJson.get("number").getAsInt();
+            endpoint.clusters = new HashMap<>();
+            logger.trace("deserializeEndpoint {}", endpoint.number);
+
+            // Deserialize clusters
+            JsonObject clustersJson = endpointJson.getAsJsonObject("clusters");
+            Set<Map.Entry<String, JsonElement>> clusterEntries = clustersJson.entrySet();
+            for (Map.Entry<String, JsonElement> clusterEntry : clusterEntries) {
+                String clusterName = clusterEntry.getKey();
+                JsonElement clusterElement = clusterEntry.getValue();
+                logger.trace("Cluster {}", clusterEntry);
+                try {
+                    Class<?> clazz = Class
+                            .forName(BaseCluster.class.getPackageName() + ".gen." + clusterName + "Cluster");
+                    if (BaseCluster.class.isAssignableFrom(clazz)) {
+                        BaseCluster cluster = context.deserialize(clusterElement, clazz);
+                        deserializeFields(cluster, clusterElement, clazz, context);
+                        endpoint.clusters.put(clusterName, cluster);
+                        logger.trace("deserializeEndpoint adding cluster {} to endpoint {}", clusterName,
+                                endpoint.number);
+                    }
+                } catch (ClassNotFoundException e) {
+                    logger.debug("Cluster not found: {}", clusterName);
+                } catch (JsonSyntaxException | IllegalArgumentException | SecurityException
+                        | IllegalAccessException e) {
+                    logger.debug("Exception for cluster {}", clusterName, e);
+                }
+            }
+
+            // Deserialize child endpoints
+            endpoint.children = new ArrayList<>();
+            JsonArray childrenJson = endpointJson.getAsJsonArray("children");
+            if (childrenJson != null) {
+                for (JsonElement childElement : childrenJson) {
+                    JsonObject childJson = childElement.getAsJsonObject();
+                    Endpoint childEndpoint = deserializeEndpoint(childJson, context);
+                    endpoint.children.add(childEndpoint);
+                }
+            }
+
+            return endpoint;
         }
 
         private void deserializeFields(Object instance, JsonElement jsonElement, Class<?> clazz,

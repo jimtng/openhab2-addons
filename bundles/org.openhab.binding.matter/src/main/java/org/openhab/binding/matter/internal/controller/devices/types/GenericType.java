@@ -10,10 +10,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.types;
+package org.openhab.binding.matter.internal.controller.devices.types;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 
 /**
  * @author Dan Cunningham
@@ -23,7 +23,7 @@ import org.openhab.binding.matter.internal.handler.EndpointHandler;
 @NonNullByDefault
 public class GenericType extends DeviceType {
 
-    public GenericType(Integer deviceType, EndpointHandler handler) {
-        super(deviceType, handler);
+    public GenericType(Integer deviceType, MatterBaseThingHandler handler, Integer endpointNumber) {
+        super(deviceType, handler, endpointNumber);
     }
 }

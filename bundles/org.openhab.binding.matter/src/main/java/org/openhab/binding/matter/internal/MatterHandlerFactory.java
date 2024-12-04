@@ -12,15 +12,18 @@
  */
 package org.openhab.binding.matter.internal;
 
+import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_BRIDGE_ENDPOINT;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_CONTROLLER;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_ENDPOINT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_NODE;
 
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.handler.BridgeEndpointHandler;
 import org.openhab.binding.matter.internal.handler.ControllerHandler;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.NodeHandler;
+import org.openhab.binding.matter.internal.util.MatterUIDUtils;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
@@ -41,24 +44,27 @@ import org.osgi.service.component.annotations.Reference;
 @NonNullByDefault
 @Component(configurationPid = "binding.matter", service = ThingHandlerFactory.class)
 public class MatterHandlerFactory extends BaseThingHandlerFactory {
-    // private final Logger logger = LoggerFactory.getLogger(MatterHandlerFactory.class);
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_CONTROLLER,
-            THING_TYPE_ENDPOINT);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_CONTROLLER, THING_TYPE_NODE,
+            THING_TYPE_BRIDGE_ENDPOINT);
 
     private final MatterStateDescriptionOptionProvider stateDescriptionProvider;
     private final MatterWebsocketService websocketService;
+    private final MatterChannelTypeProvider channelGroupTypeProvider;
 
     @Activate
     public MatterHandlerFactory(@Reference MatterWebsocketService websocketService,
-            @Reference MatterStateDescriptionOptionProvider stateDescriptionProvider) {
+            @Reference MatterStateDescriptionOptionProvider stateDescriptionProvider,
+            @Reference MatterChannelTypeProvider channelGroupTypeProvider) {
         this.websocketService = websocketService;
         this.stateDescriptionProvider = stateDescriptionProvider;
+        this.channelGroupTypeProvider = channelGroupTypeProvider;
     }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+        ThingTypeUID baseTypeUID = MatterUIDUtils.baseTypeForThingType(thingTypeUID);
+        return SUPPORTED_THING_TYPES_UIDS.contains(baseTypeUID != null ? baseTypeUID : thingTypeUID);
     }
 
     @Override
@@ -69,12 +75,15 @@ public class MatterHandlerFactory extends BaseThingHandlerFactory {
             return new ControllerHandler((Bridge) thing, websocketService);
         }
 
-        // if (THING_TYPE_NODE.equals(thingTypeUID)) {
-        // return new NodeHandler((Bridge) thing);
-        // }
+        ThingTypeUID baseTypeUID = MatterUIDUtils.baseTypeForThingType(thingTypeUID);
+        ThingTypeUID derivedTypeUID = baseTypeUID != null ? baseTypeUID : thingTypeUID;
 
-        if (THING_TYPE_ENDPOINT.equals(thingTypeUID)) {
-            return new EndpointHandler(thing, stateDescriptionProvider);
+        if (THING_TYPE_NODE.equals(derivedTypeUID)) {
+            return new NodeHandler((Bridge) thing, stateDescriptionProvider, channelGroupTypeProvider);
+        }
+
+        if (THING_TYPE_BRIDGE_ENDPOINT.equals(derivedTypeUID)) {
+            return new BridgeEndpointHandler(thing, stateDescriptionProvider, channelGroupTypeProvider);
         }
 
         return null;

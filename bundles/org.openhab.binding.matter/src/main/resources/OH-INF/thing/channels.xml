@@ -394,7 +394,7 @@
 		<item-type>Number:Illuminance</item-type>
 		<label>Illumination</label>
 		<description>Indicates the brightness in Lux.</description>
-		<category>Humidity</category>
+		<category>Illumination</category>
 		<state pattern="%d %unit%" readOnly="true"></state>
 	</channel-type>
 
@@ -403,6 +403,14 @@
 		<label>Boolean State</label>
 		<description>Indicates a boolean, true or false, value</description>
 		<state readOnly="true"></state>
+	</channel-type>
+
+	<channel-type id="wififnetworkdiagnostics-rssi" advanced="true">
+		<item-type unitHint="dBm">Number:Power</item-type>
+		<label>Signal</label>
+		<description>Wi-Fi signal strength indicator.</description>
+		<category>QualityOfService</category>
+		<state readOnly="true" pattern="%d %unit%"></state>
 	</channel-type>
 
 </thing:thing-descriptions>

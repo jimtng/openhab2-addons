@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.*;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +50,8 @@ public class ConverterRegistry {
         ConverterRegistry.registerConverter(IlluminanceMeasurementCluster.CLUSTER_ID,
                 IlluminanceMeasurementConverter.class);
         ConverterRegistry.registerConverter(BooleanStateCluster.CLUSTER_ID, BooleanStateConverter.class);
+        ConverterRegistry.registerConverter(WiFiNetworkDiagnosticsCluster.CLUSTER_ID,
+                WiFiNetworkDiagnosticsConverter.class);
     }
 
     public static void registerConverter(Integer clusterId,
@@ -58,14 +60,15 @@ public class ConverterRegistry {
     }
 
     public static @Nullable GenericConverter<? extends BaseCluster> createConverter(BaseCluster cluster,
-            EndpointHandler handler) {
+            MatterBaseThingHandler handler, int endpointNumber, String labelPrefix) {
         Class<? extends GenericConverter<? extends BaseCluster>> clazz = converters.get(cluster.id);
         if (clazz != null) {
             try {
-                Class<?>[] constructorParameterTypes = new Class<?>[] { cluster.getClass(), EndpointHandler.class };
+                Class<?>[] constructorParameterTypes = new Class<?>[] { cluster.getClass(),
+                        MatterBaseThingHandler.class, int.class, String.class };
                 Constructor<? extends GenericConverter<? extends BaseCluster>> constructor = clazz
                         .getConstructor(constructorParameterTypes);
-                return constructor.newInstance(cluster, handler);
+                return constructor.newInstance(cluster, handler, endpointNumber, labelPrefix);
             } catch (Exception e) {
                 logger.debug("Could not create converter", e);
             }

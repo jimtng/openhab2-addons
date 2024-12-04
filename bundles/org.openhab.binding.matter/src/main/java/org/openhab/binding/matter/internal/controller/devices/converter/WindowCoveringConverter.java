@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_WINDOWCOVERING_LIFT;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_WINDOWCOVERING_LIFT;
@@ -24,13 +24,13 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.WindowCoveringCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -45,14 +45,16 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public WindowCoveringConverter(WindowCoveringCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public WindowCoveringConverter(WindowCoveringCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_WINDOWCOVERING_LIFT.getId()), ITEM_TYPE_ROLLERSHUTTER)
-                .withType(CHANNEL_WINDOWCOVERING_LIFT).withLabel(CHANNEL_LABEL_WINDOWCOVERING_LIFT).build();
+                .withType(CHANNEL_WINDOWCOVERING_LIFT).withLabel(formatLabel(CHANNEL_LABEL_WINDOWCOVERING_LIFT))
+                .build();
         return Collections.singletonMap(channel, null);
     }
 
@@ -107,6 +109,6 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
     }
 
     private void moveCommand(ClusterCommand command) {
-        handler.sendClusterCommand(WindowCoveringCluster.CLUSTER_NAME, command);
+        handler.sendClusterCommand(endpointNumber, WindowCoveringCluster.CLUSTER_NAME, command);
     }
 }

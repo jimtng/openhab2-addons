@@ -13,7 +13,7 @@
 package org.openhab.binding.matter.internal.handler;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COMMAND;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_ENDPOINT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_NODE;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -24,17 +24,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.matter.internal.MatterControllerClient;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
-import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
-import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.BridgeEventMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
 import org.openhab.binding.matter.internal.config.ControllerConfiguration;
+import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryHandler;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
@@ -58,15 +55,12 @@ import org.slf4j.LoggerFactory;
 public class ControllerHandler extends BaseBridgeHandler implements MatterClientListener, MatterDiscoveryHandler {
 
     private final Logger logger = LoggerFactory.getLogger(ControllerHandler.class);
-    // The endpoints / devices associated with a node. Typically a node has 1 device endpoint, but may have more (Hue
-    // bridge, complicated devices, etc..)
-    private Map<BigInteger, Map<Integer, Endpoint>> nodeEndpoints = Collections.synchronizedMap(new HashMap<>());
     // Set of nodes we are waiting to connect to
     private Set<BigInteger> outstandingNodeRequests = Collections.synchronizedSet(new HashSet<>());
     // Set of nodes we need to try reconnecting to
     private Set<BigInteger> disconnectedNodes = Collections.synchronizedSet(new HashSet<>());
-    // Nodes which are linked to endpoints.
-    private Set<BigInteger> linkedNodes = Collections.synchronizedSet(new HashSet<>());
+    // Nodes that we
+    private Map<BigInteger, NodeHandler> linkedNodes = Collections.synchronizedMap(new HashMap<>());
 
     private @Nullable MatterDiscoveryService discoveryService;
     private MatterControllerClient client;
@@ -128,7 +122,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         if (checkFuture != null) {
             checkFuture.cancel(true);
         }
-        nodeEndpoints.clear();
+        // nodes.clear();
         outstandingNodeRequests.clear();
         disconnectedNodes.clear();
         linkedNodes.clear();
@@ -139,9 +133,9 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
         super.childHandlerInitialized(childHandler, childThing);
         logger.debug("childHandlerInitialized ready {} {}", ready, childHandler);
-        if (childHandler instanceof EndpointHandler handler) {
+        if (childHandler instanceof NodeHandler handler) {
             BigInteger nodeId = handler.getNodeId();
-            linkedNodes.add(nodeId);
+            linkedNodes.put(nodeId, handler);
             updateNode(nodeId);
         }
     }
@@ -153,8 +147,9 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         if (!ready) {
             return;
         }
-        if (childHandler instanceof EndpointHandler handler) {
-            endpointRemoved(handler.getNodeId(), handler.getEndpointId(), false);
+        if (childHandler instanceof NodeHandler handler) {
+            // todo support decommissioned removal
+            removeNode(handler.getNodeId(), false);
         }
     }
 
@@ -162,6 +157,10 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     public void setDiscoveryService(@Nullable MatterDiscoveryService service) {
         logger.debug("setDiscoveryService");
         this.discoveryService = service;
+    }
+
+    public @Nullable MatterDiscoveryService getDiscoveryService() {
+        return discoveryService;
     }
 
     @Override
@@ -193,8 +192,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             case DISCONNECTED:
                 updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Node " + message.state);
-                // only add an endpoint to our disconnect list if we care about it
-                if (nodeEndpoints.containsKey(message.nodeId)) {
+                if (linkedNodes.containsKey(message.nodeId)) {
                     disconnectedNodes.add(message.nodeId);
                 }
                 break;
@@ -209,7 +207,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
 
     @Override
     public void onEvent(AttributeChangedMessage message) {
-        EndpointHandler handler = endpointHandler(message.path.nodeId, message.path.endpointId);
+        NodeHandler handler = linkedNodes.get(message.path.nodeId);
         if (handler == null) {
             logger.debug("No handler found for node {}", message.path.nodeId);
             return;
@@ -219,7 +217,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
 
     @Override
     public void onEvent(EventTriggeredMessage message) {
-        EndpointHandler handler = endpointHandler(message.path.nodeId, message.path.endpointId);
+        NodeHandler handler = linkedNodes.get(message.path.nodeId);
         if (handler == null) {
             logger.debug("No handler found for node {}", message.path.nodeId);
             return;
@@ -238,15 +236,17 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
 
     @Override
     public void onDisconnect(String reason) {
+        logger.debug("websocket disconnected");
         setOffline(reason);
     }
 
     @Override
     public void onReady() {
+        logger.debug("websocket ready");
         ready = true;
         updateStatus(ThingStatus.ONLINE);
         cancelReconnect();
-        linkedNodes.forEach(nodeId -> updateNode(nodeId));
+        linkedNodes.keySet().forEach(nodeId -> updateNode(nodeId));
     }
 
     private void connect() {
@@ -265,10 +265,8 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
 
         logger.debug("matter config: {}", storagePath);
         final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
-        checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
-        scheduler.execute(() -> {
-            client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
-        });
+        // checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
+        client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
     }
 
     public MatterControllerClient getClient() {
@@ -299,35 +297,12 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         });
     }
 
-    protected void endpointRemoved(BigInteger nodeId, int endpointId, boolean isDeleted) {
-        logger.debug("endpointRemoved endpoint {}:{}", nodeId, endpointId);
-        // only remove the node from the network if all endpoints things on the node are deleted
-        synchronized (nodeEndpoints) {
-            boolean lastEndpoint = true;
-            for (Thing thing : getThing().getThings()) {
-                ThingHandler handler = thing.getHandler();
-                if (handler instanceof EndpointHandler endpointHandler) {
-                    if (endpointHandler.getNodeId().equals(nodeId)) {
-                        // if this handler has another endpoint on the node, then its not last
-                        if (endpointHandler.endpointId != endpointId) {
-                            lastEndpoint = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (lastEndpoint) {
-                removeNode(nodeId, isDeleted);
-            }
-        }
-    }
-
-    private void removeNode(BigInteger nodeId, boolean decommission) {
+    protected void removeNode(BigInteger nodeId, boolean decommission) {
         try {
             logger.debug("Decommissioning node {}", nodeId);
-            nodeEndpoints.remove(nodeId);
             disconnectedNodes.remove(nodeId);
             outstandingNodeRequests.remove(nodeId);
+            linkedNodes.remove(nodeId);
             // check if we remove deleted endpoint things from the actual matter network
             if (decommission && getConfigAs(ControllerConfiguration.class).decommissionNodesOnDelete) {
                 logger.debug("Decommissioning node {}", nodeId);
@@ -339,11 +314,12 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     }
 
     private synchronized void reconnect() {
+        logger.debug("reconnect!");
         cancelReconnect();
         this.reconnectFuture = scheduler.schedule(this::connect, 30, TimeUnit.SECONDS);
     }
 
-    private void cancelReconnect() {
+    private synchronized void cancelReconnect() {
         ScheduledFuture<?> reconnectFuture = this.reconnectFuture;
         if (reconnectFuture != null) {
             reconnectFuture.cancel(true);
@@ -351,7 +327,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         this.reconnectFuture = null;
     }
 
-    protected CompletableFuture<Void> updateNode(BigInteger id) {
+    CompletableFuture<Void> updateNode(BigInteger id) {
         logger.debug("updateNode BEGIN {}", id);
 
         // If we are already waiting to get this node, return a completed future
@@ -364,7 +340,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         }
 
         return client.getNode(id).thenAccept(node -> {
-            updateNodeEndpoints(node);
+            updateNode(node);
             disconnectedNodes.remove(id);
             logger.debug("updateNode END {}", id);
         }).exceptionally(e -> {
@@ -382,20 +358,11 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
      * 
      * @param node
      */
-    private void updateNodeEndpoints(Node node) {
-        synchronized (nodeEndpoints) {
-            Map<Integer, Endpoint> endpoints = new HashMap<>();
-            for (Endpoint e : node.endpoints.values()) {
-                endpoints.put(e.number, e);
-                discoverChildEndpoint(node, e);
-                EndpointHandler handler = endpointHandler(node.id, e.number);
-                if (handler != null) {
-                    Thing thing = handler.getThing();
-                    updateEndpointThingProperties(node, thing, e.number);
-                    handler.updateEndpoint(e);
-                }
-            }
-            nodeEndpoints.put(node.id, endpoints);
+    private synchronized void updateNode(Node node) {
+        discoverChildNode(node);
+        NodeHandler handler = linkedNodes.get(node.id);
+        if (handler != null) {
+            handler.updateNode(node);
         }
     }
 
@@ -403,7 +370,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             String details) {
         for (Thing thing : getThing().getThings()) {
             ThingHandler handler = thing.getHandler();
-            if (handler instanceof EndpointHandler endpointHandler) {
+            if (handler instanceof NodeHandler endpointHandler) {
                 if (nodeId.equals(endpointHandler.getNodeId())) {
                     endpointHandler.setEndpointStatus(status, detail, details);
                 }
@@ -412,50 +379,20 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     }
 
     private void setOffline(@Nullable String message) {
+        logger.debug("setOffline {}", message);
         client.disconnect();
         updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, message);
         reconnect();
     }
 
-    private void discoverChildEndpoint(Node node, Endpoint endpoint) {
-        logger.debug("discoverChildEndpoint {}", node.id);
-        // endpoint 0 is the root info cluster, not an actual device
-        if (endpoint.number == 0) {
-            return;
-        }
+    private void discoverChildNode(Node node) {
+        logger.debug("discoverChildNode {}", node.id);
 
         MatterDiscoveryService discoveryService = this.discoveryService;
         if (discoveryService != null) {
             ThingUID bridgeUID = getThing().getUID();
-            ThingUID thingUID = new ThingUID(THING_TYPE_ENDPOINT, bridgeUID, node.id + "_" + endpoint.number);
-            discoveryService.discoverChildEndpointThing(thingUID, bridgeUID, node, endpoint.number);
-        }
-    }
-
-    private @Nullable EndpointHandler endpointHandler(BigInteger nodeId, int endpointId) {
-        for (Thing thing : getThing().getThings()) {
-            ThingHandler handler = thing.getHandler();
-            if (handler instanceof EndpointHandler endpointHandler) {
-                if (nodeId.equals(endpointHandler.getNodeId()) && endpointHandler.getEndpointId() == endpointId) {
-                    return endpointHandler;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void updateEndpointThingProperties(Node node, Thing thing, int endpointNum) {
-        Endpoint root = node.endpoints.get(Integer.valueOf(0));
-        if (root != null) {
-            BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
-            if (cluster != null && cluster instanceof BasicInformationCluster basicCluster) {
-                thing.setProperty(Thing.PROPERTY_SERIAL_NUMBER, basicCluster.serialNumber);
-                thing.setProperty(Thing.PROPERTY_FIRMWARE_VERSION, basicCluster.softwareVersionString);
-                thing.setProperty(Thing.PROPERTY_VENDOR, basicCluster.vendorName);
-                thing.setProperty(Thing.PROPERTY_MODEL_ID, basicCluster.productName);
-                thing.setProperty(Thing.PROPERTY_HARDWARE_VERSION, basicCluster.hardwareVersionString);
-                thing.setProperty("path", node.id + ":" + endpointNum);
-            }
+            ThingUID thingUID = new ThingUID(THING_TYPE_NODE, bridgeUID, node.id.toString());
+            discoveryService.discoverNodeDevice(thingUID, bridgeUID, node);
         }
     }
 

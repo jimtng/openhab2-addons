@@ -27,43 +27,57 @@ export class Nodes {
     }
 
     async serializePairedNode(node: PairedNode) {
-        function allEndpoints(endpoint: EndpointInterface, endpoints: EndpointInterface[]) {
-            endpoints.push(endpoint);
-            endpoint.getChildEndpoints().forEach(endpoint => allEndpoints(endpoint, endpoints));
-        };
-        if (this.theNode.commissioningController === undefined) {
+        if (!this.theNode.commissioningController) {
             throw new Error("CommissioningController not initialized");
         }
-        const data: any = {};
-        data.id = node.nodeId;
-        const endpoints: EndpointInterface[] = [];
-        endpoints.push(node.getRootEndpoint() as EndpointInterface);
-        node.getDevices().forEach(endpoint => allEndpoints(endpoint, endpoints));
-        data.endpoints = {};
-        for (const endpoint of endpoints) {
-            if (endpoint === undefined || endpoint.number === undefined) continue;
-            const endpointNumber = endpoint.number.toString();
-            data.endpoints[endpointNumber] = {};
-            data.endpoints[endpointNumber].number = endpoint.number;
-            data.endpoints[endpointNumber].clusters = {};
+    
+        // Recursive function to build the hierarchy
+        async function serializeEndpoint(endpoint: EndpointInterface): Promise<any> {
+            const endpointData: any = {
+                number: endpoint.number,
+                clusters: {},
+                children: []
+            };
+    
+            // Serialize clusters
             for (const cluster of endpoint.getAllClusterClients()) {
-                if (cluster.id === undefined) continue;
-                data.endpoints[endpointNumber].clusters[cluster.name] = {};
-                data.endpoints[endpointNumber].clusters[cluster.name].id = cluster.id
-                data.endpoints[endpointNumber].clusters[cluster.name].name = cluster.name
+                if (!cluster.id) continue;
+                const clusterData: any = {
+                    id: cluster.id,
+                    name: cluster.name
+                };
+    
+                // Serialize attributes
                 for (const attributeName in cluster.attributes) {
                     const attribute = cluster.attributes[attributeName];
-                    if (attribute === undefined) continue;
+                    if (!attribute) continue;
                     const attributeValue = await attribute.get();
-                    if (attributeValue === undefined) continue;
-                    data.endpoints[endpointNumber].clusters[cluster.name][attributeName] = attributeValue;
+                    if (attributeValue !== undefined) {
+                        clusterData[attributeName] = attributeValue;
+                    }
                 }
-
-            };
+    
+                endpointData.clusters[cluster.name] = clusterData;
+            }
+    
+            // Serialize child endpoints recursively
+            for (const child of endpoint.getChildEndpoints()) {
+                endpointData.children.push(await serializeEndpoint(child));
+            }
+    
+            return endpointData;
+        }
+    
+        // Start serialization from the root endpoint
+        const rootEndpoint = node.getRootEndpoint() as EndpointInterface;
+        const data: any = {
+            id: node.nodeId,
+            rootEndpoint: await serializeEndpoint(rootEndpoint)
         };
+    
         return data;
     }
-
+    
     async pairNode(pairingCode: string | undefined, shortDiscriminator: number | undefined, setupPinCode: number | undefined) {
         let discriminator: number | undefined;
         let nodeIdStr: string | undefined;

@@ -10,11 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal;
+package org.openhab.binding.matter.internal.controller;
 
-import java.io.File;
 import java.math.BigInteger;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +25,6 @@ import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.ws.ActiveSessionInformation;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
@@ -41,30 +37,16 @@ import com.google.gson.reflect.TypeToken;
 @NonNullByDefault
 public class MatterControllerClient extends MatterWebsocketClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(MatterControllerClient.class);
-
     public void connect(String host, int port, BigInteger nodeId, String controllerName, String storagePath)
             throws Exception {
-        // TODO remove this check and helper function after a few releases of beta testing
         Map<String, String> params;
-        if (isLegacyStorage(storagePath, controllerName)) {
-            storagePath = storagePath + File.separator + controllerName + ".json";
-            params = Map.of("nodeId", nodeId.toString(), "storagePath", storagePath);
-        } else {
-            params = Map.of("nodeId", nodeId.toString(), "controllerName", controllerName, "storagePath", storagePath);
-        }
+        params = Map.of("nodeId", nodeId.toString(), "controllerName", controllerName, "storagePath", storagePath);
         connect(host, port, params);
     }
 
     public void connect(MatterWebsocketService wss, BigInteger nodeId, String controllerName, String storagePath) {
-        // TODO remove this check and helper function after a few releases of beta testing
-        Map<String, String> params;
-        if (isLegacyStorage(storagePath, controllerName)) {
-            storagePath = storagePath + File.separator + controllerName + ".json";
-            params = Map.of("nodeId", nodeId.toString(), "storagePath", storagePath);
-        } else {
-            params = Map.of("nodeId", nodeId.toString(), "controllerName", controllerName, "storagePath", storagePath);
-        }
+        Map<String, String> params = Map.of("nodeId", nodeId.toString(), "controllerName", controllerName,
+                "storagePath", storagePath);
         connect(wss, params);
     }
 
@@ -134,7 +116,7 @@ public class MatterControllerClient extends MatterWebsocketClient {
         return future.thenAccept(obj -> {
             // Do nothing, just to complete the future
         });
-    } // enhancedCommissioningWindow
+    }
 
     public CompletableFuture<Void> clusterCommand(BigInteger nodeId, Integer endpointId, String clusterName,
             ClusterCommand command) {
@@ -169,11 +151,5 @@ public class MatterControllerClient extends MatterWebsocketClient {
             ActiveSessionInformation[] sessions = gson.fromJson(obj, ActiveSessionInformation[].class);
             return sessions == null ? new ActiveSessionInformation[0] : sessions;
         });
-    }
-
-    private boolean isLegacyStorage(String storagePath, String controllerName) {
-        java.nio.file.Path path = java.nio.file.Paths.get(storagePath + File.separator + controllerName + ".json");
-        logger.debug("Checking for legacy storage {}", path);
-        return Files.exists(path);
     }
 }

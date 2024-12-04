@@ -15,6 +15,9 @@
 
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * DeviceTypes
  *
@@ -23,6 +26,15 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
  public class DeviceTypes {
  
+    public static final Map<Integer, String> DEVICE_MAPPING = new HashMap<>();
+    static {
+{{#each deviceTypes}}
+{{#if (isEmpty id)}}
+{{else}}
+        DEVICE_MAPPING.put({{id}}, "{{asUpperCamelCase name}}");
+{{/if}}        
+{{/each}}
+    }
 {{#each deviceTypes}}
 /**
 * {{details}}

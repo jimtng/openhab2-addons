@@ -15,6 +15,9 @@
 
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * DeviceTypes
  *
@@ -23,6 +26,70 @@ package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
 public class DeviceTypes {
 
+    public static final Map<Integer, String> DEVICE_MAPPING = new HashMap<>();
+    static {
+        DEVICE_MAPPING.put(22, "RootNode");
+        DEVICE_MAPPING.put(17, "PowerSource");
+        DEVICE_MAPPING.put(18, "OtaRequestor");
+        DEVICE_MAPPING.put(20, "OtaProvider");
+        DEVICE_MAPPING.put(19, "BridgedNode");
+        DEVICE_MAPPING.put(1296, "ElectricalSensor");
+        DEVICE_MAPPING.put(1293, "DeviceEnergyManagement");
+        DEVICE_MAPPING.put(256, "OnOffLight");
+        DEVICE_MAPPING.put(257, "DimmableLight");
+        DEVICE_MAPPING.put(268, "ColorTemperatureLight");
+        DEVICE_MAPPING.put(269, "ExtendedColorLight");
+        DEVICE_MAPPING.put(266, "OnOffPlugInUnit");
+        DEVICE_MAPPING.put(267, "DimmablePlugInUnit");
+        DEVICE_MAPPING.put(771, "Pump");
+        DEVICE_MAPPING.put(66, "WaterValve");
+        DEVICE_MAPPING.put(259, "OnOffLightSwitch");
+        DEVICE_MAPPING.put(260, "DimmerSwitch");
+        DEVICE_MAPPING.put(261, "ColorDimmerSwitch");
+        DEVICE_MAPPING.put(2112, "ControlBridge");
+        DEVICE_MAPPING.put(772, "PumpController");
+        DEVICE_MAPPING.put(15, "GenericSwitch");
+        DEVICE_MAPPING.put(21, "ContactSensor");
+        DEVICE_MAPPING.put(262, "LightSensor");
+        DEVICE_MAPPING.put(263, "OccupancySensor");
+        DEVICE_MAPPING.put(770, "TemperatureSensor");
+        DEVICE_MAPPING.put(773, "PressureSensor");
+        DEVICE_MAPPING.put(774, "FlowSensor");
+        DEVICE_MAPPING.put(775, "HumiditySensor");
+        DEVICE_MAPPING.put(2128, "OnOffSensor");
+        DEVICE_MAPPING.put(118, "SmokeCoAlarm");
+        DEVICE_MAPPING.put(44, "AirQualitySensor");
+        DEVICE_MAPPING.put(65, "WaterFreezeDetector");
+        DEVICE_MAPPING.put(67, "WaterLeakDetector");
+        DEVICE_MAPPING.put(68, "RainSensor");
+        DEVICE_MAPPING.put(10, "DoorLock");
+        DEVICE_MAPPING.put(11, "DoorLockController");
+        DEVICE_MAPPING.put(514, "WindowCovering");
+        DEVICE_MAPPING.put(515, "WindowCoveringController");
+        DEVICE_MAPPING.put(769, "Thermostat");
+        DEVICE_MAPPING.put(43, "Fan");
+        DEVICE_MAPPING.put(45, "AirPurifier");
+        DEVICE_MAPPING.put(40, "BasicVideoPlayer");
+        DEVICE_MAPPING.put(35, "CastingVideoPlayer");
+        DEVICE_MAPPING.put(34, "Speaker");
+        DEVICE_MAPPING.put(36, "ContentApp");
+        DEVICE_MAPPING.put(41, "CastingVideoClient");
+        DEVICE_MAPPING.put(42, "VideoRemoteControl");
+        DEVICE_MAPPING.put(39, "ModeSelect");
+        DEVICE_MAPPING.put(14, "Aggregator");
+        DEVICE_MAPPING.put(116, "RoboticVacuumCleaner");
+        DEVICE_MAPPING.put(115, "LaundryWasher");
+        DEVICE_MAPPING.put(112, "Refrigerator");
+        DEVICE_MAPPING.put(114, "RoomAirConditioner");
+        DEVICE_MAPPING.put(113, "TemperatureControlledCabinet");
+        DEVICE_MAPPING.put(117, "Dishwasher");
+        DEVICE_MAPPING.put(124, "LaundryDryer");
+        DEVICE_MAPPING.put(119, "CookSurface");
+        DEVICE_MAPPING.put(120, "Cooktop");
+        DEVICE_MAPPING.put(123, "Oven");
+        DEVICE_MAPPING.put(122, "ExtractorHood");
+        DEVICE_MAPPING.put(121, "MicrowaveOven");
+    }
     /**
      * This defines conformance for a root node endpoint (see System Model specification). This endpoint is akin to a
      * &quot;read me first&quot; endpoint that describes itself and the other endpoints that make up the node.

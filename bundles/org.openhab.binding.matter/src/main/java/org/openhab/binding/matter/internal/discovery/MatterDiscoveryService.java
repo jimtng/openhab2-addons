@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.matter.internal.discovery;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_ENDPOINT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_NODE;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +24,6 @@ import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DescriptorCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.FixedLabelCluster;
 import org.openhab.core.config.discovery.AbstractDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
@@ -47,7 +46,7 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
     public MatterDiscoveryService() throws IllegalArgumentException {
         // set a 5 min timeout, which should be plenty of time to discover devices, but stopScan will be called when the
         // Matter client is done looking for new Nodes/Endpoints
-        super(Set.of(THING_TYPE_ENDPOINT), 60 * 5, false);
+        super(Set.of(THING_TYPE_NODE), 60 * 5, false);
     }
 
     @Override
@@ -84,59 +83,6 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
         return "11 digit matter pairing code (with or without hyphens) or a short code and key (separated by a space)";
     }
 
-    public void discoverChildEndpointThing(ThingUID thingUID, ThingUID bridgeUID, Node node, Integer endpointId) {
-        logger.debug("discoverChildEndpointThing: {} {} {}", thingUID, bridgeUID, endpointId);
-        String vendorName = "";
-        String productName = "";
-        String nodeLabel = "";
-        String fixedLabel = "";
-        Endpoint root = node.endpoints.get(Integer.valueOf(0));
-        if (root != null) {
-            BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
-            if (cluster != null && cluster instanceof BasicInformationCluster basicCluster) {
-                vendorName = basicCluster.vendorName;
-                productName = basicCluster.productName;
-            }
-        }
-        Endpoint device = node.endpoints.get(endpointId);
-        if (device != null) {
-            if (device.clusters.get(
-                    BridgedDeviceBasicInformationCluster.CLUSTER_NAME) instanceof BridgedDeviceBasicInformationCluster bridgedCluster) {
-                nodeLabel = bridgedCluster.nodeLabel;
-            }
-
-            if (device.clusters.get(FixedLabelCluster.CLUSTER_NAME) instanceof FixedLabelCluster fixedLabelCluster) {
-                fixedLabel = fixedLabelCluster.labelList.stream().map(l -> l.label + ": " + l.value)
-                        .collect(Collectors.joining(" "));
-            }
-            DescriptorCluster cluster = (DescriptorCluster) device.clusters.get(DescriptorCluster.CLUSTER_NAME);
-            String deviceTypeIds = cluster.deviceTypeList.stream().map(d -> d.deviceType.toString())
-                    .collect(Collectors.joining(","));
-            String idSting = node.id.toString();
-            // String shortId = (idSting.length() > 5 ? idSting.substring(idSting.length() - 5) : idSting) + "-"
-            // + endpointId;
-            String label = "Matter Device";
-            if (vendorName != null && !vendorName.isEmpty()) {
-                label += " " + vendorName;
-            }
-            if (productName != null && !productName.isEmpty()) {
-                label += " " + productName;
-            }
-            if (nodeLabel != null && !nodeLabel.isEmpty()) {
-                label += " " + nodeLabel;
-            }
-            if (fixedLabel != null && !fixedLabel.isEmpty()) {
-                label += " " + fixedLabel;
-            }
-            String path = idSting + ":" + endpointId;
-            DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withLabel(label)
-                    .withProperty("nodeId", node.id.toString()).withProperty("endpointId", endpointId)
-                    .withProperty("path", path).withProperty("deviceTypes", deviceTypeIds)
-                    .withRepresentationProperty("path").withBridge(bridgeUID).build();
-            thingDiscovered(result);
-        }
-    }
-
     @Override
     protected void startScan() {
         startScan("");
@@ -151,5 +97,59 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
                 stopScan();
             });
         }
+    }
+
+    public void discoverBridgeEndpoint(ThingUID thingUID, ThingUID bridgeUID, Endpoint root) {
+        discoverThing(thingUID, bridgeUID, root, root.number.toString(), "endpointId", "Matter Bridged Device:");
+    }
+
+    public void discoverNodeDevice(ThingUID thingUID, ThingUID bridgeUID, Node node) {
+        discoverThing(thingUID, bridgeUID, node.rootEndpoint, node.id.toString(), "nodeId", "Matter Device:");
+    }
+
+    private void discoverThing(ThingUID thingUID, ThingUID bridgeUID, Endpoint root, String id,
+            String representationProperty, String label) {
+        logger.debug("discoverThing: {} {} {}", thingUID, bridgeUID);
+        String vendorName = "";
+        String productName = "";
+        String nodeLabel = "";
+        String fixedLabel = "";
+
+        BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
+        if (cluster != null && cluster instanceof BasicInformationCluster basicCluster) {
+            vendorName = basicCluster.vendorName;
+            productName = basicCluster.productName;
+            nodeLabel = basicCluster.nodeLabel;
+        } else {
+            cluster = root.clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
+            if (cluster != null && cluster instanceof BridgedDeviceBasicInformationCluster basicCluster) {
+                vendorName = basicCluster.vendorName;
+                productName = basicCluster.productName;
+                nodeLabel = basicCluster.nodeLabel;
+            }
+        }
+
+        if (root.clusters.get(FixedLabelCluster.CLUSTER_NAME) instanceof FixedLabelCluster fixedLabelCluster) {
+            fixedLabel = fixedLabelCluster.labelList.stream().map(l -> l.label + ": " + l.value)
+                    .collect(Collectors.joining(" "));
+        }
+
+        if (nodeLabel != null && !nodeLabel.isEmpty()) {
+            label += " " + nodeLabel;
+        } else {
+            if (vendorName != null && !vendorName.isEmpty()) {
+                label += " " + vendorName;
+            }
+            if (productName != null && !productName.isEmpty()) {
+                label += " " + productName;
+            }
+        }
+        if (fixedLabel != null && !fixedLabel.isEmpty()) {
+            label += " - " + fixedLabel;
+        }
+        DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withLabel(label)
+                .withProperty(representationProperty, id).withRepresentationProperty(representationProperty)
+                .withBridge(bridgeUID).build();
+        thingDiscovered(result);
     }
 }

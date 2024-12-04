@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_ONOFF_ONOFF;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ONOFF_ONOFF;
@@ -24,11 +24,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -39,20 +39,21 @@ import org.openhab.core.types.StateDescription;
 @NonNullByDefault
 public class OnOffConverter extends GenericConverter<OnOffCluster> {
 
-    public OnOffConverter(OnOffCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public OnOffConverter(OnOffCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_ONOFF_ONOFF.getId()), ITEM_TYPE_SWITCH)
-                .withType(CHANNEL_ONOFF_ONOFF).withLabel(CHANNEL_LABEL_ONOFF_ONOFF).build();
+                .withType(CHANNEL_ONOFF_ONOFF).withLabel(formatLabel(CHANNEL_LABEL_ONOFF_ONOFF)).build();
         return Collections.singletonMap(channel, null);
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
-            handler.sendClusterCommand(OnOffCluster.CLUSTER_NAME, onOffCommand);
+            handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
 
         }
     }

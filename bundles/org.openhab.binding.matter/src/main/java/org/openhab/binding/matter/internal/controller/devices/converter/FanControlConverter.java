@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
@@ -24,13 +24,13 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.FanControlCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.IncreaseDecreaseType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -47,15 +47,16 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public FanControlConverter(FanControlCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public FanControlConverter(FanControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
+            String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Map<Channel, @Nullable StateDescription> channels = new HashMap<>();
         Channel percentChannel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_FANCONTROL_PERCENT.getId()), ITEM_TYPE_DIMMER)
-                .withType(CHANNEL_FANCONTROL_PERCENT).withLabel(CHANNEL_LABEL_FANCONTROL_PERCENT).build();
+                .withType(CHANNEL_FANCONTROL_PERCENT).withLabel(formatLabel(CHANNEL_LABEL_FANCONTROL_PERCENT)).build();
         channels.put(percentChannel, null);
 
         if (cluster.fanModeSequence != null) {
@@ -130,12 +131,14 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
                         break;
                 }
             } else if (command instanceof PercentType percentType) {
-                handler.writeAttribute(FanControlCluster.CLUSTER_NAME, "percentSetting", percentType.toString());
+                handler.writeAttribute(endpointNumber, FanControlCluster.CLUSTER_NAME, "percentSetting",
+                        percentType.toString());
             }
         }
         if (channelUID.getId().equals(CHANNEL_FANCONTROL_MODE.getId())) {
             if (command instanceof DecimalType decimalType) {
-                handler.writeAttribute(FanControlCluster.CLUSTER_NAME, "fanMode", decimalType.toString());
+                handler.writeAttribute(endpointNumber, FanControlCluster.CLUSTER_NAME, "fanMode",
+                        decimalType.toString());
             }
         }
     }
@@ -165,6 +168,6 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
     }
 
     private void moveCommand(ClusterCommand command) {
-        handler.sendClusterCommand(FanControlCluster.CLUSTER_NAME, command);
+        handler.sendClusterCommand(endpointNumber, FanControlCluster.CLUSTER_NAME, command);
     }
 }

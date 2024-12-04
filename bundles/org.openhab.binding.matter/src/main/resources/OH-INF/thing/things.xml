@@ -7,12 +7,6 @@
 	<bridge-type id="controller">
 		<label>Matter Controller</label>
 		<description>The Matter Controller connects to Matter Nodes and Devices</description>
-
-		<channels>
-			<channel id="pair_code" typeId="pair_code"/>
-			<channel id="command" typeId="command"/>
-		</channels>
-
 		<config-description>
 			<parameter name="nodeId" type="text" required="true">
 				<label>Node ID</label>
@@ -30,49 +24,35 @@
 		</config-description>
 	</bridge-type>
 
-	<thing-type id="endpoint">
+	<bridge-type id="node">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="controller"/>
 		</supported-bridge-type-refs>
-		<label>Matter Endpoint</label>
-		<description>The Matter Endpoint describes a logical endpoint on a Matter </description>
+		<label>Matter Node</label>
+		<description>The Matter Node describes a logical node in a Matter Fabric</description>
 
-		<properties>
-			<property name="path"></property>
-			<property name="deviceTypes"></property>
-			<property name="externalPairCode"></property>
-		</properties>
-
-		<representation-property>path</representation-property>
+		<representation-property>nodeId</representation-property>
 
 		<config-description>
 			<parameter name="nodeId" type="text" required="true">
 				<label>Node Id</label>
 				<description>The Matter Node Id</description>
 			</parameter>
+		</config-description>
+	</bridge-type>
+
+	<thing-type id="bridge-endpoint">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="node"/>
+		</supported-bridge-type-refs>
+		<label>Matter Bridge Endpoint</label>
+		<description>A Matter Bridge Endpoint represented as a standalone Thing</description>
+		<representation-property>endpointId</representation-property>
+		<config-description>
 			<parameter name="endpointId" type="integer" required="true">
 				<label>Endpoint Id</label>
 				<description>The Matter Endpoint Id</description>
 			</parameter>
-			<parameter name="commissionMode" type="boolean">
-				<label>Commission Mode</label>
-				<description>Puts the device's parent node into commission mode for 3rd party systems to connect to. A temporary
-					pairing code will
-					be generated and available in this thing's properties</description>
-				<advanced>true</advanced>
-				<default>false</default>
-			</parameter>
 		</config-description>
 	</thing-type>
-
-	<channel-type id="pair_code">
-		<item-type>String</item-type>
-		<label>Pair Node with Code</label><!-- Use uppercase words, except prepositions. 2-3 words, max 25 chars -->
-		<description>Pairs a Matter Node with a device code</description>
-	</channel-type>
-	<channel-type id="command">
-		<item-type>String</item-type>
-		<label>Send a generic command</label><!-- Use uppercase words, except prepositions. 2-3 words, max 25 chars -->
-		<description>Send a generic command for testing</description>
-	</channel-type>
 </thing:thing-descriptions>

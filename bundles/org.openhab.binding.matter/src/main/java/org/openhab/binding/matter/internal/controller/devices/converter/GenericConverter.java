@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,15 +23,15 @@ import org.openhab.binding.matter.internal.client.EventTriggeredListener;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.ImperialUnits;
 import org.openhab.core.library.unit.SIUnits;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -48,14 +48,18 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
     private final static BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
 
     protected T cluster;
-    protected EndpointHandler handler;
+    protected MatterBaseThingHandler handler;
+    protected int endpointNumber;
+    protected String labelPrefix;
 
-    public GenericConverter(T cluster, EndpointHandler handler) {
+    public GenericConverter(T cluster, MatterBaseThingHandler handler, int endpointNumber, String labelPrefix) {
         this.cluster = cluster;
         this.handler = handler;
+        this.endpointNumber = endpointNumber;
+        this.labelPrefix = labelPrefix;
     }
 
-    public abstract Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID);
+    public abstract Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID);
 
     public abstract void handleCommand(ChannelUID channelUID, Command command);
 
@@ -76,7 +80,11 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
     }
 
     public final void updateState(ChannelTypeUID channelTypeUID, State state) {
-        handler.updateState(channelTypeUID.getId(), state);
+        handler.updateState(endpointNumber, channelTypeUID, state);
+    }
+
+    public final void triggerChannel(ChannelTypeUID channelTypeUID, String event) {
+        handler.triggerChannel(endpointNumber, channelTypeUID, event);
     }
 
     /**
@@ -141,5 +149,12 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
      */
     public static QuantityType valueToTemperature(int value) {
         return new QuantityType<>(BigDecimal.valueOf(value, 2), SIUnits.CELSIUS);
+    }
+
+    protected String formatLabel(String channelLabel) {
+        if (labelPrefix.trim().length() > 0) {
+            return labelPrefix.trim() + " - " + channelLabel;
+        }
+        return channelLabel;
     }
 }

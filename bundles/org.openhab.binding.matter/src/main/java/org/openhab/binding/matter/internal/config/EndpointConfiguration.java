@@ -22,11 +22,5 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class EndpointConfiguration {
 
-    public String nodeId = "0";
-
-    public int endpointId;
-
-    public Boolean commissionMode = false;
-
-    public String deviceTypes = "";
+    public Integer endpointId = 0;
 }

@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.devices.converter;
+package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE;
@@ -23,11 +23,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.RelativeHumidityMeasurementCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
-import org.openhab.binding.matter.internal.handler.EndpointHandler;
+import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
-import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -38,16 +38,17 @@ import org.openhab.core.types.StateDescription;
 @NonNullByDefault
 public class RelativeHumidityMeasurementConverter extends GenericConverter<RelativeHumidityMeasurementCluster> {
 
-    public RelativeHumidityMeasurementConverter(RelativeHumidityMeasurementCluster cluster, EndpointHandler handler) {
-        super(cluster, handler);
+    public RelativeHumidityMeasurementConverter(RelativeHumidityMeasurementCluster cluster,
+            MatterBaseThingHandler handler, int endpointNumber, String labelPrefix) {
+        super(cluster, handler, endpointNumber, labelPrefix);
     }
 
-    public Map<Channel, @Nullable StateDescription> createChannels(ThingUID thingUID) {
+    public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE.getId()),
                         ITEM_TYPE_NUMBER_TEMPERATURE)
                 .withType(CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE)
-                .withLabel(CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE).build();
+                .withLabel(formatLabel(CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE)).build();
         return Collections.singletonMap(channel, null);
     }
 
