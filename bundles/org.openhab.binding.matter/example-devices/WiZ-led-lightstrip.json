@@ -1,0 +1,739 @@
+{
+    "type": "response",
+    "message": {
+        "type": "resultSuccess",
+        "id": "dd5d35d9-6f79-416e-849f-5f9ae41ec15b",
+        "result": {
+            "id": "5480448090148895738",
+            "endpoints": {
+                "0": {
+                    "number": 0,
+                    "clusters": {
+                        "Descriptor": {
+                            "id": 29,
+                            "name": "Descriptor",
+                            "deviceTypeList": [
+                                {
+                                    "deviceType": 22,
+                                    "revision": 2
+                                }
+                            ],
+                            "serverList": [
+                                29,
+                                31,
+                                40,
+                                48,
+                                49,
+                                51,
+                                60,
+                                62,
+                                63,
+                                54
+                            ],
+                            "clientList": [],
+                            "partsList": [
+                                1
+                            ],
+                            "clusterRevision": 2,
+                            "featureMap": {
+                                "tagList": false
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        },
+                        "AccessControl": {
+                            "id": 31,
+                            "name": "AccessControl",
+                            "acl": [
+                                {
+                                    "privilege": 5,
+                                    "authMode": 2,
+                                    "subjects": [
+                                        "15535928020013973987"
+                                    ],
+                                    "targets": null,
+                                    "fabricIndex": 3
+                                }
+                            ],
+                            "subjectsPerAccessControlEntry": 4,
+                            "targetsPerAccessControlEntry": 3,
+                            "accessControlEntriesPerFabric": 4,
+                            "clusterRevision": 1,
+                            "featureMap": {},
+                            "attributeList": [
+                                0,
+                                2,
+                                4,
+                                3,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        },
+                        "BasicInformation": {
+                            "id": 40,
+                            "name": "BasicInformation",
+                            "dataModelRevision": 17,
+                            "vendorName": "Signify",
+                            "vendorId": 4107,
+                            "productName": "WiZ LED Strip",
+                            "productId": 8195,
+                            "nodeLabel": "",
+                            "location": "XX",
+                            "hardwareVersion": 0,
+                            "hardwareVersionString": "v1.0",
+                            "softwareVersion": 0,
+                            "softwareVersionString": "v1.0",
+                            "productLabel": "WiZ LED Strip",
+                            "uniqueId": "18d426447ef3cdda982d7d19b84182b3",
+                            "capabilityMinima": {
+                                "caseSessionsPerFabric": 3,
+                                "subscriptionsPerFabric": 3
+                            },
+                            "clusterRevision": 2,
+                            "featureMap": {},
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                0,
+                                6,
+                                1,
+                                2,
+                                3,
+                                4,
+                                7,
+                                8,
+                                9,
+                                10,
+                                19,
+                                65533,
+                                5,
+                                18,
+                                14
+                            ],
+                            "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        },
+                        "GeneralCommissioning": {
+                            "id": 48,
+                            "name": "GeneralCommissioning",
+                            "breadcrumb": 0,
+                            "basicCommissioningInfo": {
+                                "failSafeExpiryLengthSeconds": 60,
+                                "maxCumulativeFailsafeSeconds": 900
+                            },
+                            "regulatoryConfig": 0,
+                            "locationCapability": 0,
+                            "supportsConcurrentConnection": true,
+                            "clusterRevision": 1,
+                            "featureMap": {},
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                2,
+                                3,
+                                1,
+                                4,
+                                65533,
+                                0
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                2,
+                                4
+                            ],
+                            "generatedCommandList": [
+                                1,
+                                3,
+                                5
+                            ]
+                        },
+                        "NetworkCommissioning": {
+                            "id": 49,
+                            "name": "NetworkCommissioning",
+                            "maxNetworks": 1,
+                            "networks": [
+                                {
+                                    "networkId": "6d616e6f2d64652e64696f73",
+                                    "connected": true
+                                }
+                            ],
+                            "interfaceEnabled": true,
+                            "lastNetworkingStatus": 0,
+                            "lastNetworkId": "6d616e6f2d64652e64696f73",
+                            "lastConnectErrorValue": null,
+                            "scanMaxTimeSeconds": 10,
+                            "connectMaxTimeSeconds": 30,
+                            "clusterRevision": 1,
+                            "featureMap": {
+                                "wiFiNetworkInterface": true,
+                                "threadNetworkInterface": false,
+                                "ethernetNetworkInterface": false
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                2,
+                                4,
+                                6,
+                                8
+                            ],
+                            "generatedCommandList": [
+                                1,
+                                5,
+                                7
+                            ]
+                        },
+                        "GeneralDiagnostics": {
+                            "id": 51,
+                            "name": "GeneralDiagnostics",
+                            "networkInterfaces": [
+                                {
+                                    "name": "WIFI_STA_DEF",
+                                    "isOperational": true,
+                                    "offPremiseServicesReachableIPv4": null,
+                                    "offPremiseServicesReachableIPv6": null,
+                                    "hardwareAddress": "cc408529da6e",
+                                    "iPv4Addresses": [
+                                        "c0a82fe9"
+                                    ],
+                                    "iPv6Addresses": [
+                                        "fe80000000000000ce4085fffe29da6e",
+                                        "200300c89f032b00ce4085fffe29da6e"
+                                    ],
+                                    "type": 1
+                                }
+                            ],
+                            "rebootCount": 15,
+                            "testEventTriggersEnabled": false,
+                            "clusterRevision": 1,
+                            "featureMap": {
+                                "dataModelTest": false
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                8,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0
+                            ],
+                            "generatedCommandList": []
+                        },
+                        "AdministratorCommissioning": {
+                            "id": 60,
+                            "name": "AdministratorCommissioning",
+                            "windowStatus": 0,
+                            "adminFabricIndex": null,
+                            "adminVendorId": null,
+                            "clusterRevision": 1,
+                            "featureMap": {
+                                "basic": false
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                0,
+                                1,
+                                2,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                2,
+                                1
+                            ],
+                            "generatedCommandList": []
+                        },
+                        "OperationalCredentials": {
+                            "id": 62,
+                            "name": "OperationalCredentials",
+                            "nocs": [
+                                {
+                                    "noc": "153001010224020137032414001826044abfe82c2605caf5954137062415012711fafb4a5780760e4c182407012408013009410447100e0b89615fdba0744c7dcaa731214541d656eeb2a06f66d1b238791ff8e7d8c958002ea5239f2e6fdd16cad50d550f40ffd83b53fc40deb830640d908276370a350128011824020136030402040118300414d5922715221054d4f0d538fff7ae46339f97374a300514e96f41a137ffe4361944eee4dc5430c9ea90673718300b405fc833b9d898d3ed7f3ed04cbb3593936d26fc5972633819d7eef807fa3dd42cae738387edea039c801fae2574db2230f131cc1ebccb6556d9cc9ce0b594cd4c18",
+                                    "icac": null,
+                                    "fabricIndex": 3
+                                }
+                            ],
+                            "supportedFabrics": 5,
+                            "commissionedFabrics": 3,
+                            "currentFabricIndex": 3,
+                            "clusterRevision": 1,
+                            "featureMap": {},
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                0,
+                                2,
+                                3,
+                                1,
+                                4,
+                                5,
+                                65533
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                2,
+                                4,
+                                6,
+                                7,
+                                9,
+                                10,
+                                11
+                            ],
+                            "generatedCommandList": [
+                                1,
+                                3,
+                                5,
+                                8
+                            ]
+                        },
+                        "GroupKeyManagement": {
+                            "id": 63,
+                            "name": "GroupKeyManagement",
+                            "groupKeyMap": [],
+                            "groupTable": [],
+                            "maxGroupsPerFabric": 4,
+                            "maxGroupKeysPerFabric": 3,
+                            "clusterRevision": 2,
+                            "featureMap": {
+                                "cacheAndSync": false
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                0,
+                                1,
+                                2,
+                                3
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                3,
+                                4
+                            ],
+                            "generatedCommandList": [
+                                2,
+                                5
+                            ]
+                        },
+                        "WiFiNetworkDiagnostics": {
+                            "id": 54,
+                            "name": "WiFiNetworkDiagnostics",
+                            "bssid": "485d3560f3c0",
+                            "securityType": 0,
+                            "wiFiVersion": 3,
+                            "channelNumber": 13,
+                            "rssi": -50,
+                            "clusterRevision": 1,
+                            "featureMap": {
+                                "packetCounts": false,
+                                "errorCounts": false
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                65533
+                            ],
+                            "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        }
+                    }
+                },
+                "1": {
+                    "number": 1,
+                    "clusters": {
+                        "Descriptor": {
+                            "id": 29,
+                            "name": "Descriptor",
+                            "deviceTypeList": [
+                                {
+                                    "deviceType": 269,
+                                    "revision": 2
+                                }
+                            ],
+                            "serverList": [
+                                29,
+                                3,
+                                4,
+                                5,
+                                6,
+                                8,
+                                768
+                            ],
+                            "clientList": [],
+                            "partsList": [],
+                            "clusterRevision": 2,
+                            "featureMap": {
+                                "tagList": false
+                            },
+                            "attributeList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533
+                            ],
+                            "acceptedCommandList": [],
+                            "generatedCommandList": []
+                        },
+                        "Identify": {
+                            "id": 3,
+                            "name": "Identify",
+                            "identifyTime": 0,
+                            "identifyType": 1,
+                            "clusterRevision": 4,
+                            "featureMap": {},
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                0,
+                                1
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                64
+                            ],
+                            "generatedCommandList": []
+                        },
+                        "Groups": {
+                            "id": 4,
+                            "name": "Groups",
+                            "nameSupport": {
+                                "nameSupport": true
+                            },
+                            "clusterRevision": 4,
+                            "featureMap": {
+                                "groupNames": true
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                0
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5
+                            ],
+                            "generatedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3
+                            ]
+                        },
+                        "Unknown cluster 0x5": {
+                            "id": 5,
+                            "name": "Unknown cluster 0x5",
+                            "clusterRevision": 5,
+                            "featureMap": {},
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                6
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                64,
+                                65,
+                                66
+                            ],
+                            "generatedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                6
+                            ],
+                            "unknownAttribute_0x0": 0,
+                            "unknownAttribute_0x1": 0,
+                            "unknownAttribute_0x2": 0,
+                            "unknownAttribute_0x3": false,
+                            "unknownAttribute_0x4": 0,
+                            "unknownAttribute_0x6": 0
+                        },
+                        "OnOff": {
+                            "id": 6,
+                            "name": "OnOff",
+                            "onOff": false,
+                            "clusterRevision": 5,
+                            "featureMap": {
+                                "lighting": true,
+                                "deadFrontBehavior": false,
+                                "offOnly": false
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                0,
+                                16384,
+                                16385,
+                                16386,
+                                16387
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                2,
+                                64,
+                                65,
+                                66
+                            ],
+                            "generatedCommandList": [],
+                            "globalSceneControl": true,
+                            "onTime": 0,
+                            "offWaitTime": 0,
+                            "startUpOnOff": 0
+                        },
+                        "LevelControl": {
+                            "id": 8,
+                            "name": "LevelControl",
+                            "currentLevel": 254,
+                            "maxLevel": 254,
+                            "options": {
+                                "executeIfOff": false,
+                                "coupleColorTempToLevel": false
+                            },
+                            "onOffTransitionTime": 0,
+                            "onLevel": 254,
+                            "onTransitionTime": 0,
+                            "offTransitionTime": 0,
+                            "clusterRevision": 5,
+                            "featureMap": {
+                                "onOff": true,
+                                "lighting": true,
+                                "frequency": false
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                0,
+                                17,
+                                15,
+                                1,
+                                2,
+                                3,
+                                16384,
+                                18,
+                                19,
+                                16
+                            ],
+                            "acceptedCommandList": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7
+                            ],
+                            "generatedCommandList": [],
+                            "minLevel": 1,
+                            "remainingTime": 0,
+                            "startUpCurrentLevel": 0
+                        },
+                        "ColorControl": {
+                            "id": 768,
+                            "name": "ColorControl",
+                            "remainingTime": 0,
+                            "colorMode": 0,
+                            "options": {
+                                "executeIfOff": false
+                            },
+                            "numberOfPrimaries": 3,
+                            "primary1X": 41943,
+                            "primary1Y": 21626,
+                            "primary1Intensity": 254,
+                            "primary2X": 19660,
+                            "primary2Y": 39321,
+                            "primary2Intensity": 254,
+                            "primary3X": 9830,
+                            "primary3Y": 3932,
+                            "primary3Intensity": 254,
+                            "enhancedColorMode": 0,
+                            "colorCapabilities": {
+                                "hueSaturation": true,
+                                "enhancedHue": true,
+                                "colorLoop": true,
+                                "xy": true,
+                                "colorTemperature": true
+                            },
+                            "clusterRevision": 6,
+                            "featureMap": {
+                                "hueSaturation": true,
+                                "enhancedHue": true,
+                                "colorLoop": true,
+                                "xy": true,
+                                "colorTemperature": true
+                            },
+                            "attributeList": [
+                                65528,
+                                65529,
+                                65531,
+                                65532,
+                                65533,
+                                8,
+                                15,
+                                16385,
+                                16394,
+                                16,
+                                2,
+                                17,
+                                18,
+                                19,
+                                21,
+                                22,
+                                23,
+                                25,
+                                26,
+                                27,
+                                7,
+                                16395,
+                                16396,
+                                16397,
+                                16400,
+                                3,
+                                4,
+                                0,
+                                1,
+                                16384,
+                                16386,
+                                16387,
+                                16388,
+                                16389,
+                                16390
+                            ],
+                            "acceptedCommandList": [
+                                71,
+                                10,
+                                75,
+                                76,
+                                7,
+                                8,
+                                9,
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                64,
+                                65,
+                                66,
+                                67,
+                                68
+                            ],
+                            "generatedCommandList": [],
+                            "currentHue": 138,
+                            "currentSaturation": 5,
+                            "currentX": 24939,
+                            "currentY": 24701,
+                            "colorTemperatureMireds": 153,
+                            "enhancedCurrentHue": 0,
+                            "colorLoopActive": 0,
+                            "colorLoopDirection": 0,
+                            "colorLoopTime": 25,
+                            "colorLoopStartEnhancedHue": 8960,
+                            "colorLoopStoredEnhancedHue": 0,
+                            "colorTempPhysicalMinMireds": 153,
+                            "colorTempPhysicalMaxMireds": 370,
+                            "coupleColorTempToLevelMinMireds": 0,
+                            "startUpColorTemperatureMireds": 250
+                        }
+                    }
+                }
+            }
+        },
+        "error": "undefined"
+    }
+}
