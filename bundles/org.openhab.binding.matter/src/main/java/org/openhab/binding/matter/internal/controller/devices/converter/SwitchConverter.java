@@ -12,14 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_SWITCH;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_SWITCH;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -32,6 +27,7 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
+import org.openhab.core.thing.type.ChannelKind;
 import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
@@ -53,6 +49,34 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
     }
 
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
+        final Map<Channel, @Nullable StateDescription> map = new HashMap<>();
+        Map<ChannelTypeUID, String> triggerChannels = new HashMap<>();
+        // See cluster specification table 1.13.4. Switch Features
+        if (cluster.featureMap.latchingSwitch) {
+            triggerChannels.put(CHANNEL_SWITCH_SWITCHLATECHED, CHANNEL_LABEL_SWITCH_SWITCHLATECHED);
+        }
+        if (cluster.featureMap.momentarySwitch) {
+            triggerChannels.put(CHANNEL_SWITCH_INITIALPRESS, CHANNEL_LABEL_SWITCH_INITIALPRESS);
+        }
+        if (cluster.featureMap.momentarySwitchRelease) {
+            triggerChannels.put(CHANNEL_SWITCH_SHORTRELEASE, CHANNEL_LABEL_SWITCH_SHORTRELEASE);
+
+        }
+        if (cluster.featureMap.momentarySwitchLongPress) {
+            triggerChannels.put(CHANNEL_SWITCH_LONGPRESS, CHANNEL_LABEL_SWITCH_LONGPRESS);
+            triggerChannels.put(CHANNEL_SWITCH_LONGRELEASE, CHANNEL_LABEL_SWITCH_LONGRELEASE);
+
+        }
+        if (cluster.featureMap.momentarySwitchMultiPress) {
+            triggerChannels.put(CHANNEL_SWITCH_MULTIPRESSCOMPLETE, CHANNEL_LABEL_SWITCH_MULTIPRESSCOMPLETE);
+            triggerChannels.put(CHANNEL_SWITCH_MULTIPRESSONGOING, CHANNEL_LABEL_SWITCH_MULTIPRESSONGOING);
+        }
+        triggerChannels
+                .forEach((type,
+                        label) -> map.put(ChannelBuilder.create(new ChannelUID(thingUID, type.getId()), null)
+                                .withType(type).withLabel(formatLabel(label)).withKind(ChannelKind.TRIGGER).build(),
+                                null));
+
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_SWITCH_SWITCH.getId()), ITEM_TYPE_NUMBER)
                 .withType(CHANNEL_SWITCH_SWITCH).withLabel(formatLabel(CHANNEL_LABEL_SWITCH_SWITCH)).build();
@@ -64,7 +88,10 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
 
         StateDescription stateDescriptionMode = StateDescriptionFragmentBuilder.create().withPattern("%d")
                 .withOptions(options).build().toStateDescription();
-        return Collections.singletonMap(channel, stateDescriptionMode);
+
+        map.put(channel, stateDescriptionMode);
+
+        return map;
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {

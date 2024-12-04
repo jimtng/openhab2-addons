@@ -149,16 +149,30 @@ public class MatterBindingConstants {
 
     public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCH = new ChannelTypeUID("matter:switch-switch");
+
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCHLATECHED = new ChannelTypeUID(
             "matter:switch-switchlatched");
+    public static final String CHANNEL_LABEL_SWITCH_SWITCHLATECHED = "Switch Latched Trigger";
+
     public static final ChannelTypeUID CHANNEL_SWITCH_INITIALPRESS = new ChannelTypeUID("matter:switch-initialpress");
+    public static final String CHANNEL_LABEL_SWITCH_INITIALPRESS = "Initial Press Trigger";
+
     public static final ChannelTypeUID CHANNEL_SWITCH_LONGPRESS = new ChannelTypeUID("matter:switch-longpress");
+    public static final String CHANNEL_LABEL_SWITCH_LONGPRESS = "Long Press Trigger";
+
     public static final ChannelTypeUID CHANNEL_SWITCH_SHORTRELEASE = new ChannelTypeUID("matter:switch-shortrelease");
+    public static final String CHANNEL_LABEL_SWITCH_SHORTRELEASE = "Short Release Trigger";
+
     public static final ChannelTypeUID CHANNEL_SWITCH_LONGRELEASE = new ChannelTypeUID("matter:switch-longrelease");
+    public static final String CHANNEL_LABEL_SWITCH_LONGRELEASE = "Long Release Trigger";
+
     public static final ChannelTypeUID CHANNEL_SWITCH_MULTIPRESSONGOING = new ChannelTypeUID(
             "matter:switch-multipressongoing");
+    public static final String CHANNEL_LABEL_SWITCH_MULTIPRESSONGOING = "Multi-press Ongoing Trigger";
+
     public static final ChannelTypeUID CHANNEL_SWITCH_MULTIPRESSCOMPLETE = new ChannelTypeUID(
             "matter:switch-multipresscomplete");
+    public static final String CHANNEL_LABEL_SWITCH_MULTIPRESSCOMPLETE = "Multi-press Complete Trigger";
 
     public static final String ITEM_TYPE_COLOR = "Color";
     public static final String ITEM_TYPE_CONTACT = "Contact";

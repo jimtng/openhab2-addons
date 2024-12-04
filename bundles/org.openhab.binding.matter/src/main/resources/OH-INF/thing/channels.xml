@@ -150,7 +150,8 @@
 		<autoUpdatePolicy>veto</autoUpdatePolicy>
 	</channel-type>
 
-	<!--Mode Select Mode -->
+	<!--Mode
+		Select Mode -->
 	<channel-type id="modeselect-mode">
 		<item-type>Number</item-type>
 		<label>Mode Select</label>
@@ -158,7 +159,8 @@
 		<state pattern="%d" readOnly="false"/>
 	</channel-type>
 
-	<!--Switch Switch -->
+	<!--Switch
+		Switch -->
 	<channel-type id="switch-switch">
 		<item-type>Number</item-type>
 		<label>Switch</label>
@@ -411,6 +413,41 @@
 		<description>Wi-Fi signal strength indicator.</description>
 		<category>QualityOfService</category>
 		<state readOnly="true" pattern="%d %unit%"></state>
+	</channel-type>
+
+	<channel-type id="switch-switchlatched">
+		<kind>trigger</kind>
+		<label>Switch Latched Trigger Channel</label>
+	</channel-type>
+
+	<channel-type id="switch-initialpress">
+		<kind>trigger</kind>
+		<label>Initial Press Trigger Channel</label>
+	</channel-type>
+
+	<channel-type id="switch-longpress">
+		<kind>trigger</kind>
+		<label>Long Press Trigger Channel</label>
+	</channel-type>
+
+	<channel-type id="switch-shortrelease">
+		<kind>trigger</kind>
+		<label>Short Release Trigger Channel</label>
+	</channel-type>
+
+	<channel-type id="switch-longrelease">
+		<kind>trigger</kind>
+		<label>Long Release Trigger Channel</label>
+	</channel-type>
+
+	<channel-type id="switch-multipressongoing">
+		<kind>trigger</kind>
+		<label>Multi-Press Ongoing Trigger Channel</label>
+	</channel-type>
+
+	<channel-type id="switch-multipresscomplete">
+		<kind>trigger</kind>
+		<label>Multi-press Complete Trigger Channel</label>
 	</channel-type>
 
 </thing:thing-descriptions>
