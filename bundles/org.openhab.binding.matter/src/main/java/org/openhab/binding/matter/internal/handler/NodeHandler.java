@@ -102,15 +102,7 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         return Set.of(MatterEndpointActions.class);
     }
 
-    public void updateNode(Node node) {
-        if (getThing().getStatus() != ThingStatus.ONLINE) {
-            logger.debug("Setting Online {}", getNodeId());
-            updateStatus(ThingStatus.ONLINE);
-        }
-        updateRootProperties(node.rootEndpoint);
-        updateEndpoint(node.rootEndpoint);
-    }
-
+    @Override
     protected boolean shouldAddEndpoint(Endpoint endpoint) {
         if (endpoint.clusters.containsKey(BridgedDeviceBasicInformationCluster.CLUSTER_NAME)) {
             updateBridgeEndpoint(endpoint);
@@ -125,7 +117,7 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         if (bridge != null) {
             bridge.removeNode(nodeId, true);
         }
-        updateStatus(ThingStatus.REMOVED);
+        super.handleRemoval();
     }
 
     @Override
@@ -164,6 +156,15 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         } else {
             super.onEvent(message);
         }
+    }
+
+    public void updateNode(Node node) {
+        if (getThing().getStatus() != ThingStatus.ONLINE) {
+            logger.debug("Setting Online {}", getNodeId());
+            updateStatus(ThingStatus.ONLINE);
+        }
+        updateRootProperties(node.rootEndpoint);
+        updateEndpoint(node.rootEndpoint);
     }
 
     private void updateBridgeEndpoint(Endpoint endpoint) {

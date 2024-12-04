@@ -103,7 +103,7 @@ public class BridgeEndpointHandler extends MatterBaseThingHandler {
         return endpointId;
     }
 
-    protected @Nullable NodeHandler nodeHandler() {
+    private @Nullable NodeHandler nodeHandler() {
         Bridge bridge = getBridge();
         if (bridge != null) {
             BridgeHandler handler = bridge.getHandler();
