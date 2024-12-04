@@ -146,11 +146,13 @@ This describes the Matter controller functionality for discovering and controlle
 The Matter Binding supports the following types of things:
 
 - `controller`: The main controller that interfaces with Matter devices. It requires the configuration parameter  `nodeId` which sets the local Matter node ID for this controller (must be unique in the fabric).
-- `endpoint`: Represents an individual endpoint within the Matter network. Configuration parameters include `nodeId` and `endpointId`.
+- `node`: Represents an individual Node within the Matter network. The only configuration parameter is `nodeId`.
+- `bridge-endpoint`: Represents an individual bridged endpoint as a child of a `node` thing. Configuration parameters include `endpointId`.
 
 ## Discovery
 
-Matter controllers must be added manually.  Endpoint (devices) will be discovered when a `pairCode` is used to search for a device to add. 
+Matter controllers must be added manually.  Nodes (devices) will be discovered when a `pairCode` is used to search for a device to add. 
+Bridged endpoints will be added to the inbox once the parent Node is added as a thing.
 
 ### Device Pairing: General
 
@@ -181,13 +183,20 @@ The controller thing must be created manually before devices can be discovered.
 | nodeId                    | number  | The matter node ID for this controller                                                                                            | 0       | yes      | no       |
 | decommissionNodesOnDelete | boolean | Decommission (unpair) Matter nodes from the Matter network when the last endpoint thing of a node is deleted/removed from openHAB | false    | yes      | no       |
 
-### Endpoint Thing Configuration
+### Node Thing Configuration
 
 Endpoints are discovered automatically (see [Discovery](#Discovery) for more information).
 
 | Name       | Type   | Description                        | Default | Required | Advanced |
 |------------|--------|------------------------------------|---------|----------|----------|
 | nodeId     | text   | The node ID of the endpoint        | N/A     | yes      | no       |
+
+### Bridge Endpoint Thing Configuration
+
+Bridge Endpoints are discovered automatically once their parent Node has been added (see [Discovery](#Discovery) for more information).
+
+| Name       | Type   | Description                        | Default | Required | Advanced |
+|------------|--------|------------------------------------|---------|----------|----------|
 | endpointId | number | The endpoint ID within the node    | N/A     | yes      | no       |
 
 ## Channels
@@ -195,8 +204,8 @@ Endpoints are discovered automatically (see [Discovery](#Discovery) for more inf
 ### Controller Channels
 Controller have no channels.
 
-### Endpoint Channels
-Endpoint channels are dynamically added based on the endpoint type and matter cluster supported.
+### Node and Bridge Endpoint Channels
+Channels are dynamically added based on the endpoint type and matter cluster supported. Each endpoint is represented as a channel group.
 Possible channels include:
 
 ## Endpoint Channels
@@ -244,15 +253,20 @@ Possible channels include:
 ### Thing Configuration
 ```java
 Thing configuration example for the Matter controller:
-Thing matter:controller:myController [ nodeId="1" ]
+Thing matter:controller:main [ nodeId="1" ]
 
-Thing configuration example for a Matter endpoint:
-Thing matter:endpoint:myEndpoint [ nodeId="12345678901234567890", endpointId=1 ]
+Thing configuration example for a Matter node:
+Thing matter:node:main:12345678901234567890 [ nodeId="12345678901234567890"]
+
+Thing configuration example for a Matter bridge endpoint:
+Thing matter:bridge-endpoint:main:12345678901234567890:2 [ endpointId=2]
 ```
 
 ### Item Configuration
 ```java
-Dimmer MyEndpointDimmer "My Endpoint Dimmer" { channel="matter:endpoint:myController:myEndpoint:levelcontrol-level" }
+Dimmer MyDimmer "My Endpoint Dimmer" { channel="matter:node:main:12345678901234567890:1#levelcontrol-level" }
+Dimmer MyBridgedDimmer "My Bridged Dimmer" { channel="matter:bridge-endpoint:main:12345678901234567890:2#levelcontrol-level" }
+
 ```
 
 ### Sitemap Configuration
