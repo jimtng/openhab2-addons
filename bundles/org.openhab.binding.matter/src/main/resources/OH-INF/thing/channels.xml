@@ -405,7 +405,7 @@
 		<state readOnly="true"></state>
 	</channel-type>
 
-	<channel-type id="wififnetworkdiagnostics-rssi" advanced="true">
+	<channel-type id="wififnetworkdiagnostics-rssi">
 		<item-type unitHint="dBm">Number:Power</item-type>
 		<label>Signal</label>
 		<description>Wi-Fi signal strength indicator.</description>

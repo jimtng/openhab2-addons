@@ -278,9 +278,11 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         // add channels, which will be used by the calling 'updateEndpoint' function
         channels.addAll(deviceType.createChannels(endpoint.number, clusters, channelGroupUID));
 
-        // add the state descriptions of channels to our custom stateDescriptionProvider
         final DeviceType dt = deviceType;
+        // give the cluster their initial values
         clusters.forEach((clusterName, cluster) -> dt.updateCluster(cluster));
+
+        // add the state descriptions of channels to our custom stateDescriptionProvider
         deviceType.getStateDescriptions().forEach((channelUID, stateDescription) -> {
             if (stateDescription != null) {
                 Optional.ofNullable(stateDescription.getOptions())
