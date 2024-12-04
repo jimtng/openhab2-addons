@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.RelativeHumidityMeasurementCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
+import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
@@ -68,8 +69,8 @@ public class RelativeHumidityMeasurementConverter extends GenericConverter<Relat
         updateState(CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE, humidityToPercent(cluster.measuredValue));
     }
 
-    private PercentType humidityToPercent(Number number) {
+    private DecimalType humidityToPercent(Number number) {
         int value = number.intValue();
-        return new PercentType(value == 0 ? 0 : value / 100);
+        return new DecimalType(value == 0 ? 0 : value / 100);
     }
 }
