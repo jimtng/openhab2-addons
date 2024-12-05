@@ -185,7 +185,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {
-        String id = channelUID.getId();
+        String id = channelUID.getIdWithoutGroup();
         if (id.equals(CHANNEL_THERMOSTAT_SYSTEMMODE.getId())) {
             handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "systemMode", command.toString());
             return;

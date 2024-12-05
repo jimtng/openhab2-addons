@@ -136,7 +136,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             // new OptionsBitmap(true, true), new OptionsBitmap(true, true));
             // handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
         } else if (command instanceof PercentType percentType) {
-            if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE.getId())) {
+            if (channelUID.getIdWithoutGroup().equals(CHANNEL_COLOR_TEMPERATURE.getId())) {
                 ClusterCommand tempCommand = ColorControlCluster
                         .moveToColorTemperature(percentTypeToMireds(percentType), 0, optionsMask, optionsMask);
                 handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME, tempCommand);
@@ -145,12 +145,12 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                         optionsBitmap, optionsBitmap);
                 handler.sendClusterCommand(endpointNumber, LevelControlCluster.CLUSTER_NAME, levelCommand);
             }
-        } else if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
+        } else if (channelUID.getIdWithoutGroup().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
                 && command instanceof DecimalType decimal) {
             ClusterCommand tempCommand = ColorControlCluster.moveToColorTemperature(decimal.intValue(), 0, optionsMask,
                     optionsMask);
             handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME, tempCommand);
-        } else if (channelUID.getId().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
+        } else if (channelUID.getIdWithoutGroup().equals(CHANNEL_COLOR_TEMPERATURE_ABS.getId())
                 && command instanceof QuantityType<?> quantity) {
             quantity = quantity.toInvertibleUnit(Units.MIRED);
             if (quantity != null) {

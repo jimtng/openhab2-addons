@@ -118,7 +118,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (channelUID.getId().equals(CHANNEL_FANCONTROL_PERCENT.getId())) {
+        if (channelUID.getIdWithoutGroup().equals(CHANNEL_FANCONTROL_PERCENT.getId())) {
             if (command instanceof IncreaseDecreaseType increaseDecreaseType) {
                 switch (increaseDecreaseType) {
                     case INCREASE:
@@ -135,7 +135,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
                         percentType.toString());
             }
         }
-        if (channelUID.getId().equals(CHANNEL_FANCONTROL_MODE.getId())) {
+        if (channelUID.getIdWithoutGroup().equals(CHANNEL_FANCONTROL_MODE.getId())) {
             if (command instanceof DecimalType decimalType) {
                 handler.writeAttribute(endpointNumber, FanControlCluster.CLUSTER_NAME, "fanMode",
                         decimalType.toString());
