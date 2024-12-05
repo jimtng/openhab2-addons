@@ -14,10 +14,12 @@ package org.openhab.binding.matter.internal;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.core.storage.StorageService;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.AbstractStorageBasedTypeProvider;
@@ -44,14 +46,16 @@ public class MatterChannelTypeProvider extends AbstractStorageBasedTypeProvider 
         this.thingTypeRegistry = thingTypeRegistry;
     }
 
-    public ThingTypeBuilder derive(ThingTypeUID newTypeId, ThingTypeUID baseTypeId) {
+    public ThingTypeBuilder derive(ThingTypeUID newTypeId, ThingTypeUID baseTypeId,
+            @Nullable List<String> supportedBridgeTypeUIDs) {
         ThingType baseType = thingTypeRegistry.getThingType(baseTypeId);
 
         ThingTypeBuilder result = ThingTypeBuilder.instance(newTypeId, baseType.getLabel())
                 .withChannelGroupDefinitions(baseType.getChannelGroupDefinitions())
                 .withChannelDefinitions(baseType.getChannelDefinitions())
                 .withExtensibleChannelTypeIds(baseType.getExtensibleChannelTypeIds())
-                .withSupportedBridgeTypeUIDs(baseType.getSupportedBridgeTypeUIDs())
+                .withSupportedBridgeTypeUIDs(supportedBridgeTypeUIDs != null ? supportedBridgeTypeUIDs
+                        : baseType.getSupportedBridgeTypeUIDs())
                 .withProperties(baseType.getProperties()).isListed(false);
 
         String representationProperty = baseType.getRepresentationProperty();

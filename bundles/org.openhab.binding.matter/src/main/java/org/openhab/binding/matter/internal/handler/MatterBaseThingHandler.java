@@ -134,6 +134,7 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
     public void handleRemoval() {
         channelTypeProvider.removeThingType(getThing().getThingTypeUID());
         channelTypeProvider.removeChannelGroupTypesForPrefix(thing.getThingTypeUID().getId());
+        super.handleRemoval();
     }
 
     @Override
@@ -193,7 +194,12 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         if (baseThingTypeUID == null) {
             throw new RuntimeException("Could not resolve base thing type for " + getThing().getThingTypeUID());
         }
-        ThingTypeBuilder thingTypeBuilder = channelTypeProvider.derive(dynamicThingTypeUID, baseThingTypeUID);
+
+        // create our dynamic thing from defaults from the xml defined thing, along with the dynamic type of the bridge
+        // thing
+        ThingTypeBuilder thingTypeBuilder = channelTypeProvider.derive(dynamicThingTypeUID, baseThingTypeUID, Optional
+                .ofNullable(getBridge()).map(bridge -> List.of(bridge.getThingTypeUID().toString())).orElse(null));
+
         thingTypeBuilder.withChannelGroupDefinitions(groupDefs);
         channelTypeProvider.putThingType(isBridgeType() ? thingTypeBuilder.buildBridge() : thingTypeBuilder.build());
         channelTypeProvider.updateChannelGroupTypesForPrefix(dynamicThingTypeUID.getId(), groupTypes);

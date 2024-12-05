@@ -62,12 +62,12 @@ public class ThermostatDevice extends GenericDevice {
             if (item != null) {
                 // State state = TypeParser.parseState(item.getAcceptedDataTypes(), data.toString());
                 switch (pathName) {
-                    case "thermostat.localTemperature":
-                    case "thermostat.outdoorTemperature":
                     case "thermostat.occupiedHeatingSetpoint":
                     case "thermostat.occupiedCoolingSetpoint":
-                        QuantityType t = valueToTemperature(Float.valueOf(data.toString()).intValue());
-                        item.setState(t);
+                        if (item instanceof NumberItem numberItem) {
+                            QuantityType t = valueToTemperature(Float.valueOf(data.toString()).intValue());
+                            numberItem.send(t);
+                        }
                         break;
                     case "thermostat.systemMode":
                         try {
