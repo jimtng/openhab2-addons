@@ -46,6 +46,15 @@ public class MatterChannelTypeProvider extends AbstractStorageBasedTypeProvider 
         this.thingTypeRegistry = thingTypeRegistry;
     }
 
+    /**
+     * Clone the defaults from a XML defined thing (baseType). Optionally pass in bridgeTypes of parent things that are
+     * dynamic and not defined in xml
+     * 
+     * @param newTypeId
+     * @param baseTypeId
+     * @param supportedBridgeTypeUIDs
+     * @return
+     */
     public ThingTypeBuilder derive(ThingTypeUID newTypeId, ThingTypeUID baseTypeId,
             @Nullable List<String> supportedBridgeTypeUIDs) {
         ThingType baseType = thingTypeRegistry.getThingType(baseTypeId);
