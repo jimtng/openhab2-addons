@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_ILLUMINANCE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +31,9 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link IlluminanceMeasurementConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class IlluminanceMeasurementConverter extends GenericConverter<IlluminanceMeasurementCluster> {
@@ -43,6 +43,7 @@ public class IlluminanceMeasurementConverter extends GenericConverter<Illuminanc
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE.getId()),
@@ -52,9 +53,11 @@ public class IlluminanceMeasurementConverter extends GenericConverter<Illuminanc
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "measuredValue":
@@ -63,6 +66,7 @@ public class IlluminanceMeasurementConverter extends GenericConverter<Illuminanc
         }
     }
 
+    @Override
     public void updateCluster(IlluminanceMeasurementCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE, new DecimalType(cluster.maxMeasuredValue));

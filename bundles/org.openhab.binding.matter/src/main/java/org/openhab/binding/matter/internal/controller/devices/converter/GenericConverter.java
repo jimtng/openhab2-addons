@@ -40,14 +40,16 @@ import org.openhab.core.types.State;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link GenericConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  *
  *         Converters are responsible for converting Matter cluster commands and attributes into openHAB commands and
  *         vice versa.
  */
 @NonNullByDefault
 public abstract class GenericConverter<T extends BaseCluster> implements AttributeListener, EventTriggeredListener {
-    private final static BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
+    private static final BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
 
     protected T cluster;
     protected MatterBaseThingHandler handler;

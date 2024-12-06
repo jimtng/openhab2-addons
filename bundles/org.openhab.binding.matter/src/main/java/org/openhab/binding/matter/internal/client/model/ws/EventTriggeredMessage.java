@@ -13,8 +13,9 @@
 package org.openhab.binding.matter.internal.client.model.ws;
 
 /**
- * @author Dan Cunningham
+ * EventTriggeredMessage
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class EventTriggeredMessage {
     public Path path;

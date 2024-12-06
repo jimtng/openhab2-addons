@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_LEVEL_LEVEL;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LEVEL_LEVEL;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_DIMMER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -38,8 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
- * 
+ * The {@link LevelControlConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class LevelControlConverter extends GenericConverter<LevelControlCluster> {
@@ -51,13 +50,14 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
-
         Channel channel = ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_LEVEL_LEVEL.getId()), ITEM_TYPE_DIMMER)
                 .withType(CHANNEL_LEVEL_LEVEL).withLabel(formatLabel(CHANNEL_LABEL_LEVEL_LEVEL)).build();
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof OnOffType onOffType) {
             ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(onOffType == OnOffType.OFF ? 0 : 100,
@@ -70,6 +70,7 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
         }
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "currentLevel":
@@ -80,6 +81,7 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
         }
     }
 
+    @Override
     public void updateCluster(LevelControlCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_LEVEL_LEVEL, levelToPercent(cluster.currentLevel));

@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component(service = MatterWebsocketService.class, scope = ServiceScope.SINGLETON)
 public class MatterWebsocketService {
-    private static final Logger logger = LoggerFactory.getLogger(MatterWebsocketService.class);
+    private final Logger logger = LoggerFactory.getLogger(MatterWebsocketService.class);
     private static final Pattern LOG_PATTERN = Pattern
             .compile("^\\S+\\s+\\S+\\s+(TRACE|DEBUG|INFO|WARN|ERROR)\\s+(\\S+)\\s+(.*)$");
     private static final String MATTER_JS_PATH = "/matter-server/matter.js";

@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * AdministratorCommissioning
@@ -198,11 +197,10 @@ public class AdministratorCommissioningCluster extends BaseCluster {
      * expiry of Fail-Safe timer”.
      */
     public static ClusterCommand revokeCommissioning() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("revokeCommissioning");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

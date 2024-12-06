@@ -12,7 +12,12 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -33,22 +38,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
- * 
+ * @author Dan Cunningham - Initial contribution
+ *
  *         A Matter Device type is a grouping of clusters that represent a single device, like a thermostat, Light,
  *         etc. This classification specifies which clusters are mandatory and which are optional for a given device
  *         type, although devices can have any number or type of Matter clusters. This is suppose to ease client
  *         development by providing a common interface for interacting with common devices types.
- * 
+ *
  *         The DeviceType class coordinates sending openHAB commands to Matter clusters and updating openHAB channels
  *         based on Matter cluster events. Some device types like lighting devices require coordination among their
  *         clusters, others do not. A DeviceType Class depends on one or more GenericConverter classes to handle the
  *         conversion of Matter cluster events to openHAB channel updates and openHAB channel commands to Matter cluster
  *         commands.
- * 
+ *
  *         Typically, we map a single openHAB channel or item type, like Color, which accepts multiple command types:
  *         HSB,Percent, and OnOff to multiple Matter clusters, like ColorControl and LevelControl and OnOffControl
- * 
+ *
  *         Most Device types need little coordination so the default logic (and GenericType instance) will suffice, but
  *         this can be overridden to provide custom logic for more complex devices (like lighting)
  */
@@ -72,14 +77,14 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.debug("Handling command for channel: " + channelUID);
+        logger.debug("Handling command for channel: {}", channelUID);
         Optional.ofNullable(channelUIDToConverters.get(channelUID))
                 .ifPresent(converter -> converter.handleCommand(channelUID, command));
     }
 
     /**
      * Update the cluster with new data
-     * 
+     *
      * @param cluster
      */
     public void updateCluster(BaseCluster cluster) {
@@ -89,7 +94,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
             GenericConverter<BaseCluster> specificConverter = (GenericConverter<BaseCluster>) converter;
             specificConverter.updateCluster(cluster);
         } else {
-            logger.debug("updateCluster: finished processing for cluster: " + cluster.id);
+            logger.debug("updateCluster: finished processing for cluster: {}", cluster.id);
         }
     }
 
@@ -99,7 +104,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
         if (converter != null) {
             converter.onEvent(message);
         } else {
-            logger.debug("onEvent: No converter found for cluster: " + message.path.clusterId);
+            logger.debug("onEvent: No converter found for cluster: {}", message.path.clusterId);
         }
     }
 
@@ -109,13 +114,13 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
         if (converter != null) {
             converter.onEvent(message);
         } else {
-            logger.debug("onEvent: No converter found for cluster: " + message.path.clusterId);
+            logger.debug("onEvent: No converter found for cluster: {}", message.path.clusterId);
         }
     }
 
     /**
      * Create openHAB channels for the device type based on the clusters provided
-     * 
+     *
      * @param clusters
      */
     public final List<Channel> createChannels(Integer endpointNumber, Map<String, BaseCluster> clusters,
@@ -125,10 +130,10 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
         List<Channel> existingChannels = new ArrayList<>();
         String label = "";
         clusters.forEach((clusterName, cluster) -> {
-            logger.debug("Creating channels for cluster: " + clusterName);
+            logger.debug("Creating channels for cluster: {}", clusterName);
             GenericConverter<? extends BaseCluster> converter = createConverter(cluster, clusters, label);
             if (converter != null) {
-                logger.debug("Converter found for cluster: " + clusterName);
+                logger.debug("Converter found for cluster: {}", clusterName);
                 Map<Channel, @Nullable StateDescription> converterChannels = converter.createChannels(channelGroupUID);
                 for (Channel channel : converterChannels.keySet()) {
                     channelUIDToConverters.put(channel.getUID(), converter);
@@ -139,7 +144,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
                     if (!hasMatchingUID) {
                         existingChannels.add(channel);
                     } else {
-                        logger.debug(clusterName + " channel already exists: " + channel.getUID());
+                        logger.debug("{} channel already exists: {}", clusterName, channel.getUID());
                     }
                 }
             }

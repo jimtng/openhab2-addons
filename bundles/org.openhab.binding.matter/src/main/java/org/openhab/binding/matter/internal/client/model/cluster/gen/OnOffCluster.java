@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OnOff
@@ -240,20 +239,14 @@ public class OnOffCluster extends BaseCluster {
 
     // commands
     public static ClusterCommand off() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("off");
     }
 
     public static ClusterCommand on() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("on");
     }
 
     public static ClusterCommand toggle() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("toggle");
     }
 
@@ -272,8 +265,6 @@ public class OnOffCluster extends BaseCluster {
      * This command allows the recall of the settings when the device was turned off.
      */
     public static ClusterCommand onWithRecallGlobalScene() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("onWithRecallGlobalScene");
     }
 
@@ -292,6 +283,7 @@ public class OnOffCluster extends BaseCluster {
         return new ClusterCommand("onWithTimedOff", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

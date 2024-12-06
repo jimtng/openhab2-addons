@@ -35,8 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link MatterDiscoveryService}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class MatterDiscoveryService extends AbstractDiscoveryService implements ThingHandlerService {
@@ -109,7 +110,7 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
 
     private void discoverThing(ThingUID thingUID, ThingUID bridgeUID, Endpoint root, String id,
             String representationProperty, String label) {
-        logger.debug("discoverThing: {} {} {}", thingUID, bridgeUID);
+        logger.debug("discoverThing: {} {} {}", thingUID, bridgeUID, id);
         String vendorName = "";
         String productName = "";
         String nodeLabel = "";

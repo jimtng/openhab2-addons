@@ -20,7 +20,12 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,24 +42,45 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
-import org.openhab.binding.matter.internal.client.model.ws.*;
+import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventAttributeChanged;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventMessage;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventTriggered;
+import org.openhab.binding.matter.internal.client.model.ws.Event;
+import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
+import org.openhab.binding.matter.internal.client.model.ws.Message;
+import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
+import org.openhab.binding.matter.internal.client.model.ws.Path;
+import org.openhab.binding.matter.internal.client.model.ws.Request;
+import org.openhab.binding.matter.internal.client.model.ws.Response;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.common.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 /**
+ * The {@link MatterWebsocketClient}
  *
- * @author Dan Cunningham
- *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class MatterWebsocketClient implements WebSocketListener, MatterWebsocketService.NodeProcessListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MatterWebsocketClient.class);
+    private final Logger logger = LoggerFactory.getLogger(MatterWebsocketClient.class);
 
     private static final int BUFFER_SIZE = 1048576 * 2; // 2 Mb
     private final ScheduledExecutorService scheduler = ThreadPoolManager
@@ -75,7 +101,7 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
 
     /**
      * Connect to an external Matter controller Websocket Server not running on this host, mainly used for testing
-     * 
+     *
      * @param host
      * @param port
      * @param nodeId
@@ -90,7 +116,7 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
 
     /**
      * Connect to a local Matter controller running on this host in openHAB, primarily use case
-     * 
+     *
      * @param nodeId
      * @param storagePath
      * @param controllerName

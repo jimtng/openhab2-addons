@@ -31,12 +31,19 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
-import org.openhab.core.types.*;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+import org.openhab.core.types.StateDescription;
+import org.openhab.core.types.StateDescriptionFragmentBuilder;
+import org.openhab.core.types.StateOption;
+import org.openhab.core.types.UnDefType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link PowerSourceConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
@@ -48,6 +55,7 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Map<Channel, @Nullable StateDescription> channels = new HashMap<>();
         if (cluster.featureMap.battery) {
@@ -75,9 +83,11 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
         return channels;
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
         switch (message.path.attributeName) {
@@ -92,6 +102,7 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
         }
     }
 
+    @Override
     public void updateCluster(PowerSourceCluster cluster) {
         super.updateCluster(cluster);
         if (cluster.batPercentRemaining != null) {
@@ -107,7 +118,7 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
      * Converts a battery charge value in half-percent units to a percentage (0-100).
      * Values are expressed in half percent units, ranging from 0 to 200.
      * For example, a value of 48 is equivalent to 24%.
-     * 
+     *
      * @param halfPercentValue the battery charge value in half-percent units.
      * @return the percentage of battery charge (0-100) or -1 if the value is null or invalid.
      */

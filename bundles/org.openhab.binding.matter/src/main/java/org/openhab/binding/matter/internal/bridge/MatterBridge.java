@@ -14,24 +14,61 @@ package org.openhab.binding.matter.internal.bridge;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.matter.internal.bridge.devices.*;
+import org.openhab.binding.matter.internal.bridge.devices.ColorDevice;
+import org.openhab.binding.matter.internal.bridge.devices.ContactSensorDevice;
+import org.openhab.binding.matter.internal.bridge.devices.DimmableLightDevice;
+import org.openhab.binding.matter.internal.bridge.devices.DoorLockDevice;
+import org.openhab.binding.matter.internal.bridge.devices.GenericDevice;
+import org.openhab.binding.matter.internal.bridge.devices.HumiditySensorDevice;
+import org.openhab.binding.matter.internal.bridge.devices.OccupancySensorDevice;
+import org.openhab.binding.matter.internal.bridge.devices.OnOffLightDevice;
+import org.openhab.binding.matter.internal.bridge.devices.OnOffPlugInUnitDevice;
+import org.openhab.binding.matter.internal.bridge.devices.TemperatureSensorDevice;
+import org.openhab.binding.matter.internal.bridge.devices.ThermostatDevice;
+import org.openhab.binding.matter.internal.bridge.devices.WindowCoveringDevice;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
-import org.openhab.binding.matter.internal.client.model.ws.*;
+import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeCommissionState;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventAttributeChanged;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventMessage;
+import org.openhab.binding.matter.internal.client.model.ws.BridgeEventTriggered;
+import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
+import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
 import org.openhab.core.common.ThreadPoolManager;
 import org.openhab.core.common.registry.RegistryChangeListener;
 import org.openhab.core.config.core.ConfigurableService;
 import org.openhab.core.config.core.Configuration;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.ItemRegistryChangeListener;
+import org.openhab.core.items.Metadata;
+import org.openhab.core.items.MetadataKey;
+import org.openhab.core.items.MetadataRegistry;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +77,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Dan Cunningham - Initial contribution
  */
+@NonNullByDefault
 @Component(immediate = true, service = MatterBridge.class, configurationPid = MatterBridge.CONFIG_PID, property = Constants.SERVICE_PID
         + "=" + MatterBridge.CONFIG_PID)
 @ConfigurableService(category = "io", label = "Matter Bridge", description_uri = MatterBridge.CONFIG_URI)
-@NonNullByDefault
 public class MatterBridge implements MatterClientListener {
     private final Logger logger = LoggerFactory.getLogger(MatterBridge.class);
     private static final String CONFIG_PID = "org.openhab.matter";
@@ -423,7 +460,7 @@ public class MatterBridge implements MatterClientListener {
                     if (device != null) {
                         try {
                             device.registerDevice().get();
-                            logger.debug("Registered item {} with node {}", item.getName());
+                            logger.debug("Registered item {} with device type {}", item.getName(), device.deviceType());
                             devices.put(item.getName(), device);
                         } catch (InterruptedException | ExecutionException e) {
                             logger.debug("Could not register device with bridge", e);

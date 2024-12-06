@@ -1309,8 +1309,6 @@ public class DoorLockCluster extends BaseCluster {
     }
 
     public static ClusterCommand toggle() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("toggle");
     }
 
@@ -1389,8 +1387,6 @@ public class DoorLockCluster extends BaseCluster {
      * respect to the setting of user status, user type and schedules.
      */
     public static ClusterCommand clearAllPinCodes() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("clearAllPinCodes");
     }
 
@@ -1610,8 +1606,6 @@ public class DoorLockCluster extends BaseCluster {
      * schedules which are supported have to be set to the default values.
      */
     public static ClusterCommand clearAllRfidCodes() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("clearAllRfidCodes");
     }
 
@@ -1727,6 +1721,7 @@ public class DoorLockCluster extends BaseCluster {
         return new ClusterCommand("unboltDoor", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

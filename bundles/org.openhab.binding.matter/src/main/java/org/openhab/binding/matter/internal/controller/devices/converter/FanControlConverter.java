@@ -40,7 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link FanControlConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class FanControlConverter extends GenericConverter<FanControlCluster> {
@@ -52,6 +54,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Map<Channel, @Nullable StateDescription> channels = new HashMap<>();
         Channel percentChannel = ChannelBuilder
@@ -117,6 +120,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
         return channels;
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (channelUID.getIdWithoutGroup().equals(CHANNEL_FANCONTROL_PERCENT.getId())) {
             if (command instanceof IncreaseDecreaseType increaseDecreaseType) {
@@ -143,6 +147,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
         }
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
         switch (message.path.attributeName) {
@@ -157,6 +162,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
         }
     }
 
+    @Override
     public void updateCluster(FanControlCluster cluster) {
         super.updateCluster(cluster);
         if (cluster.fanMode != null) {

@@ -19,18 +19,34 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.*;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.BooleanStateCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.ColorControlCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.FanControlCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.IlluminanceMeasurementCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.ModeSelectCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.OccupancySensingCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.PowerSourceCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.RelativeHumidityMeasurementCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.SwitchCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.TemperatureMeasurementCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.ThermostatCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.WiFiNetworkDiagnosticsCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.WindowCoveringCluster;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link ConverterRegistry}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class ConverterRegistry {
-    private static final Logger logger = LoggerFactory.getLogger(ConverterRegistry.class);
-    private static final Map<Integer, Class<? extends GenericConverter<? extends BaseCluster>>> converters = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConverterRegistry.class);
+    private static final Map<Integer, Class<? extends GenericConverter<? extends BaseCluster>>> CONVERTERS = new HashMap<>();
 
     static {
         ConverterRegistry.registerConverter(ColorControlCluster.CLUSTER_ID, ColorControlConverter.class);
@@ -56,12 +72,12 @@ public class ConverterRegistry {
 
     public static void registerConverter(Integer clusterId,
             Class<? extends GenericConverter<? extends BaseCluster>> converter) {
-        converters.put(clusterId, converter);
+        CONVERTERS.put(clusterId, converter);
     }
 
     public static @Nullable GenericConverter<? extends BaseCluster> createConverter(BaseCluster cluster,
             MatterBaseThingHandler handler, int endpointNumber, String labelPrefix) {
-        Class<? extends GenericConverter<? extends BaseCluster>> clazz = converters.get(cluster.id);
+        Class<? extends GenericConverter<? extends BaseCluster>> clazz = CONVERTERS.get(cluster.id);
         if (clazz != null) {
             try {
                 Class<?>[] constructorParameterTypes = new Class<?>[] { cluster.getClass(),
@@ -70,10 +86,10 @@ public class ConverterRegistry {
                         .getConstructor(constructorParameterTypes);
                 return constructor.newInstance(cluster, handler, endpointNumber, labelPrefix);
             } catch (Exception e) {
-                logger.debug("Could not create converter", e);
+                LOGGER.debug("Could not create converter", e);
             }
         } else {
-            logger.debug("No converter found for cluster {}", cluster.id);
+            LOGGER.debug("No converter found for cluster {}", cluster.id);
         }
         return null;
     }

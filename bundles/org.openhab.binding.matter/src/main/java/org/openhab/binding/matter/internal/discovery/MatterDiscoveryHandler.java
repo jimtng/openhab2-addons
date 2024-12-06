@@ -18,8 +18,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * @author Dan Cunningham
+ * The {@link MatterDiscoveryHandler}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public interface MatterDiscoveryHandler {

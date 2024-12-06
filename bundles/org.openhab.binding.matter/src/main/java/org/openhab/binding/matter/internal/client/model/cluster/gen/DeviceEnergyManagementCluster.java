@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * DeviceEnergyManagement
@@ -862,8 +861,6 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
      * Allows a client to cancel an ongoing PowerAdjustmentRequest operation.
      */
     public static ClusterCommand cancelPowerAdjustRequest() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("cancelPowerAdjustRequest");
     }
 
@@ -894,8 +891,6 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
      * Allows a client to cancel the PauseRequest command and enable earlier resumption of operation.
      */
     public static ClusterCommand resumeRequest() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("resumeRequest");
     }
 
@@ -929,11 +924,10 @@ public class DeviceEnergyManagementCluster extends BaseCluster {
      * ModifyForecastRequest or RequestConstraintBasedForecast command.
      */
     public static ClusterCommand cancelRequest() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("cancelRequest");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

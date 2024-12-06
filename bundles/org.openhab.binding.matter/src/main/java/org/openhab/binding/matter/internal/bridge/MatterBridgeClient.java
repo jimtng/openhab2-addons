@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.matter.internal.bridge;
 
 import java.util.Map;
@@ -6,14 +18,16 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
 import org.openhab.binding.matter.internal.client.model.ws.BridgeCommissionState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
+/**
+ * The {@link MatterBridgeClient}
+ *
+ * @author Dan Cunningham - Initial contribution
+ */
 @NonNullByDefault
 public class MatterBridgeClient extends MatterWebsocketClient {
-    private static final Logger logger = LoggerFactory.getLogger(MatterBridgeClient.class);
 
     public CompletableFuture<String> addEndpoint(String deviceType, String id, String nodeLabel, String productName,
             String productLabel, String serialNumber, Map<String, Map<String, Object>> attributeMap) {

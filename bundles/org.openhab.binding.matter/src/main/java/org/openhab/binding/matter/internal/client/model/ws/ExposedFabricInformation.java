@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
@@ -16,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import java.math.BigInteger;
 
 /**
- * @author Dan Cunningham
+ * ExposedFabricInformation
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class ExposedFabricInformation {
     public Integer fabricIndex;

@@ -1,9 +1,26 @@
+/**
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.matter.internal.bridge;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+/**
+ * The {@link SetupPayload}
+ *
+ * @author Dan Cunningham - Initial contribution
+ */
 public class SetupPayload {
     public enum CommissioningFlow {
         Standard(0),
@@ -22,8 +39,9 @@ public class SetupPayload {
 
         public static CommissioningFlow fromInt(int value) {
             for (CommissioningFlow flow : CommissioningFlow.values()) {
-                if (flow.value == value)
+                if (flow.value == value) {
                     return flow;
+                }
             }
             throw new IllegalArgumentException("Invalid flow value");
         }
@@ -89,7 +107,6 @@ public class SetupPayload {
         offset = encodeBits(bits, offset, 16, payload.flow == CommissioningFlow.Standard ? 0 : payload.pid);
         offset = encodeBits(bits, offset, 7, 0); // padding
 
-        byte[] bytes = bits.toByteArray();
         StringBuilder payloadBuilder = new StringBuilder();
 
         payloadBuilder.append(getChunk(bits, 0, 4));
@@ -113,8 +130,9 @@ public class SetupPayload {
     private static String getChunk(BitSet bits, int start, int length) {
         int value = 0;
         for (int i = 0; i < length; i++) {
-            if (bits.get(start + i))
+            if (bits.get(start + i)) {
                 value |= (1 << i);
+            }
         }
         return String.format("%0" + (length / 4) + "d", value);
     }
@@ -237,9 +255,9 @@ public class SetupPayload {
          */
         public static String generateVerhoeff(String number) {
             int checksum = 0;
-            int[] StringToReversedIntArray = StringToReversedIntArray(number);
-            for (int i = 0; i < StringToReversedIntArray.length; i++) {
-                checksum = d[checksum][p[(i + 1) % 8][StringToReversedIntArray[i]]];
+            int[] reversedIntArray = stringToReversedIntArray(number);
+            for (int i = 0; i < reversedIntArray.length; i++) {
+                checksum = d[checksum][p[(i + 1) % 8][reversedIntArray[i]]];
             }
             return Integer.toString(inv[checksum]);
         }
@@ -252,9 +270,9 @@ public class SetupPayload {
          */
         public static boolean validateVerhoeff(String number) {
             int checksum = 0;
-            int[] StringToReversedIntArray = StringToReversedIntArray(number);
-            for (int i = 0; i < StringToReversedIntArray.length; i++) {
-                checksum = d[i][p[i % 8][StringToReversedIntArray[i]]];
+            int[] reversedIntArray = stringToReversedIntArray(number);
+            for (int i = 0; i < reversedIntArray.length; i++) {
+                checksum = d[i][p[i % 8][reversedIntArray[i]]];
             }
             return checksum == 0;
         }
@@ -266,12 +284,12 @@ public class SetupPayload {
          * @return Integer array containing the digits in the numeric string
          *         provided in reverse.
          */
-        private static int[] StringToReversedIntArray(String number) {
+        private static int[] stringToReversedIntArray(String number) {
             int[] myArray = new int[number.length()];
             for (int i = 0; i < number.length(); i++) {
                 myArray[i] = Integer.parseInt(number.substring(i, i + 1));
             }
-            return Reverse(myArray);
+            return reverse(myArray);
         }
 
         /**
@@ -280,7 +298,7 @@ public class SetupPayload {
          * @param myArray The input array which needs to be reversed
          * @return The array provided in reverse order.
          */
-        private static int[] Reverse(int[] myArray) {
+        private static int[] reverse(int[] myArray) {
             int[] reversed = new int[myArray.length];
             for (int i = 0; i < myArray.length; i++) {
                 reversed[i] = myArray[myArray.length - (i + 1)];

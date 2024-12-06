@@ -16,8 +16,9 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * @author Dan Cunningham
+ * The {@link ClusterCommand}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class ClusterCommand {
     public String commandName;

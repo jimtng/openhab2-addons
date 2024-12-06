@@ -16,12 +16,9 @@
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * EthernetNetworkDiagnostics
@@ -151,11 +148,10 @@ public class EthernetNetworkDiagnosticsCluster extends BaseCluster {
      * This command has no associated data.
      */
     public static ClusterCommand resetCounts() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("resetCounts");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

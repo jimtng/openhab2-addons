@@ -18,8 +18,9 @@ import java.util.Map;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 
 /**
- * @author Dan Cunningham
+ * The {@link Endpoint}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class Endpoint {
     public Integer number;

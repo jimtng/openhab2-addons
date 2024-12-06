@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ValveConfigurationAndControl
@@ -236,11 +235,10 @@ public class ValveConfigurationAndControlCluster extends BaseCluster {
      * This command is used to set the valve to its closed position.
      */
     public static ClusterCommand close() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("close");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

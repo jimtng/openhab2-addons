@@ -16,12 +16,9 @@
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * RvcOperationalState
@@ -200,11 +197,10 @@ public class RvcOperationalStateCluster extends BaseCluster {
      * • The device shall respond with an OperationalCommandResponse command with an ErrorStateID of NoError.
      */
     public static ClusterCommand goHome() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("goHome");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

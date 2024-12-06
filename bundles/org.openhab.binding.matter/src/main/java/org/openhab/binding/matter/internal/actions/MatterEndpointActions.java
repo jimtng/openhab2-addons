@@ -31,10 +31,12 @@ import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@NonNullByDefault
 /**
- * @author Dan Cunningham
+ * The {@link MatterEndpointActions}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
+@NonNullByDefault
 @Component(scope = ServiceScope.PROTOTYPE, service = MatterEndpointActions.class)
 @ThingActionsScope(name = "matter")
 public class MatterEndpointActions implements ThingActions {

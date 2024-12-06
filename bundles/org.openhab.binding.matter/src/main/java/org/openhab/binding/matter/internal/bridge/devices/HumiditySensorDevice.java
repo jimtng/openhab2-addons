@@ -33,7 +33,7 @@ import org.openhab.core.types.State;
  */
 @NonNullByDefault
 public class HumiditySensorDevice extends GenericDevice {
-    private final static BigDecimal HUMIDITY_MULTIPLIER = new BigDecimal(100);
+    private static final BigDecimal HUMIDITY_MULTIPLIER = new BigDecimal(100);
 
     public HumiditySensorDevice(MetadataRegistry metadataRegistry, MatterBridgeClient client, GenericItem item) {
         super(metadataRegistry, client, item);
@@ -64,6 +64,7 @@ public class HumiditySensorDevice extends GenericDevice {
         primaryItem.removeStateChangeListener(this);
     }
 
+    @Override
     public void updateState(Item item, State state) {
         setEndpointState("relativeHumidityMeasurement", "measuredValue", toMatterValue(state));
     }

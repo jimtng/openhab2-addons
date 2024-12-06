@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * MediaPlayback
@@ -342,8 +341,6 @@ public class MediaPlaybackCluster extends BaseCluster {
      * media to normal playback speed.
      */
     public static ClusterCommand play() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("play");
     }
 
@@ -351,8 +348,6 @@ public class MediaPlaybackCluster extends BaseCluster {
      * Upon receipt, this shall pause playback of the media.
      */
     public static ClusterCommand pause() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("pause");
     }
 
@@ -361,8 +356,6 @@ public class MediaPlaybackCluster extends BaseCluster {
      * the user back to the location from where the media was originally launched.
      */
     public static ClusterCommand stop() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("stop");
     }
 
@@ -370,8 +363,6 @@ public class MediaPlaybackCluster extends BaseCluster {
      * Upon receipt, this shall Start Over with the current media playback item.
      */
     public static ClusterCommand startOver() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("startOver");
     }
 
@@ -380,8 +371,6 @@ public class MediaPlaybackCluster extends BaseCluster {
      * context-specific. This will often Go back to the previous media playback item.
      */
     public static ClusterCommand previous() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("previous");
     }
 
@@ -390,8 +379,6 @@ public class MediaPlaybackCluster extends BaseCluster {
      * specific. This will often Go forward to the next media playback item.
      */
     public static ClusterCommand next() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("next");
     }
 
@@ -495,11 +482,10 @@ public class MediaPlaybackCluster extends BaseCluster {
      * it.
      */
     public static ClusterCommand deactivateTextTrack() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("deactivateTextTrack");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

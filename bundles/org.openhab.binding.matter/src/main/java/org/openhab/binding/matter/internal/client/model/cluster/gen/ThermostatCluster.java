@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * Thermostat
@@ -1007,11 +1006,10 @@ public class ThermostatCluster extends BaseCluster {
      * in response. There are no error responses to this command.
      */
     public static ClusterCommand clearWeeklySchedule() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("clearWeeklySchedule");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

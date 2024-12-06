@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_BOOLEANSTATE_STATEVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_BOOLEANSTATE_STATEVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_SWITCH;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +31,9 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link BooleanStateConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class BooleanStateConverter extends GenericConverter<BooleanStateCluster> {
@@ -43,6 +43,7 @@ public class BooleanStateConverter extends GenericConverter<BooleanStateCluster>
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_BOOLEANSTATE_STATEVALUE.getId()), ITEM_TYPE_SWITCH)
@@ -51,9 +52,11 @@ public class BooleanStateConverter extends GenericConverter<BooleanStateCluster>
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "stateValue":
@@ -64,6 +67,7 @@ public class BooleanStateConverter extends GenericConverter<BooleanStateCluster>
         }
     }
 
+    @Override
     public void updateCluster(BooleanStateCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_BOOLEANSTATE_STATEVALUE, OnOffType.from(cluster.stateValue));
