@@ -182,6 +182,7 @@ public class MatterBindingConstants {
     public static final String ITEM_TYPE_NUMBER_TEMPERATURE = "Number:Temperature";
     public static final String ITEM_TYPE_NUMBER_ILLUMINANCE = "Number:Illuminance";
     public static final String ITEM_TYPE_NUMBER_POWER = "Number:Power";
+    public static final String ITEM_TYPE_NUMBER_DIMENSIONLESS = "Number:Dimensionless";
 
     public static final String ITEM_TYPE_ROLLERSHUTTER = "Rollershutter";
     public static final String ITEM_TYPE_SWITCH = "Switch";
