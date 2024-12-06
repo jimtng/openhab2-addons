@@ -12,19 +12,21 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_TEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
+
+import javax.measure.quantity.Dimensionless;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.RelativeHumidityMeasurementCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
-import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
@@ -43,18 +45,21 @@ public class RelativeHumidityMeasurementConverter extends GenericConverter<Relat
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE.getId()),
-                        ITEM_TYPE_NUMBER_TEMPERATURE)
+                        ITEM_TYPE_NUMBER_DIMENSIONLESS)
                 .withType(CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE)
                 .withLabel(formatLabel(CHANNEL_LABEL_HUMIDITYMEASURMENT_MEASUREDVALUE)).build();
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "measuredValue":
@@ -63,13 +68,13 @@ public class RelativeHumidityMeasurementConverter extends GenericConverter<Relat
         }
     }
 
+    @Override
     public void updateCluster(RelativeHumidityMeasurementCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE, humidityToPercent(cluster.measuredValue));
     }
 
-    private DecimalType humidityToPercent(Number number) {
-        int value = number.intValue();
-        return new DecimalType(value == 0 ? 0 : value / 100);
+    private QuantityType<Dimensionless> humidityToPercent(Number number) {
+        return new QuantityType<>(BigDecimal.valueOf(number.intValue(), 2), Units.PERCENT);
     }
 }

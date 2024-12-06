@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
+import javax.measure.quantity.Temperature;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.AttributeListener;
@@ -147,7 +149,7 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
      * @param value the integer value to convert
      * @return the {@link QuantityType}
      */
-    public static QuantityType valueToTemperature(int value) {
+    public static QuantityType<Temperature> valueToTemperature(int value) {
         return new QuantityType<>(BigDecimal.valueOf(value, 2), SIUnits.CELSIUS);
     }
 
