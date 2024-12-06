@@ -113,6 +113,20 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
     }
 
     @Override
+    public void initialize() {
+        Bridge bridge = getBridge();
+        BridgeHandler handler = bridge == null ? null : bridge.getHandler();
+        if (handler == null) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
+        } else if (handler.getThing().getStatus() != ThingStatus.ONLINE) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+        } else if (getThing().getStatus() != ThingStatus.ONLINE) {
+            // wait for us to be updated.
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
+        }
+    }
+
+    @Override
     public void dispose() {
         channelTypeProvider.removeChannelGroupTypesForPrefix(getThing().getThingTypeUID().getId());
     }
