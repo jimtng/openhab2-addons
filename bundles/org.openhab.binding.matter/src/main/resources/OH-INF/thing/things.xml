@@ -6,19 +6,12 @@
 
 	<bridge-type id="controller">
 		<label>Matter Controller</label>
-		<description>The Matter Controller connects to Matter Nodes and Devices</description>
+		<description>The Matter controller connects to Matter nodes and devices</description>
 		<config-description>
 			<parameter name="nodeId" type="text" required="true">
 				<label>Node ID</label>
 				<description>The Matter Node ID / Number of the Controller bridge. Do not change this once devices have been added.</description>
 				<default>0</default>
-				<advanced>true</advanced>
-			</parameter>
-			<parameter name="decommissionNodesOnDelete" type="boolean" required="true">
-				<label>Decommission Nodes On Delete</label>
-				<description>Decommission (unpair) Matter nodes from the Matter network when the last endpoint thing of a node is
-					deleted/removed from openHAB.</description>
-				<default>false</default>
 				<advanced>true</advanced>
 			</parameter>
 		</config-description>
@@ -29,10 +22,8 @@
 			<bridge-type-ref id="controller"/>
 		</supported-bridge-type-refs>
 		<label>Matter Node</label>
-		<description>The Matter Node describes a logical node in a Matter Fabric</description>
-
+		<description>The Matter node describes a logical node in a Matter Fabric</description>
 		<representation-property>nodeId</representation-property>
-
 		<config-description>
 			<parameter name="nodeId" type="text" required="true">
 				<label>Node Id</label>

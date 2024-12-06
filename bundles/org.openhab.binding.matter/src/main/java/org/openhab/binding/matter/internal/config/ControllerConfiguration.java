@@ -24,5 +24,4 @@ public class ControllerConfiguration {
 
     public String nodeId = "0";
     public String pairCode = "";
-    public boolean decommissionNodesOnDelete = false;
 }

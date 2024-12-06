@@ -12,7 +12,6 @@
  */
 package org.openhab.binding.matter.internal.handler;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COMMAND;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_NODE;
 
 import java.io.File;
@@ -24,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.actions.MatterControllerActions;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
 import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
@@ -36,7 +36,6 @@ import org.openhab.binding.matter.internal.discovery.MatterDiscoveryHandler;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
 import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
-import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.*;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.thing.binding.ThingHandler;
@@ -78,32 +77,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
-        return Set.of(MatterDiscoveryService.class);
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.debug("handleCommand {} {}", channelUID, command);
-        if (!client.isConnected()) {
-            logger.debug("not connected");
-            return;
-        }
-
-        if (CHANNEL_COMMAND.equals(channelUID.getId()) && command instanceof StringType) {
-            String[] args = command.toString().split(" ");
-            if (args.length < 2) {
-                logger.debug("Commands require at least 2 segments");
-                return;
-            }
-            Object[] params = args.length > 2 ? (Object[]) Arrays.copyOfRange(args, 2, args.length) : new String[0];
-            client.genericCommand(args[0], args[1], params).thenAccept(result -> {
-                logger.debug("Command {} ", command);
-                logger.debug("Result: {}", result);
-            }).exceptionally(e -> {
-                logger.debug("Could not send command", e);
-                return null;
-            });
-        }
+        return Set.of(MatterDiscoveryService.class, MatterControllerActions.class);
     }
 
     @Override
@@ -130,6 +104,10 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
     }
 
     @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+    }
+
+    @Override
     public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
         super.childHandlerInitialized(childHandler, childThing);
         logger.debug("childHandlerInitialized ready {} {}", ready, childHandler);
@@ -149,7 +127,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         }
         if (childHandler instanceof NodeHandler handler) {
             // todo support decommissioned removal
-            removeNode(handler.getNodeId(), false);
+            removeNode(handler.getNodeId());
         }
     }
 
@@ -187,7 +165,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             case DECOMMISSIONED:
                 updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.GONE,
                         "Node " + message.state);
-                removeNode(message.nodeId, false);
+                removeNode(message.nodeId);
                 break;
             case DISCONNECTED:
                 updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
@@ -297,19 +275,14 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         });
     }
 
-    protected void removeNode(BigInteger nodeId, boolean decommission) {
+    protected void removeNode(BigInteger nodeId) {
         try {
-            logger.debug("Decommissioning node {}", nodeId);
+            logger.debug("removing node {}", nodeId);
             disconnectedNodes.remove(nodeId);
             outstandingNodeRequests.remove(nodeId);
             linkedNodes.remove(nodeId);
-            // check if we remove deleted endpoint things from the actual matter network
-            if (decommission && getConfigAs(ControllerConfiguration.class).decommissionNodesOnDelete) {
-                logger.debug("Decommissioning node {}", nodeId);
-                client.removeNode(nodeId);
-            }
         } catch (Exception e) {
-            logger.debug("Could not decommission node {}", nodeId, e);
+            logger.debug("Could not remove node {}", nodeId, e);
         }
     }
 
@@ -363,6 +336,8 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         NodeHandler handler = linkedNodes.get(node.id);
         if (handler != null) {
             handler.updateNode(node);
+        } else {
+            logger.debug("Could not find handler for node {}", node.id);
         }
     }
 

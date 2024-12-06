@@ -181,7 +181,6 @@ The controller thing must be created manually before devices can be discovered.
 | Name                      | Type    | Description                                                                                                                       | Default | Required | Advanced |
 |---------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------|---------|----------|----------|
 | nodeId                    | number  | The matter node ID for this controller                                                                                            | 0       | yes      | no       |
-| decommissionNodesOnDelete | boolean | Decommission (unpair) Matter nodes from the Matter network when the last endpoint thing of a node is deleted/removed from openHAB | false    | yes      | no       |
 
 ### Node Thing Configuration
 
@@ -198,6 +197,20 @@ Bridge Endpoints are discovered automatically once their parent Node has been ad
 | Name       | Type   | Description                        | Default | Required | Advanced |
 |------------|--------|------------------------------------|---------|----------|----------|
 | endpointId | number | The endpoint ID within the node    | N/A     | yes      | no       |
+
+## Thing Actions
+
+### Controller Thing Actions
+
+| Name        Description              |                                                                                                              |
+|--------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| Send a raw command to the controller | Sends a raw command to the controller, eg. namespace=nodes functionName=disconnectNode parameters=1234567890 |
+
+### Node Thing Actions
+| Name        Description                         |                                                                                                                                                                                                                                                                           |
+|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Decommission Matter node from fabric            | This will remove the device from the Matter fabric. If the device is online and reachable this will attempt to remove the credentials from the device first before removing it from the network. Once a device is removed, this Thing will go offline and can be removed. |
+| Generate a new pairing code for a Matter device | Generates a new manual and QR pairing code to be used to pair the Matter device with an external Matter controller                                                                                                                                                        |
 
 ## Channels
 

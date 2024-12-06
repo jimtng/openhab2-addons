@@ -51,7 +51,7 @@ public class MatterEndpointActions implements ThingActions {
         return handler;
     }
 
-    @RuleAction(label = "generate a new pairing code for a Matter device", description = "Generates a new manual and QR pairing code to be used to pair the Matter device with an external Matter controller")
+    @RuleAction(label = "Generate a new pairing code for a Matter device", description = "Generates a new manual and QR pairing code to be used to pair the Matter device with an external Matter controller")
     public @Nullable @ActionOutputs({
             @ActionOutput(name = "manualPairingCode", label = "Manual pairing code", type = "java.lang.String"),
             @ActionOutput(name = "qrPairingCode", label = "QR pairing code", type = "qrCode") }) Map<String, Object> generateNewPairingCode() {
@@ -64,6 +64,25 @@ public class MatterEndpointActions implements ThingActions {
                     return Map.of("manualPairingCode", code.manualPairingCode, "qrPairingCode", code.qrPairingCode);
                 } catch (InterruptedException | ExecutionException e) {
                     logger.debug("Failed to generate new pairing code for device {}", handler.getNodeId(), e);
+                }
+            }
+        }
+        return null;
+    }
+
+    @RuleAction(label = "Decommission Matter node from fabric", description = "This will remove the device from the Matter fabric.  If the device is online and reachable this will attempt to remove the credentials from the device first before removing it from the network.  Once a device is removed, this Thing will go offline and can be removed.")
+    public @Nullable @ActionOutputs({
+            @ActionOutput(name = "result", label = "Result from decommissioning process", type = "java.lang.String") }) String decommissionNode() {
+        NodeHandler handler = this.handler;
+        if (handler != null) {
+            MatterControllerClient client = handler.getClient();
+            if (client != null) {
+                try {
+                    client.removeNode(handler.getNodeId()).get();
+                    return "success";
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.debug("Failed to decommission device {}", handler.getNodeId(), e);
+                    return e.getLocalizedMessage();
                 }
             }
         }

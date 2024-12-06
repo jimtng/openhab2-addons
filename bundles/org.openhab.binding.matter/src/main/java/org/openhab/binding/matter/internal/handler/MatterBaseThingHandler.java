@@ -207,6 +207,11 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         ThingBuilder thingBuilder = editThing().withChannels();
         thingBuilder.withChannels(channels);
         updateThing(thingBuilder.build());
+
+        if (getThing().getStatus() != ThingStatus.ONLINE) {
+            logger.debug("Setting Online {}", getNodeId());
+            updateStatus(ThingStatus.ONLINE);
+        }
     }
 
     /**
@@ -358,23 +363,6 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
             }
         }
         return cachedClient;
-    }
-
-    public static boolean areEqual(Object obj1, Object obj2) {
-        if (obj1 == null || obj2 == null) {
-            return Objects.equals(obj1, obj2); // Return true if both are null, false if one is null
-        }
-
-        if (obj1 instanceof BigDecimal && obj2 instanceof BigDecimal) {
-            return ((BigDecimal) obj1).compareTo((BigDecimal) obj2) == 0;
-        }
-
-        if (obj1 instanceof Number && obj2 instanceof Number) {
-            return BigDecimal.valueOf(((Number) obj1).doubleValue())
-                    .compareTo(BigDecimal.valueOf(((Number) obj2).doubleValue())) == 0;
-        }
-
-        return obj1.equals(obj2); // Fallback to the default equals method
     }
 
     protected void updateRootProperties(Endpoint root) {

@@ -65,7 +65,8 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         } else if (handler.getThing().getStatus() != ThingStatus.ONLINE) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
         } else {
-            updateStatus(ThingStatus.UNKNOWN);
+            // wait for us to be updated.
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
         }
     }
 
@@ -115,7 +116,7 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
     public void handleRemoval() {
         ControllerHandler bridge = controllerHandler();
         if (bridge != null) {
-            bridge.removeNode(nodeId, true);
+            bridge.removeNode(nodeId);
         }
         super.handleRemoval();
     }
@@ -159,10 +160,6 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
     }
 
     public void updateNode(Node node) {
-        if (getThing().getStatus() != ThingStatus.ONLINE) {
-            logger.debug("Setting Online {}", getNodeId());
-            updateStatus(ThingStatus.ONLINE);
-        }
         updateRootProperties(node.rootEndpoint);
         updateEndpoint(node.rootEndpoint);
     }
