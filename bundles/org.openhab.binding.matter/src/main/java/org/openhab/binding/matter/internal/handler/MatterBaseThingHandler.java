@@ -16,8 +16,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -31,11 +29,13 @@ import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.*;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.GeneralDiagnosticsCluster.NetworkInterface;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.controller.devices.types.DeviceType;
 import org.openhab.binding.matter.internal.controller.devices.types.DeviceTypeRegistry;
+import org.openhab.binding.matter.internal.util.MatterLabelUtils;
 import org.openhab.binding.matter.internal.util.MatterUIDUtils;
 import org.openhab.core.thing.*;
 import org.openhab.core.thing.binding.BaseThingHandler;
@@ -229,49 +229,15 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         }
 
         Map<String, BaseCluster> clusters = endpoint.clusters;
-        Object basicInfoObject = clusters.get(BasicInformationCluster.CLUSTER_NAME);
-
-        // The matter spec requires a descriptor cluster and device type, so this should always be present
-        DescriptorCluster descriptorCluster = (DescriptorCluster) clusters.get(DescriptorCluster.CLUSTER_NAME);
-        Integer deviceTypID = -1;
-        if (descriptorCluster != null && !descriptorCluster.deviceTypeList.isEmpty()) {
-            deviceTypID = descriptorCluster.deviceTypeList.get(0).deviceType;
-        }
-
-        // labels will look like "Device Type : Custom Node Label Or Product Label"
-        final StringBuffer label = new StringBuffer(splitAndCapitalize(DeviceTypes.DEVICE_MAPPING.get(deviceTypID)))
-                .append(": ");
-
-        // Check if a "nodeLabel" is set, otherwise use the product label. This varies from vendor to vendor
-        if (basicInfoObject != null) {
-            BasicInformationCluster basicInfo = (BasicInformationCluster) basicInfoObject;
-            label.append(basicInfo.nodeLabel != null && basicInfo.nodeLabel.length() > 0 ? basicInfo.nodeLabel
-                    : basicInfo.productLabel);
-        } else {
-            // we need to add a child device, a child instance of this class
-            basicInfoObject = clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
-            if (basicInfoObject != null) {
-                BridgedDeviceBasicInformationCluster basicInfo = (BridgedDeviceBasicInformationCluster) basicInfoObject;
-                label.append(basicInfo.nodeLabel != null && basicInfo.nodeLabel.length() > 0 ? basicInfo.nodeLabel
-                        : basicInfo.productLabel);
-            }
-        }
-
-        // Fixed labels are a way of vendors to label endpoints with additional meta data.
-        if (clusters.get(FixedLabelCluster.CLUSTER_NAME) instanceof FixedLabelCluster fixedLabelCluster) {
-            fixedLabelCluster.labelList
-                    .forEach(fixedLabel -> label.append(" " + fixedLabel.label + " " + fixedLabel.value));
-        }
-
-        // label for the Group Channel
-        String deviceLabel = label.toString().trim();
+        Integer deviceTypeID = MatterLabelUtils.primaryDeviceTypeForEndpoint(endpoint);
+        String deviceLabel = MatterLabelUtils.labelForEndpoint(endpoint);
 
         // Do we already have a device created yet?
         DeviceType deviceType = devices.get(endpoint.number);
         if (deviceType == null) {
-            deviceType = DeviceTypeRegistry.createDeviceType(deviceTypID, this, endpoint.number);
+            deviceType = DeviceTypeRegistry.createDeviceType(deviceTypeID, this, endpoint.number);
             devices.put(endpoint.number, deviceType);
-            logger.debug("updateEndpointInternal added device type {} {}", deviceTypID, endpoint.number);
+            logger.debug("updateEndpointInternal added device type {} {}", deviceTypeID, endpoint.number);
         }
 
         // create custom group for endpoint
@@ -383,14 +349,22 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
                 thing.setProperty(Thing.PROPERTY_HARDWARE_VERSION, basicCluster.hardwareVersionString);
             }
         }
-    }
+        cluster = root.clusters.get(GeneralDiagnosticsCluster.CLUSTER_NAME);
+        if (cluster != null && cluster instanceof GeneralDiagnosticsCluster generalCluster) {
+            for (NetworkInterface ni : generalCluster.networkInterfaces) {
+                thing.setProperty(Thing.PROPERTY_MAC_ADDRESS, MatterLabelUtils.formatMacAddress(ni.hardwareAddress));
+                if (ni.iPv6Addresses.size() > 0) {
+                    String newValue = MatterLabelUtils.formatIPv6Address(ni.iPv6Addresses.get(0));
+                    String oldValue = thing.setProperty("ipv6Address", newValue);
+                    if (oldValue != null && !newValue.equals(oldValue)) {
+                        logger.debug("WARNING IPV6 ADDRESS Changed {} to {}", oldValue, newValue);
+                    }
+                }
+                if (ni.iPv4Addresses.size() > 0) {
+                    thing.setProperty("ipv4Address", MatterLabelUtils.formatIPv6Address(ni.iPv4Addresses.get(0)));
+                }
+            }
 
-    private String splitAndCapitalize(@Nullable String camelCase) {
-        if (camelCase == null) {
-            return "";
         }
-        return Pattern.compile("(?<=[a-z])(?=[A-Z])").splitAsStream(camelCase)
-                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-                .collect(Collectors.joining(" "));
     }
 }

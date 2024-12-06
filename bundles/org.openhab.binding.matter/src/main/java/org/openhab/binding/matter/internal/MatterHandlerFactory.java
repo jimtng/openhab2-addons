@@ -20,11 +20,11 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.matter.internal.client.MatterWebsocketService;
 import org.openhab.binding.matter.internal.handler.BridgeEndpointHandler;
 import org.openhab.binding.matter.internal.handler.ControllerHandler;
 import org.openhab.binding.matter.internal.handler.NodeHandler;
 import org.openhab.binding.matter.internal.util.MatterUIDUtils;
-import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;

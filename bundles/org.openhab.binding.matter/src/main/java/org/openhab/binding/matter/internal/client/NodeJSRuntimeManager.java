@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.matter.internal.util;
+package org.openhab.binding.matter.internal.client;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,9 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.*;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.core.OpenHAB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,25 +31,26 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Dan Cunningham - Initial contribution
  */
-class NodeManager {
-    private static final Logger logger = LoggerFactory.getLogger(NodeManager.class);
+@NonNullByDefault
+class NodeJSRuntimeManager {
+    private static final Logger logger = LoggerFactory.getLogger(NodeJSRuntimeManager.class);
 
     private static final String NODE_VERSION = "v22.0.0";
     private static final String BASE_URL = "https://nodejs.org/dist/" + NODE_VERSION + "/";
     private static final String CACHE_DIR = Paths
             .get(OpenHAB.getUserDataFolder(), "cache", "org.openhab.binding.matter", "node_cache").toString();
 
-    private String platform;
-    private String arch;
-    private String nodeExecutable;
+    private String platform = "";
+    private String arch = "";
+    private String nodeExecutable = "";
 
-    public NodeManager() {
+    public NodeJSRuntimeManager() {
         detectPlatformAndArch();
     }
 
     private void detectPlatformAndArch() {
-        String os = System.getProperty("os.name").toLowerCase();
-        String arch = System.getProperty("os.arch").toLowerCase();
+        String os = Optional.ofNullable(System.getProperty("os.name")).orElseGet(() -> "unknown").toLowerCase();
+        String arch = Optional.ofNullable(System.getProperty("os.arch")).orElseGet(() -> "unknown").toLowerCase();
 
         if (os.contains("win")) {
             platform = "win";
@@ -87,7 +91,7 @@ class NodeManager {
         return nodePath.toString();
     }
 
-    private Path findNodeExecutable(String cacheDir) throws IOException {
+    private @Nullable Path findNodeExecutable(String cacheDir) throws IOException {
         Path rootDir = Paths.get(cacheDir);
         if (!Files.exists(rootDir)) {
             return null;
