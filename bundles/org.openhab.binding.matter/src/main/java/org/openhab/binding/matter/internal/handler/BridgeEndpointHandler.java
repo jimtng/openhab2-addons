@@ -47,17 +47,9 @@ public class BridgeEndpointHandler extends MatterBaseThingHandler {
     @Override
     public void initialize() {
         EndpointConfiguration config = getConfigAs(EndpointConfiguration.class);
-        logger.debug("initialize endpoint {}", config.endpointId);
         endpointId = config.endpointId;
-        NodeHandler handler = nodeHandler();
-        if (handler == null) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
-        } else if (handler.getThing().getStatus() != ThingStatus.ONLINE) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
-        } else {
-            // wait for us to be updated.
-            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
-        }
+        logger.debug("initialize bridge endpoint {}", config.endpointId);
+        super.initialize();
     }
 
     @Override

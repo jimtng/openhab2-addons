@@ -10,8 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
-package org.openhab.binding.matter.internal.util;
+package org.openhab.binding.matter.internal.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component(service = MatterWebsocketService.class, scope = ServiceScope.SINGLETON)
 public class MatterWebsocketService {
-    private final Logger logger = LoggerFactory.getLogger(MatterWebsocketService.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final Pattern LOG_PATTERN = Pattern
             .compile("^\\S+\\s+\\S+\\s+(TRACE|DEBUG|INFO|WARN|ERROR)\\s+(\\S+)\\s+(.*)$");
     private static final String MATTER_JS_PATH = "/matter-server/matter.js";
@@ -60,7 +59,7 @@ public class MatterWebsocketService {
 
     @Activate
     public MatterWebsocketService() throws IOException {
-        NodeManager nodeManager = new NodeManager();
+        NodeJSRuntimeManager nodeManager = new NodeJSRuntimeManager();
         String nodePath = nodeManager.getNodePath();
         this.nodePath = nodePath;
         restart();

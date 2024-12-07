@@ -41,6 +41,7 @@ import org.openhab.binding.matter.internal.bridge.devices.TemperatureSensorDevic
 import org.openhab.binding.matter.internal.bridge.devices.ThermostatDevice;
 import org.openhab.binding.matter.internal.bridge.devices.WindowCoveringDevice;
 import org.openhab.binding.matter.internal.client.MatterClientListener;
+import org.openhab.binding.matter.internal.client.MatterWebsocketService;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.BridgeCommissionState;
 import org.openhab.binding.matter.internal.client.model.ws.BridgeEventAttributeChanged;
@@ -48,7 +49,6 @@ import org.openhab.binding.matter.internal.client.model.ws.BridgeEventMessage;
 import org.openhab.binding.matter.internal.client.model.ws.BridgeEventTriggered;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
-import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.OpenHAB;
 import org.openhab.core.common.ThreadPoolManager;
 import org.openhab.core.common.registry.RegistryChangeListener;

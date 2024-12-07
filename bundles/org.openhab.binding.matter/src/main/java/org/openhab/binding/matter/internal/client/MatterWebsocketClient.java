@@ -53,7 +53,6 @@ import org.openhab.binding.matter.internal.client.model.ws.NodeStateMessage;
 import org.openhab.binding.matter.internal.client.model.ws.Path;
 import org.openhab.binding.matter.internal.client.model.ws.Request;
 import org.openhab.binding.matter.internal.client.model.ws.Response;
-import org.openhab.binding.matter.internal.util.MatterWebsocketService;
 import org.openhab.core.common.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ import com.google.gson.reflect.TypeToken;
 @NonNullByDefault
 public class MatterWebsocketClient implements WebSocketListener, MatterWebsocketService.NodeProcessListener {
 
-    private final Logger logger = LoggerFactory.getLogger(MatterWebsocketClient.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final int BUFFER_SIZE = 1048576 * 2; // 2 Mb
     private final ScheduledExecutorService scheduler = ThreadPoolManager

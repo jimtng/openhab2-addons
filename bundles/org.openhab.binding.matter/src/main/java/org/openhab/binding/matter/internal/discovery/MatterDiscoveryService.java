@@ -15,16 +15,12 @@ package org.openhab.binding.matter.internal.discovery;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_NODE;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
-import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.FixedLabelCluster;
+import org.openhab.binding.matter.internal.util.MatterLabelUtils;
 import org.openhab.core.config.discovery.AbstractDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
 import org.openhab.core.config.discovery.DiscoveryResultBuilder;
@@ -101,53 +97,19 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
     }
 
     public void discoverBridgeEndpoint(ThingUID thingUID, ThingUID bridgeUID, Endpoint root) {
-        discoverThing(thingUID, bridgeUID, root, root.number.toString(), "endpointId", "Matter Bridged Device:");
+        String label = ("Matter Bridged Device: " + MatterLabelUtils.labelForBridgeEndpoint(root)).trim();
+        discoverThing(thingUID, bridgeUID, root, root.number.toString(), "endpointId", label);
     }
 
     public void discoverNodeDevice(ThingUID thingUID, ThingUID bridgeUID, Node node) {
-        discoverThing(thingUID, bridgeUID, node.rootEndpoint, node.id.toString(), "nodeId", "Matter Device:");
+        String label = ("Matter Device: " + MatterLabelUtils.labelForNode(node.rootEndpoint)).trim();
+        discoverThing(thingUID, bridgeUID, node.rootEndpoint, node.id.toString(), "nodeId", label);
     }
 
     private void discoverThing(ThingUID thingUID, ThingUID bridgeUID, Endpoint root, String id,
             String representationProperty, String label) {
         logger.debug("discoverThing: {} {} {}", thingUID, bridgeUID, id);
-        String vendorName = "";
-        String productName = "";
-        String nodeLabel = "";
-        String fixedLabel = "";
 
-        BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
-        if (cluster != null && cluster instanceof BasicInformationCluster basicCluster) {
-            vendorName = basicCluster.vendorName;
-            productName = basicCluster.productName;
-            nodeLabel = basicCluster.nodeLabel;
-        } else {
-            cluster = root.clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
-            if (cluster != null && cluster instanceof BridgedDeviceBasicInformationCluster basicCluster) {
-                vendorName = basicCluster.vendorName;
-                productName = basicCluster.productName;
-                nodeLabel = basicCluster.nodeLabel;
-            }
-        }
-
-        if (root.clusters.get(FixedLabelCluster.CLUSTER_NAME) instanceof FixedLabelCluster fixedLabelCluster) {
-            fixedLabel = fixedLabelCluster.labelList.stream().map(l -> l.label + ": " + l.value)
-                    .collect(Collectors.joining(" "));
-        }
-
-        if (nodeLabel != null && !nodeLabel.isEmpty()) {
-            label += " " + nodeLabel;
-        } else {
-            if (vendorName != null && !vendorName.isEmpty()) {
-                label += " " + vendorName;
-            }
-            if (productName != null && !productName.isEmpty()) {
-                label += " " + productName;
-            }
-        }
-        if (fixedLabel != null && !fixedLabel.isEmpty()) {
-            label += " - " + fixedLabel;
-        }
         DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withLabel(label)
                 .withProperty(representationProperty, id).withRepresentationProperty(representationProperty)
                 .withBridge(bridgeUID).build();
