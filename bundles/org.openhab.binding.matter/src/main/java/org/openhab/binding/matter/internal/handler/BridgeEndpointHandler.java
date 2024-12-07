@@ -88,6 +88,7 @@ public class BridgeEndpointHandler extends MatterBaseThingHandler {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                     "Bridge reports device as not reachable");
         }
+        updateRootProperties(endpoint);
         super.updateEndpoint(endpoint);
     }
 
