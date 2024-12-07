@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * GeneralCommissioning
@@ -327,11 +326,10 @@ public class GeneralCommissioningCluster extends BaseCluster {
      * previously established PASE session to still be usable, due to the server having cleared such sessions.
      */
     public static ClusterCommand commissioningComplete() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("commissioningComplete");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

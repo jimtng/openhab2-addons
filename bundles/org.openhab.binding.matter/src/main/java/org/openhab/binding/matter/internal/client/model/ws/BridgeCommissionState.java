@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 
 /**
- * @author Dan Cunningham
+ * BridgeCommissionState
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class BridgeCommissionState {
     public PairingCodes pairingCodes;

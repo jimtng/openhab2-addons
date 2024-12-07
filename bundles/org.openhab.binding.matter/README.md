@@ -37,6 +37,7 @@ Matter **requires** IPv6 to be enabled and be routable between openHAB and the M
 In the Matter ecosystem, a **node** represents a single device that joins a Matter network and will have a locally routable IPv6 address. A **node** can have multiple **endpoints**, which are logical representations of specific features or functionalities of the device. For example, a smart thermostat (node) may have an endpoint for general thermostat control (heating, cooling, current temperature, operating state, etc....) and another endpoint for humidity sensing.  Many devices will only have a single endpoint.  [Matter Bridges](#bridges) will expose multiple endpoints for each device they are bridging, and the bridge itself will be a node.
 
 **Example:**
+
 - A Thermostat node with an endpoint for general temperature control and another endpoint for a remote temperature or humidity sensor.
 
 ### Controllers
@@ -44,6 +45,7 @@ In the Matter ecosystem, a **node** represents a single device that joins a Matt
 A **controller** manages the interaction between Matter devices and other parts of the network. Controllers can send commands, receive updates, and facilitate device communication. They also handle the commissioning process when new devices are added to the network.
 
 **Example:**
+
 - openHAB or another smart home hub or a smartphone app that manages your smart light bulbs, door locks, and sensors (Google Home, Apple Home, Amazon Alexa, etc...)
 
 ### Bridges
@@ -53,6 +55,7 @@ A **bridge** is a special type of node that connects non-Matter devices to a Mat
 openHAB fully supports connecting to Matter bridges. In addition, openHAB has experimental support for running its own Matter bridge service, exposing openHAB items as Matter endpoints to 3rd party systems.  See [Matter Bridge](#Matter-Bridge) for information on running a Bridge server. 
 
 **Example:**
+
 - A bridge that connects Zigbee or Z-Wave devices, making them accessible within a Matter ecosystem. The Ikea Dirigera and Philips Hue Bridge both act as matter bridges and are supported in openHAB.
 
 ### Thread Border Routers
@@ -60,6 +63,7 @@ openHAB fully supports connecting to Matter bridges. In addition, openHAB has ex
 A **Thread Border Router** is a device that allows devices connected via Thread (a low-power wireless protocol) to communicate with devices on other networks, such as Wi-Fi or Ethernet. It facilitates IPv6-based communication between Thread networks and the local IP network.
 
 **Example:**
+
 - An Open Thread Boarder Router (open source) as well as recent versions of Apple TVs, Amazon Echos and Google Nest Hubs all have embedded thread boarder routers. 
 
 ## IPv6 and Network Connectivity
@@ -67,12 +71,15 @@ A **Thread Border Router** is a device that allows devices connected via Thread 
 Matter devices operate over an IPv6 network, and obtaining an IPv6 address is required for communication. Devices can connect to the network via different interfaces:
 
 ### Ethernet
+
 Ethernet-connected Matter devices receive an IPv6 address through standard DHCPv6 or stateless address auto-configuration (SLAAC).
 
 ### Wi-Fi
+
 Wi-Fi-enabled Matter devices also receive an IPv6 address using DHCPv6 or SLAAC. They rely on the existing Wi-Fi infrastructure for communication within the Matter ecosystem.
 
 ### Thread
+
 Thread-based Matter devices connect to the network via a **Thread Border Router**. They receive an IPv6 address from the Thread router
 
 ## IPv6 Requirements
@@ -82,6 +89,7 @@ For Matter devices to function correctly, **IPv6 must be enabled** and supported
 **Note that environments like Docker require special configurations to enable IPv6**
 
 ### Enabling IPv6 Thread Connectivity on Linux Hosts
+
 It is important to make sure that Route Announcements (RA) and Route Information Options (RIO) are enabled on your host so that Thread boarder routers can announce routes to the Thread network. 
 This is done by setting the following sysctl options:
 
@@ -93,30 +101,35 @@ the `accept_ra` is defaulted to `1` for most distributions.
 There may be other network daemons which will override this option (for example, dhcpcd on Raspberry Pi will override accept_ra to 0). 
 
 You can check the accept_ra value with:
+
 ```
 $ sudo sysctl -n net.ipv6.conf.wlan0.accept_ra
 0
 ```
 
 And set the value to 1 (or 2 in case IP forwarding is enabled) with:
+
 ```
 $ sudo sysctl -w net.ipv6.conf.wlan0.accept_ra=1
 Net.ipv6.conf.wlan0.accept_ra = 1
 ```
 
 The accept_ra_rt_info_max_plen option on most Linux distributions is default to 0, set it to 64 with:
+
 ```
 $ sudo sysctl -w net.ipv6.conf.wlan0.accept_ra_rt_info_max_plen=64
 net.ipv6.conf.wlan0.accept_ra_rt_info_max_plen = 64
 ```
 
 To make these changes permanent, add the following lines to `/etc/sysctl.conf`:
+
 ```
 net.ipv6.conf.eth0.accept_ra=1
 net.ipv6.conf.eth0.accept_ra_rt_info_max_plen=64
 ```
 
 Raspberry Pi users may need to add the following lines to `/etc/dhcpcd.conf` to prevent dhcpcd from overriding the accept_ra value:
+
 ```
 noipv6
 noipv6rs
@@ -129,12 +142,15 @@ noipv6rs
 Commissioning a Matter device involves securely adding it to the network using a **pairing code**. This process ensures that only authorized devices can join the network.
 
 ### Pairing Code from the Device
+
 When commissioning a new Matter device, it typically has a printed QR code or numeric pairing code that you scan or enter during setup. This pairing code allows the controller to establish a secure connection to the device and add it to the network. Once a device pairing code is in use, it can not be used again to pair other controllers.
 
 ### Additional Pairing Code from a Controller
+
 If a device has already been commissioned and you want to add it to another Matter controller, the existing controller can generate an additional pairing code. This is useful when sharing access to a device across multiple hubs or apps. Apple Home, Google Home, Amazon Alexa and openHAB all support generating pairing codes for existing paired devices.
 
 ### Example:
+
 - When setting up a smart lock, you may scan a QR code directly from the lock, or use the 11 digit pairing code printed on it to pair it with openHAB. If you later want to control the lock from another app or hub, you would retrieve a new pairing code directly from openHAB.
 
 # Matter Binding Configuration
@@ -207,6 +223,7 @@ Bridge Endpoints are discovered automatically once their parent Node has been ad
 | Send a raw command to the controller | Sends a raw command to the controller, eg. namespace=nodes functionName=disconnectNode parameters=1234567890 |
 
 ### Node Thing Actions
+
 | Name        Description                         |                                                                                                                                                                                                                                                                           |
 |-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Decommission Matter node from fabric            | This will remove the device from the Matter fabric. If the device is online and reachable this will attempt to remove the credentials from the device first before removing it from the network. Once a device is removed, this Thing will go offline and can be removed. |
@@ -215,9 +232,11 @@ Bridge Endpoints are discovered automatically once their parent Node has been ad
 ## Channels
 
 ### Controller Channels
+
 Controller have no channels.
 
 ### Node and Bridge Endpoint Channels
+
 Channels are dynamically added based on the endpoint type and matter cluster supported. Each endpoint is represented as a channel group.
 Possible channels include:
 
@@ -264,6 +283,7 @@ Possible channels include:
 ## Full Example
 
 ### Thing Configuration
+
 ```java
 Thing configuration example for the Matter controller:
 Thing matter:controller:main [ nodeId="1" ]
@@ -276,6 +296,7 @@ Thing matter:bridge-endpoint:main:12345678901234567890:2 [ endpointId=2]
 ```
 
 ### Item Configuration
+
 ```java
 Dimmer MyDimmer "My Endpoint Dimmer" { channel="matter:node:main:12345678901234567890:1#levelcontrol-level" }
 Dimmer MyBridgedDimmer "My Bridged Dimmer" { channel="matter:bridge-endpoint:main:12345678901234567890:2#levelcontrol-level" }
@@ -283,6 +304,7 @@ Dimmer MyBridgedDimmer "My Bridged Dimmer" { channel="matter:bridge-endpoint:mai
 ```
 
 ### Sitemap Configuration
+
 ```perl
 Optional Sitemap configuration:
 sitemap home label="Home"
@@ -305,6 +327,7 @@ The openHAB matter bridge uses Metadata tags with the key "matter", similar to t
 Pairing codes and other options can be found in the MainUI under "Settings -> Add-on Settings -> Matter Binding"
 
 ### Device Types
+
 | Type               | Item Type                     | Tag               | Option                                       | Notes                 |
 |--------------------|-------------------------------|-------------------|----------------------------------------------|-----------------------|
 | OnOff Light        | Switch, Dimmer                | OnOffLight        |                                              |                       |

@@ -24,13 +24,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link DeviceTypeRegistry}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class DeviceTypeRegistry {
-    private static final Logger logger = LoggerFactory.getLogger(DeviceTypeRegistry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceTypeRegistry.class);
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static final Map<Integer, Class<? extends DeviceType>> deviceTypes = new HashMap();
+    private static final Map<Integer, Class<? extends DeviceType>> DEVICE_TYPES = new HashMap();
 
     static {
         List.of(DeviceTypes.OnOffLight, DeviceTypes.OnOffLightSwitch, DeviceTypes.OnOffPlugInUnit,
@@ -41,17 +43,17 @@ public class DeviceTypeRegistry {
 
     /**
      * Register a device type with the device type id.
-     * 
+     *
      * @param deviceTypeId
      * @param deviceType
      */
     public static void registerDeviceType(Integer deviceTypeId, Class<? extends DeviceType> deviceType) {
-        deviceTypes.put(deviceTypeId, deviceType);
+        DEVICE_TYPES.put(deviceTypeId, deviceType);
     }
 
     /**
      * Create a device type based on the device type id. If the device type is not found, a generic type is returned.
-     * 
+     *
      * @param deviceTypeId
      * @param handler
      * @return
@@ -59,7 +61,7 @@ public class DeviceTypeRegistry {
     @SuppressWarnings("null")
     public static DeviceType createDeviceType(Integer deviceTypeId, MatterBaseThingHandler handler,
             Integer endpointNumber) {
-        Class<? extends DeviceType> clazz = deviceTypes.get(deviceTypeId);
+        Class<? extends DeviceType> clazz = DEVICE_TYPES.get(deviceTypeId);
         if (clazz != null) {
             try {
                 Class<?>[] constructorParameterTypes = new Class<?>[] { Integer.class, MatterBaseThingHandler.class,
@@ -67,7 +69,7 @@ public class DeviceTypeRegistry {
                 Constructor<? extends DeviceType> constructor = clazz.getConstructor(constructorParameterTypes);
                 return constructor.newInstance(deviceTypeId, handler, endpointNumber);
             } catch (Exception e) {
-                logger.debug("Could not create device type", e);
+                LOGGER.debug("Could not create device type", e);
             }
         }
         return new GenericType(0, handler, endpointNumber);

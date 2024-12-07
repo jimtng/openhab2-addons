@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import com.google.gson.JsonElement;
 
 /**
- * @author Dan Cunningham
+ * Response
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class Response {
     public String type;

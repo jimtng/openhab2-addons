@@ -26,7 +26,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ClusterRegistry;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.Metadata;
+import org.openhab.core.items.MetadataKey;
+import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.items.StateChangeListener;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.QuantityType;
@@ -45,8 +50,9 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public abstract class GenericDevice implements StateChangeListener {
+    private static final BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private final static BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
 
     protected final GenericItem primaryItem;
     protected @Nullable Metadata primaryItemMetadata;
@@ -60,15 +66,15 @@ public abstract class GenericDevice implements StateChangeListener {
         this.primaryItemMetadata = metadataRegistry.get(new MetadataKey("matter", primaryItem.getUID()));
     }
 
-    abstract public String deviceType();
+    public abstract String deviceType();
 
-    abstract public MatterDeviceOptions activate();
+    public abstract MatterDeviceOptions activate();
 
-    abstract public void dispose();
+    public abstract void dispose();
 
-    abstract public void updateState(Item item, State state);
+    public abstract void updateState(Item item, State state);
 
-    abstract public void handleMatterEvent(String clusterName, String attributeName, Object data);
+    public abstract void handleMatterEvent(String clusterName, String attributeName, Object data);
 
     public void handleMatterEvent(Integer clusterId, String attributeName, Object data) {
         Class<? extends BaseCluster> cluster = ClusterRegistry.CLUSTER_IDS.get(clusterId);

@@ -16,13 +16,10 @@
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ThreadNetworkDiagnostics
@@ -756,11 +753,10 @@ public class ThreadNetworkDiagnosticsCluster extends BaseCluster {
      * SUCCESS back to the initiator.
      */
     public static ClusterCommand resetCounts() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("resetCounts");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

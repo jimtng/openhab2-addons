@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import java.util.Map;
 
 /**
- * @author Dan Cunningham
+ * BridgeEventTriggered
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class BridgeEventTriggered extends BridgeEventMessage {
 

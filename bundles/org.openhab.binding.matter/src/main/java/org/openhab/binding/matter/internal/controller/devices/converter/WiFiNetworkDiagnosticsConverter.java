@@ -31,7 +31,9 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link WiFiNetworkDiagnosticsConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class WiFiNetworkDiagnosticsConverter extends GenericConverter<WiFiNetworkDiagnosticsCluster> {
@@ -41,6 +43,7 @@ public class WiFiNetworkDiagnosticsConverter extends GenericConverter<WiFiNetwor
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_WIFINETWORKDIAGNOSTICS_RSSI.getId()), ITEM_TYPE_NUMBER_POWER)
@@ -49,9 +52,11 @@ public class WiFiNetworkDiagnosticsConverter extends GenericConverter<WiFiNetwor
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "rssi":
@@ -62,6 +67,7 @@ public class WiFiNetworkDiagnosticsConverter extends GenericConverter<WiFiNetwor
         }
     }
 
+    @Override
     public void updateCluster(WiFiNetworkDiagnosticsCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_WIFINETWORKDIAGNOSTICS_RSSI, new DecimalType(cluster.rssi));

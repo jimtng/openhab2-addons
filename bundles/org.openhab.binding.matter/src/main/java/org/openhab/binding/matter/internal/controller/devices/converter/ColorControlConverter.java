@@ -34,8 +34,13 @@ import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControl
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster.OptionsBitmap;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
+import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
-import org.openhab.core.library.types.*;
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
@@ -50,6 +55,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The {@link MatterControllerClient}
+ *
  * @author Dan Cunningham - Initial contribution
  * @author Chris Jackson - Original Zigbee binding color logic
  *

@@ -30,9 +30,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 /**
+ * The {@link MatterControllerClient}
  *
- * @author Dan Cunningham
- *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class MatterControllerClient extends MatterWebsocketClient {
@@ -52,7 +52,7 @@ public class MatterControllerClient extends MatterWebsocketClient {
 
     /**
      * Get all nodes the are commissioned / paired to this controller
-     * 
+     *
      * @param onlyConnected filter to nodes that are currently connected
      * @return
      * @throws Exception

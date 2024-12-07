@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_ONOFF_ONOFF;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ONOFF_ONOFF;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_SWITCH;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -34,7 +32,9 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link OnOffConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class OnOffConverter extends GenericConverter<OnOffCluster> {
@@ -44,12 +44,14 @@ public class OnOffConverter extends GenericConverter<OnOffCluster> {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_ONOFF_ONOFF.getId()), ITEM_TYPE_SWITCH)
                 .withType(CHANNEL_ONOFF_ONOFF).withLabel(formatLabel(CHANNEL_LABEL_ONOFF_ONOFF)).build();
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
@@ -58,6 +60,7 @@ public class OnOffConverter extends GenericConverter<OnOffCluster> {
         }
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "onOff":
@@ -66,6 +69,7 @@ public class OnOffConverter extends GenericConverter<OnOffCluster> {
         }
     }
 
+    @Override
     public void updateCluster(OnOffCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_ONOFF_ONOFF, OnOffType.from(Boolean.valueOf(cluster.onOff)));

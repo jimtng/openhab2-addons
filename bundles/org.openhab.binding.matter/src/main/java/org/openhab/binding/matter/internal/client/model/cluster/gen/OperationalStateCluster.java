@@ -16,13 +16,10 @@
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * OperationalState
@@ -265,8 +262,6 @@ public class OperationalStateCluster extends BaseCluster {
      * ### Table 3. Pause Compatibility
      */
     public static ClusterCommand pause() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("pause");
     }
 
@@ -285,8 +280,6 @@ public class OperationalStateCluster extends BaseCluster {
      * • The device shall respond with an OperationalCommandResponse command with an ErrorStateID of NoError.
      */
     public static ClusterCommand stop() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("stop");
     }
 
@@ -307,8 +300,6 @@ public class OperationalStateCluster extends BaseCluster {
      * • The device shall respond with an OperationalCommandResponse command with an ErrorStateID of NoError.
      */
     public static ClusterCommand start() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("start");
     }
 
@@ -337,11 +328,10 @@ public class OperationalStateCluster extends BaseCluster {
      * • The device shall respond with an OperationalCommandResponse command with an ErrorStateID of NoError.
      */
     public static ClusterCommand resume() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("resume");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

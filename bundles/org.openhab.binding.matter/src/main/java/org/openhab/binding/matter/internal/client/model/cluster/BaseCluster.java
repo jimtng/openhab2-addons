@@ -18,8 +18,9 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 /**
- * @author Dan Cunningham
+ * The {@link BaseCluster}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public abstract class BaseCluster {
     protected static final Gson GSON = new Gson();

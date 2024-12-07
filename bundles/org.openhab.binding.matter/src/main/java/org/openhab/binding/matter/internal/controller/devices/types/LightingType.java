@@ -12,8 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.types;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LEVEL_LEVEL;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ONOFF_ONOFF;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Map;
 
@@ -39,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * @author Dan Cunningham - Initial contribution
  *
  *         Lighting requires special handling for the OnOff, ColorControl and LevelControl clusters.
  *         For example, the Matter specification mandates Switches also must have a LevelControl cluster, even though
@@ -59,7 +58,7 @@ public class LightingType extends DeviceType {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.debug("Handling command for channel: " + channelUID);
+        logger.debug("Handling command for channel: {}", channelUID);
         // we want OnOff commands to always use OnOff cluster (not levelcontrol)
         if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();

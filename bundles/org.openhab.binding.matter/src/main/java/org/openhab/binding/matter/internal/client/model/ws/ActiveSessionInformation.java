@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import java.math.BigInteger;
 
 /**
- * @author Dan Cunningham
+ * ActiveSessionInformation
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class ActiveSessionInformation {
     public String name;

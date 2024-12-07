@@ -16,8 +16,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
 
 /**
- * @author Dan Cunningham
+ * The {@link EventTriggeredListener}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public interface EventTriggeredListener {

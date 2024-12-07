@@ -35,7 +35,9 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link RelativeHumidityMeasurementConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class RelativeHumidityMeasurementConverter extends GenericConverter<RelativeHumidityMeasurementCluster> {

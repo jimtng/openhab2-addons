@@ -13,8 +13,9 @@
 package org.openhab.binding.matter.internal.client.model.ws;
 
 /**
- * @author Dan Cunningham
+ * BridgeEventAttributeChanged
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class BridgeEventAttributeChanged extends BridgeEventMessage {
     public AttributeChangedData data;

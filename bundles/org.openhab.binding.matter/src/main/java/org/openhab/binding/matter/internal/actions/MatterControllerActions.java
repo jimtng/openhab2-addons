@@ -30,10 +30,12 @@ import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@NonNullByDefault
 /**
- * @author Dan Cunningham
+ * The {@link MatterControllerActions}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
+@NonNullByDefault
 @Component(scope = ServiceScope.PROTOTYPE, service = MatterControllerActions.class)
 @ThingActionsScope(name = "matter")
 public class MatterControllerActions implements ThingActions {
@@ -59,15 +61,12 @@ public class MatterControllerActions implements ThingActions {
         ControllerHandler handler = this.handler;
         if (handler != null) {
             MatterControllerClient client = handler.getClient();
-            if (client != null) {
-
-                String[] args = parameters.toString().split(" ");
-                try {
-                    return client.genericCommand(namespace, functionName, (Object[]) args).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.debug("Failed to execute command", e);
-                    return e.getLocalizedMessage();
-                }
+            String[] args = parameters.toString().split(" ");
+            try {
+                return client.genericCommand(namespace, functionName, (Object[]) args).get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.debug("Failed to execute command", e);
+                return e.getLocalizedMessage();
             }
         }
         return null;

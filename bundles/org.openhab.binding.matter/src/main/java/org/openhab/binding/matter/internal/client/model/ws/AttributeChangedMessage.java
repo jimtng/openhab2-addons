@@ -13,8 +13,9 @@
 package org.openhab.binding.matter.internal.client.model.ws;
 
 /**
- * @author Dan Cunningham
+ * AttributeChangedMessage
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class AttributeChangedMessage {
     public Path path;

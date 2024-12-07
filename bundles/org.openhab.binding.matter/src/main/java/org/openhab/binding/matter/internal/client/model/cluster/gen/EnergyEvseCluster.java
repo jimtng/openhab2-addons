@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * EnergyEvse
@@ -498,8 +497,6 @@ public class EnergyEvseCluster extends BaseCluster {
      * Allows a client to disable the EVSE from charging and discharging.
      */
     public static ClusterCommand disable() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("disable");
     }
 
@@ -532,8 +529,6 @@ public class EnergyEvseCluster extends BaseCluster {
      * Allows a client to put the EVSE into a self-diagnostics mode.
      */
     public static ClusterCommand startDiagnostics() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("startDiagnostics");
     }
 
@@ -551,8 +546,6 @@ public class EnergyEvseCluster extends BaseCluster {
      * Allows a client to retrieve the current set of charging targets.
      */
     public static ClusterCommand getTargets() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("getTargets");
     }
 
@@ -560,11 +553,10 @@ public class EnergyEvseCluster extends BaseCluster {
      * Allows a client to clear all stored charging targets.
      */
     public static ClusterCommand clearTargets() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("clearTargets");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

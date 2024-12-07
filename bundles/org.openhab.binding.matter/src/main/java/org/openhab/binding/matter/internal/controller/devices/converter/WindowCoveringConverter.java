@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_WINDOWCOVERING_LIFT;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_WINDOWCOVERING_LIFT;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_ROLLERSHUTTER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -38,7 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link WindowCoveringConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class WindowCoveringConverter extends GenericConverter<WindowCoveringCluster> {
@@ -50,6 +50,7 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_WINDOWCOVERING_LIFT.getId()), ITEM_TYPE_ROLLERSHUTTER)
@@ -58,6 +59,7 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof UpDownType upDownType) {
             switch (upDownType) {
@@ -83,6 +85,7 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
         }
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
         switch (message.path.attributeName) {
@@ -97,6 +100,7 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
         }
     }
 
+    @Override
     public void updateCluster(WindowCoveringCluster cluster) {
         super.updateCluster(cluster);
         Integer pos = 0;

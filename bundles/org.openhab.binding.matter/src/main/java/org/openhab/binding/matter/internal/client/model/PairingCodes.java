@@ -14,8 +14,9 @@
 package org.openhab.binding.matter.internal.client.model;
 
 /**
- * @author Dan Cunningham
+ * The {@link PairingCodes}
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class PairingCodes {
     public String manualPairingCode;

@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * @author Dan Cunningham
+ * NodeState
  *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public enum NodeState {

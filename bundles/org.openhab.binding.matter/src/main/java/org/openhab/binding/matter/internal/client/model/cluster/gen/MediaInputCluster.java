@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * MediaInput
@@ -144,8 +143,6 @@ public class MediaInputCluster extends BaseCluster {
      * Upon receipt, this command shall display the active status of the input list on screen.
      */
     public static ClusterCommand showInputStatus() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("showInputStatus");
     }
 
@@ -153,8 +150,6 @@ public class MediaInputCluster extends BaseCluster {
      * Upon receipt, this command shall hide the input list from the screen.
      */
     public static ClusterCommand hideInputStatus() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("hideInputStatus");
     }
 
@@ -170,6 +165,7 @@ public class MediaInputCluster extends BaseCluster {
         return new ClusterCommand("renameInput", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

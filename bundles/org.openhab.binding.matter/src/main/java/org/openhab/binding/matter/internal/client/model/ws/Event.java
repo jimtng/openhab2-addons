@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import com.google.gson.JsonElement;
 
 /**
- * @author Dan Cunningham
+ * Event
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class Event {
     public String type;

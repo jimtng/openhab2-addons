@@ -14,7 +14,10 @@ package org.openhab.binding.matter.internal.controller.devices.converter;
 
 import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -37,7 +40,9 @@ import org.openhab.core.types.StateOption;
 import com.google.gson.Gson;
 
 /**
- * @author Dan Cunningham
+ * The {@link SwitchConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class SwitchConverter extends GenericConverter<SwitchCluster> {
@@ -48,6 +53,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         final Map<Channel, @Nullable StateDescription> map = new HashMap<>();
         Map<ChannelTypeUID, String> triggerChannels = new HashMap<>();
@@ -94,10 +100,12 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         return map;
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         // no commands to handle
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
         switch (message.path.attributeName) {
@@ -108,6 +116,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         }
     }
 
+    @Override
     public void onEvent(EventTriggeredMessage message) {
         String eventName = message.path.eventName.toLowerCase();
         // TODO: check if there are any switch events that actually have more then one event data, I don't think there
@@ -116,6 +125,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         triggerChannel(new ChannelTypeUID("matter:switch-" + eventName), eventData);
     }
 
+    @Override
     public void updateCluster(SwitchCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_SWITCH_SWITCH, new DecimalType(cluster.currentPosition));

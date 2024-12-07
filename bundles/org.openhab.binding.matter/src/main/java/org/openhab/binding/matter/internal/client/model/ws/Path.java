@@ -15,8 +15,9 @@ package org.openhab.binding.matter.internal.client.model.ws;
 import java.math.BigInteger;
 
 /**
- * @author Dan Cunningham
+ * Path
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class Path {
     public BigInteger nodeId;

@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_OCCUPANCYSENSING_OCCUPIED;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_OCCUPANCYSENSING_OCCUPIED;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_SWITCH;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -35,7 +33,9 @@ import org.openhab.core.types.StateDescription;
 import com.google.gson.internal.LinkedTreeMap;
 
 /**
- * @author Dan Cunningham
+ * The {@link OccupancySensingConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class OccupancySensingConverter extends GenericConverter<OccupancySensingCluster> {
@@ -45,6 +45,7 @@ public class OccupancySensingConverter extends GenericConverter<OccupancySensing
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_OCCUPANCYSENSING_OCCUPIED.getId()), ITEM_TYPE_SWITCH)
@@ -53,9 +54,11 @@ public class OccupancySensingConverter extends GenericConverter<OccupancySensing
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "occupancy":
@@ -69,6 +72,7 @@ public class OccupancySensingConverter extends GenericConverter<OccupancySensing
         }
     }
 
+    @Override
     public void updateCluster(OccupancySensingCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_OCCUPANCYSENSING_OCCUPIED, OnOffType.from(cluster.occupancy.occupied));

@@ -17,7 +17,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -33,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 class NodeJSRuntimeManager {
-    private static final Logger logger = LoggerFactory.getLogger(NodeJSRuntimeManager.class);
+    private final Logger logger = LoggerFactory.getLogger(NodeJSRuntimeManager.class);
 
     private static final String NODE_VERSION = "v22.0.0";
     private static final String BASE_URL = "https://nodejs.org/dist/" + NODE_VERSION + "/";
@@ -118,7 +122,7 @@ class NodeJSRuntimeManager {
 
     private void downloadAndExtract(String cacheDir) throws IOException {
         String fileName = "node-" + NODE_VERSION + "-" + platform + "-" + arch
-                + (platform.equals("win") ? ".zip" : ".tar.gz");
+                + ("win".equals(platform) ? ".zip" : ".tar.gz");
         String downloadUrl = BASE_URL + fileName;
 
         Path downloadPath = Paths.get(cacheDir, fileName);
@@ -130,7 +134,7 @@ class NodeJSRuntimeManager {
         }
 
         logger.debug("Extracting Node.js");
-        if (platform.equals("win")) {
+        if ("win".equals(platform)) {
             unzip(downloadPath.toString(), cacheDir);
         } else {
             untar(downloadPath.toString(), cacheDir);

@@ -13,8 +13,9 @@
 package org.openhab.binding.matter.internal.client.model.ws;
 
 /**
- * @author Dan Cunningham
+ * BridgeEventMessage
  *
+ * @author Dan Cunningham - Initial contribution
  */
 public class BridgeEventMessage {
     public String type;

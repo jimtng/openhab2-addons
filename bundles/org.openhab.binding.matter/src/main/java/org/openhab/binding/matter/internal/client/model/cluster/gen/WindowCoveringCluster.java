@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * WindowCovering
@@ -481,8 +480,6 @@ public class WindowCoveringCluster extends BaseCluster {
      * • CurrentPositionTilt attribute shall be equal to the InstalledOpenLimitTilt attribute.
      */
     public static ClusterCommand upOrOpen() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("upOrOpen");
     }
 
@@ -504,8 +501,6 @@ public class WindowCoveringCluster extends BaseCluster {
      * • CurrentPositionTilt attribute shall be equal to the InstalledClosedLimitTilt attribute.
      */
     public static ClusterCommand downOrClose() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("downOrClose");
     }
 
@@ -516,8 +511,6 @@ public class WindowCoveringCluster extends BaseCluster {
      * • TargetPositionTiltPercent100ths attribute will be set to CurrentPositionTiltPercent100ths attribute value.
      */
     public static ClusterCommand stopMotion() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("stopMotion");
     }
 
@@ -575,6 +568,7 @@ public class WindowCoveringCluster extends BaseCluster {
         return new ClusterCommand("goToTiltPercentage", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

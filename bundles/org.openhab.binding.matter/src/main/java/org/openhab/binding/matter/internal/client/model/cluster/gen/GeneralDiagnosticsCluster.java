@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * GeneralDiagnostics
@@ -353,8 +352,6 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
      * Upon command invocation, the server shall respond with a TimeSnapshotResponse.
      */
     public static ClusterCommand timeSnapshot() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("timeSnapshot");
     }
 
@@ -375,6 +372,7 @@ public class GeneralDiagnosticsCluster extends BaseCluster {
         return new ClusterCommand("payloadTestRequest", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

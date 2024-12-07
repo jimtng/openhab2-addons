@@ -16,12 +16,9 @@
 package org.openhab.binding.matter.internal.client.model.cluster.gen;
 
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * SmokeCoAlarm
@@ -296,11 +293,10 @@ public class SmokeCoAlarmCluster extends BaseCluster {
      * reflect the current state of the server.
      */
     public static ClusterCommand selfTestRequest() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("selfTestRequest");
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

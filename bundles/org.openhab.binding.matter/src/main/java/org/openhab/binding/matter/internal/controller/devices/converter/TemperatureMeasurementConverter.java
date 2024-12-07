@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_TEMPERATUREMEASURMENT_MEASUREDVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE;
-import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_TEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,7 +30,9 @@ import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
- * @author Dan Cunningham
+ * The {@link TemperatureMeasurementConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class TemperatureMeasurementConverter extends GenericConverter<TemperatureMeasurementCluster> {
@@ -42,6 +42,7 @@ public class TemperatureMeasurementConverter extends GenericConverter<Temperatur
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder
                 .create(new ChannelUID(thingUID, CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE.getId()),
@@ -51,9 +52,11 @@ public class TemperatureMeasurementConverter extends GenericConverter<Temperatur
         return Collections.singletonMap(channel, null);
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         switch (message.path.attributeName) {
             case "measuredValue":
@@ -63,6 +66,7 @@ public class TemperatureMeasurementConverter extends GenericConverter<Temperatur
         }
     }
 
+    @Override
     public void updateCluster(TemperatureMeasurementCluster cluster) {
         super.updateCluster(cluster);
         updateState(CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE, valueToTemperature(cluster.measuredValue));

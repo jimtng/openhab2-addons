@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * ContentControl
@@ -401,8 +400,6 @@ public class ContentControlCluster extends BaseCluster {
      * If this command is executed successfully, a ResetPINResponse command with a new PIN shall be returned.
      */
     public static ClusterCommand resetPin() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("resetPin");
     }
 
@@ -411,8 +408,6 @@ public class ContentControlCluster extends BaseCluster {
      * Upon receipt of the Enable command, the media device shall set the Enabled attribute to TRUE.
      */
     public static ClusterCommand enable() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("enable");
     }
 
@@ -421,8 +416,6 @@ public class ContentControlCluster extends BaseCluster {
      * On receipt of the Disable command, the media device shall set the Enabled attribute to FALSE.
      */
     public static ClusterCommand disable() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("disable");
     }
 
@@ -466,8 +459,6 @@ public class ContentControlCluster extends BaseCluster {
      * Upon receipt of the BlockUnratedContent command, the media device shall set the BlockUnrated attribute to TRUE.
      */
     public static ClusterCommand blockUnratedContent() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("blockUnratedContent");
     }
 
@@ -478,8 +469,6 @@ public class ContentControlCluster extends BaseCluster {
      * FALSE.
      */
     public static ClusterCommand unblockUnratedContent() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("unblockUnratedContent");
     }
 
@@ -605,6 +594,7 @@ public class ContentControlCluster extends BaseCluster {
         return new ClusterCommand("removeBlockContentTimeWindow", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

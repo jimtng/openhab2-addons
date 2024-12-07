@@ -16,9 +16,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 
 /**
- * @author Dan Cunningham
- * 
- *         This class is a generic type of device and can be used for most Matter devices
+ * The {@link GenericType} is a generic type of device and can be used for most Matter devices
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class GenericType extends DeviceType {

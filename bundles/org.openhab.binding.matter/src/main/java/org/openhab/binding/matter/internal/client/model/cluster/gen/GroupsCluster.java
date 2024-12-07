@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.DataTypes.*;
 
 /**
  * Groups
@@ -118,8 +117,6 @@ public class GroupsCluster extends BaseCluster {
      * endpoint.
      */
     public static ClusterCommand removeAllGroups() {
-        Map<String, Object> map = new LinkedHashMap<>();
-
         return new ClusterCommand("removeAllGroups");
     }
 
@@ -139,6 +136,7 @@ public class GroupsCluster extends BaseCluster {
         return new ClusterCommand("addGroupIfIdentifying", map);
     }
 
+    @Override
     public String toString() {
         String str = "";
         str += "clusterRevision : " + clusterRevision + "\n";

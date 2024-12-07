@@ -38,7 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Dan Cunningham
+ * The {@link ThermostatConverter}
+ *
+ * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
 public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
@@ -50,6 +52,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
 
+    @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Map<Channel, @Nullable StateDescription> channels = new HashMap<>();
 
@@ -184,6 +187,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
         return channels;
     }
 
+    @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         String id = channelUID.getIdWithoutGroup();
         if (id.equals(CHANNEL_THERMOSTAT_SYSTEMMODE.getId())) {
@@ -202,6 +206,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
         }
     }
 
+    @Override
     public void onEvent(AttributeChangedMessage message) {
         logger.debug("OnEvent: {}", message.path.attributeName);
         Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
@@ -235,6 +240,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
         }
     }
 
+    @Override
     public void updateCluster(ThermostatCluster cluster) {
         super.updateCluster(cluster);
         if (cluster.localTemperature != null) {
