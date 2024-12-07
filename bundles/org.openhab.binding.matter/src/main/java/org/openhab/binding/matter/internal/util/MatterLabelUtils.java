@@ -118,7 +118,7 @@ public class MatterLabelUtils {
         }
 
         if (label.length() == 0) {
-            label.append(deviceTypeLabel);
+            label.append(deviceTypeLabel + " " + endpoint.number.toString());
         }
 
         // Fixed labels are a way of vendors to label endpoints with additional meta data.
