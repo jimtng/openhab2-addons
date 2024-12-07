@@ -99,11 +99,8 @@ public class MatterLabelUtils {
         Map<String, BaseCluster> clusters = endpoint.clusters;
         Object basicInfoObject = clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
 
-        Integer deviceTypeID = primaryDeviceTypeForEndpoint(endpoint);
-
         // labels will look like "Device Type : Custom Node Label Or Product Label"
         final StringBuffer label = new StringBuffer();
-        String deviceTypeLabel = splitAndCapitalize(DeviceTypes.DEVICE_MAPPING.get(deviceTypeID));
         // Check if a "nodeLabel" is set, otherwise use the product label. This varies from vendor to vendor
         if (basicInfoObject != null) {
             BridgedDeviceBasicInformationCluster basicInfo = (BridgedDeviceBasicInformationCluster) basicInfoObject;
@@ -118,7 +115,9 @@ public class MatterLabelUtils {
         }
 
         if (label.length() == 0) {
-            label.append(deviceTypeLabel + " " + endpoint.number.toString());
+            Integer deviceTypeID = primaryDeviceTypeForEndpoint(endpoint);
+            String deviceTypeLabel = splitAndCapitalize(DeviceTypes.DEVICE_MAPPING.get(deviceTypeID));
+            label.append(deviceTypeLabel + " (" + endpoint.number.toString() + ")");
         }
 
         // Fixed labels are a way of vendors to label endpoints with additional meta data.
@@ -147,10 +146,13 @@ public class MatterLabelUtils {
         if (descriptorCluster != null && !descriptorCluster.deviceTypeList.isEmpty()) {
             for (DeviceTypeStruct ds : descriptorCluster.deviceTypeList) {
                 // ignore bridge types
-                if (!DeviceTypes.BridgedNode.equals(ds.deviceType) || !DeviceTypes.Aggregator.equals(ds.deviceType)) {
+                if (!DeviceTypes.BridgedNode.equals(ds.deviceType) && !DeviceTypes.Aggregator.equals(ds.deviceType)) {
                     deviceTypeID = ds.deviceType;
                     break;
                 }
+            }
+            if (deviceTypeID == -1) {
+                deviceTypeID = descriptorCluster.deviceTypeList.get(0).deviceType;
             }
         }
         return deviceTypeID;
