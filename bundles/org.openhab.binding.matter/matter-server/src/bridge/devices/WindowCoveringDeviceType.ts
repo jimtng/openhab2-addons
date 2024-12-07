@@ -27,7 +27,15 @@ export class WindowCoveringDeviceType extends GenericDeviceType {
         return {
             windowCovering: {
                 currentPositionLiftPercent100ths: 0,
-                liftEncoderControlled: true
+                configStatus: {
+                    operational: true,
+                    onlineReserved: false,
+                    liftMovementReversed: false,
+                    liftPositionAware: true,
+                    tiltPositionAware: false,
+                    liftEncoderControlled: true,
+                    tiltEncoderControlled: false
+                }
             }
         }
     }
