@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.matter.internal.MatterChannelTypeProvider;
 import org.openhab.binding.matter.internal.MatterStateDescriptionOptionProvider;
-import org.openhab.binding.matter.internal.actions.MatterEndpointActions;
+import org.openhab.binding.matter.internal.actions.MatterNodeActions;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
@@ -92,7 +92,7 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
 
     @Override
     public Collection<Class<? extends ThingHandlerService>> getServices() {
-        return Set.of(MatterEndpointActions.class);
+        return Set.of(MatterNodeActions.class);
     }
 
     @Override
@@ -157,11 +157,12 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
     }
 
     private void updateBridgeEndpoint(Endpoint endpoint) {
-        discoverChildBridge(endpoint);
         BridgeEndpointHandler handler = bridgedEndpoints.get(endpoint.number);
         if (handler != null) {
             updateBridgeEndpointMap(endpoint, handler);
             handler.updateEndpoint(endpoint);
+        } else {
+            discoverChildBridge(endpoint);
         }
     }
 

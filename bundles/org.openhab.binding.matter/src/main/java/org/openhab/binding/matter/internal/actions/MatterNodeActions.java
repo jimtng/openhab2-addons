@@ -32,14 +32,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link MatterEndpointActions}
+ * The {@link MatterNodeActions}
  *
  * @author Dan Cunningham - Initial contribution
  */
 @NonNullByDefault
-@Component(scope = ServiceScope.PROTOTYPE, service = MatterEndpointActions.class)
+@Component(scope = ServiceScope.PROTOTYPE, service = MatterNodeActions.class)
 @ThingActionsScope(name = "matter")
-public class MatterEndpointActions implements ThingActions {
+public class MatterNodeActions implements ThingActions {
     public final Logger logger = LoggerFactory.getLogger(getClass());
     private @Nullable NodeHandler handler;
 
@@ -66,6 +66,25 @@ public class MatterEndpointActions implements ThingActions {
                     return Map.of("manualPairingCode", code.manualPairingCode, "qrPairingCode", code.qrPairingCode);
                 } catch (InterruptedException | ExecutionException e) {
                     logger.debug("Failed to generate new pairing code for device {}", handler.getNodeId(), e);
+                }
+            }
+        }
+        return null;
+    }
+
+    @RuleAction(label = "Reconnect Matter node", description = "This will trigger a reconnection of the node if one is not already in progress")
+    public @Nullable @ActionOutputs({
+            @ActionOutput(name = "result", label = "Result from reconnection trigger", type = "java.lang.String") }) String reconnectNode() {
+        NodeHandler handler = this.handler;
+        if (handler != null) {
+            MatterControllerClient client = handler.getClient();
+            if (client != null) {
+                try {
+                    client.reconnectNode(handler.getNodeId()).get();
+                    return "success";
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.debug("Failed to attempt reconnection to device {}", handler.getNodeId(), e);
+                    return e.getLocalizedMessage();
                 }
             }
         }

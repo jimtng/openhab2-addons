@@ -332,12 +332,12 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
      * @param node
      */
     private synchronized void updateNode(Node node) {
-        discoverChildNode(node);
+
         NodeHandler handler = linkedNodes.get(node.id);
         if (handler != null) {
             handler.updateNode(node);
         } else {
-            logger.debug("Could not find handler for node {}", node.id);
+            discoverChildNode(node);
         }
     }
 

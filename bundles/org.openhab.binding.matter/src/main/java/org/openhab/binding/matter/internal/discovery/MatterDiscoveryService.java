@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.matter.internal.discovery;
 
+import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_BRIDGE_ENDPOINT;
 import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_TYPE_NODE;
 
 import java.util.Set;
@@ -41,9 +42,9 @@ public class MatterDiscoveryService extends AbstractDiscoveryService implements 
     private @Nullable ThingHandler thingHandler;
 
     public MatterDiscoveryService() throws IllegalArgumentException {
-        // set a 5 min timeout, which should be plenty of time to discover devices, but stopScan will be called when the
+        // set a 2 min timeout, which should be plenty of time to discover devices, but stopScan will be called when the
         // Matter client is done looking for new Nodes/Endpoints
-        super(Set.of(THING_TYPE_NODE), 60 * 5, false);
+        super(Set.of(THING_TYPE_NODE, THING_TYPE_BRIDGE_ENDPOINT), 60 * 2, false);
     }
 
     @Override

@@ -99,6 +99,13 @@ public class MatterControllerClient extends MatterWebsocketClient {
         });
     }
 
+    public CompletableFuture<Void> reconnectNode(BigInteger nodeId) {
+        CompletableFuture<JsonElement> future = sendMessage("nodes", "reconnectNode", new Object[] { nodeId });
+        return future.thenAccept(obj -> {
+            // Do nothing, just to complete the future
+        });
+    }
+
     public CompletableFuture<PairingCodes> enhancedCommissioningWindow(BigInteger id) {
         CompletableFuture<JsonElement> future = sendMessage("nodes", "enhancedCommissioningWindow",
                 new Object[] { id });

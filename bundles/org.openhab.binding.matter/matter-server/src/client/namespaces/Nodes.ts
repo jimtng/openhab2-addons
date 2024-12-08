@@ -176,6 +176,19 @@ export class Nodes {
         await node.disconnect();
     }
 
+    async reconnectNode(nodeId: number | string) {
+        if (this.theNode.commissioningController === undefined) {
+            console.log("Controller not initialized, nothing to disconnect.");
+            return;
+        }
+
+        const node = await this.theNode.getNode(nodeId, this.nodeListener);
+        if (node === undefined) {
+            throw new Error(`Node ${nodeId} not found`);
+        }
+        node.triggerReconnect();
+    }
+
     async removeNode(nodeId: number | string) {
         await this.theNode.commissioningController?.removeNode(NodeId(BigInt(nodeId)), true);
     }
