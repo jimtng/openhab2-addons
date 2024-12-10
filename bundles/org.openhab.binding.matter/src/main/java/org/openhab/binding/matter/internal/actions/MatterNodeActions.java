@@ -14,15 +14,15 @@ package org.openhab.binding.matter.internal.actions;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.handler.NodeHandler;
-import org.openhab.core.automation.annotation.ActionOutput;
-import org.openhab.core.automation.annotation.ActionOutputs;
-import org.openhab.core.automation.annotation.RuleAction;
+import org.openhab.binding.matter.internal.util.MatterVendorIDs;
+import org.openhab.core.automation.annotation.*;
 import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.binding.ThingActionsScope;
 import org.openhab.core.thing.binding.ThingHandler;
@@ -103,6 +103,47 @@ public class MatterNodeActions implements ThingActions {
                     return "success";
                 } catch (InterruptedException | ExecutionException e) {
                     logger.debug("Failed to decommission device {}", handler.getNodeId(), e);
+                    return e.getLocalizedMessage();
+                }
+            }
+        }
+        return null;
+    }
+
+    @RuleAction(label = "List connected Matter fabrics", description = "This will list all the Matter fabrics this node belongs to")
+    public @Nullable @ActionOutputs({
+            @ActionOutput(name = "result", label = "Connected Fabrics", type = "java.lang.String") }) String getFabrics() {
+        NodeHandler handler = this.handler;
+        if (handler != null) {
+            MatterControllerClient client = handler.getClient();
+            if (client != null) {
+                try {
+                    var fabrics = client.getFabrics(handler.getNodeId()).get();
+                    return fabrics.stream().map(fabric -> String.format("#%d %s (%s)", fabric.fabricIndex, fabric.label,
+                            MatterVendorIDs.VENDOR_IDS.get(fabric.vendorId))).collect(Collectors.joining(", "));
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.debug("Failed to retrieve fabrics {}", handler.getNodeId(), e);
+                    return e.getLocalizedMessage();
+                }
+            }
+        }
+        return null;
+    }
+
+    @RuleAction(label = "Remove connected Matter fabric", description = "This removes a connected Matter fabric from a device.  Use the 'List connected Matter fabrics' action to retrieve the fabric index number")
+    public @Nullable @ActionOutputs({
+            @ActionOutput(name = "result", label = "Remove Result", type = "java.lang.String") }) String removeFabric(
+                    @ActionInputs({
+                            @ActionInput(name = "index", label = "The index number of the fabric", description = "The index number of the connected Matter fabric") }) Integer index) {
+        NodeHandler handler = this.handler;
+        if (handler != null) {
+            MatterControllerClient client = handler.getClient();
+            if (client != null) {
+                try {
+                    client.removeFabric(handler.getNodeId(), index).get();
+                    return "success";
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.debug("Failed to remove fabric {} {} ", handler.getNodeId(), index, e);
                     return e.getLocalizedMessage();
                 }
             }

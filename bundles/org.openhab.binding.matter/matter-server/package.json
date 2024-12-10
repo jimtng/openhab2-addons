@@ -24,9 +24,9 @@
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
-        "@matter/main": "0.11.9-alpha.0-20241208-09ad57f78",
-        "@matter/node": "0.11.9-alpha.0-20241208-09ad57f78",
-        "@project-chip/matter.js" : "0.11.9-alpha.0-20241208-09ad57f78",
+        "@matter/main": "0.11.9-alpha.0-20241209-06a8040e1",
+        "@matter/node": "0.11.9-alpha.0-20241209-06a8040e1",
+        "@project-chip/matter.js" : "0.11.9-alpha.0-20241209-06a8040e1",
         "uuid": "^9.0.1",
         "ws": "^8.18.0",
         "yargs": "^17.7.2"

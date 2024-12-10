@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller;
 
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.openhab.binding.matter.internal.client.MatterWebsocketService;
 import org.openhab.binding.matter.internal.client.model.Node;
 import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.OperationalCredentialsCluster;
 import org.openhab.binding.matter.internal.client.model.ws.ActiveSessionInformation;
 
 import com.google.gson.JsonElement;
@@ -120,6 +122,28 @@ public class MatterControllerClient extends MatterWebsocketClient {
 
     public CompletableFuture<Void> disconnectNode(BigInteger nodeId) {
         CompletableFuture<JsonElement> future = sendMessage("nodes", "disconnectNode", new Object[] { nodeId });
+        return future.thenAccept(obj -> {
+            // Do nothing, just to complete the future
+        });
+    }
+
+    public CompletableFuture<List<OperationalCredentialsCluster.FabricDescriptorStruct>> getFabrics(BigInteger nodeId) {
+        Object[] clusterArgs = { String.valueOf(nodeId) };
+        CompletableFuture<JsonElement> future = sendMessage("nodes", "getFabrics", clusterArgs);
+        return future.thenApply(obj -> {
+            Type listType = new TypeToken<List<OperationalCredentialsCluster.FabricDescriptorStruct>>() {
+            }.getType();
+            // return List<OperationalCredentialsCluster.FabricDescriptorStruct> list = gson.fromJson(obj, listType);
+            List<OperationalCredentialsCluster.FabricDescriptorStruct> list = gson.fromJson(obj, listType);
+            if (list == null) {
+                throw new IllegalStateException("Could not deserialize fabrics");
+            }
+            return list;
+        });
+    }
+
+    public CompletableFuture<Void> removeFabric(BigInteger nodeId, Integer index) {
+        CompletableFuture<JsonElement> future = sendMessage("nodes", "removeFabric", new Object[] { nodeId, index });
         return future.thenAccept(obj -> {
             // Do nothing, just to complete the future
         });

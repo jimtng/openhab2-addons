@@ -1,13 +1,16 @@
 import { CommissioningControllerNodeOptions, PairedNode } from "@project-chip/matter.js/device";
 import { EndpointInterface } from "@matter/protocol";
 import { NodeCommissioningOptions } from "@project-chip/matter.js";
-import { GeneralCommissioning } from "@matter/main/clusters";
-import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode, NodeId } from "@matter/types";
+import { GeneralCommissioning, OperationalCredentialsCluster } from "@matter/main/clusters";
+import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode, NodeId, FabricIndex } from "@matter/types";
 
 import { Logger } from "@matter/main";
 import { MatterNode } from "../MatterNode";
 const logger = Logger.get("matter");
 
+/**
+ * Methods not marked as private are intended to be exposed to websocket clients
+ */
 export class Nodes {
 
     constructor(private theNode: MatterNode, private nodeListener: Partial<CommissioningControllerNodeOptions>) {
@@ -187,6 +190,52 @@ export class Nodes {
             throw new Error(`Node ${nodeId} not found`);
         }
         node.triggerReconnect();
+    }
+
+    async getFabrics(nodeId: number | string) {
+        if (this.theNode.commissioningController === undefined) {
+            console.log("Controller not initialized, nothing to disconnect.");
+            return;
+        }
+
+        const node = await this.theNode.getNode(nodeId, this.nodeListener);
+        if (node === undefined) {
+            throw new Error(`Node ${nodeId} not found`);
+        }
+        const operationalCredentialsCluster = node.getRootClusterClient(OperationalCredentialsCluster);
+
+        if (operationalCredentialsCluster === undefined) {
+            throw new Error(`OperationalCredentialsCluster for node ${nodeId} not found.`);
+        }
+
+        return await operationalCredentialsCluster.getFabricsAttribute(true, false);
+    }
+
+    async removeFabric(nodeId: number | string, index: number) {
+        if (this.theNode.commissioningController === undefined) {
+            console.log("Controller not initialized, nothing to disconnect.");
+            return;
+        }
+
+        const node = await this.theNode.getNode(nodeId, this.nodeListener);
+        if (node === undefined) {
+            throw new Error(`Node ${nodeId} not found`);
+        }
+        const operationalCredentialsCluster = node.getRootClusterClient(OperationalCredentialsCluster);
+
+        if (operationalCredentialsCluster === undefined) {
+            throw new Error(`OperationalCredentialsCluster for node ${nodeId} not found.`);
+        }
+
+
+        const fabricInstance = FabricIndex(index);
+        const ourFabricIndex = await operationalCredentialsCluster.getCurrentFabricIndexAttribute(true);
+
+        if (ourFabricIndex == fabricInstance) {
+            throw new Error("Will not delete our own fabric");
+        }
+
+        await operationalCredentialsCluster.commands.removeFabric({ fabricIndex: fabricInstance });
     }
 
     async removeNode(nodeId: number | string) {
