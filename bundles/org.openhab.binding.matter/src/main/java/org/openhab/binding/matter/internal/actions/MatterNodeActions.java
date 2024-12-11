@@ -22,7 +22,10 @@ import org.openhab.binding.matter.internal.client.model.PairingCodes;
 import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.handler.NodeHandler;
 import org.openhab.binding.matter.internal.util.MatterVendorIDs;
-import org.openhab.core.automation.annotation.*;
+import org.openhab.core.automation.annotation.ActionInput;
+import org.openhab.core.automation.annotation.ActionOutput;
+import org.openhab.core.automation.annotation.ActionOutputs;
+import org.openhab.core.automation.annotation.RuleAction;
 import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.binding.ThingActionsScope;
 import org.openhab.core.thing.binding.ThingHandler;
@@ -133,17 +136,16 @@ public class MatterNodeActions implements ThingActions {
     @RuleAction(label = "Remove connected Matter fabric", description = "This removes a connected Matter fabric from a device.  Use the 'List connected Matter fabrics' action to retrieve the fabric index number")
     public @Nullable @ActionOutputs({
             @ActionOutput(name = "result", label = "Remove Result", type = "java.lang.String") }) String removeFabric(
-                    @ActionInputs({
-                            @ActionInput(name = "index", label = "The index number of the fabric", description = "The index number of the connected Matter fabric") }) Integer index) {
+                    @ActionInput(name = "indexNumber", label = "The index number of the fabric", description = "The index number of the connected Matter fabric") Integer indexNumber) {
         NodeHandler handler = this.handler;
         if (handler != null) {
             MatterControllerClient client = handler.getClient();
             if (client != null) {
                 try {
-                    client.removeFabric(handler.getNodeId(), index).get();
+                    client.removeFabric(handler.getNodeId(), indexNumber).get();
                     return "success";
                 } catch (InterruptedException | ExecutionException e) {
-                    logger.debug("Failed to remove fabric {} {} ", handler.getNodeId(), index, e);
+                    logger.debug("Failed to remove fabric {} {} ", handler.getNodeId(), indexNumber, e);
                     return e.getLocalizedMessage();
                 }
             }
