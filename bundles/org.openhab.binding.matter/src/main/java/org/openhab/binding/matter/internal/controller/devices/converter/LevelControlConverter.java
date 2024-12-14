@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_LEVEL_LEVEL;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LEVEL_LEVEL;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_DIMMER;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,8 +34,6 @@ import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link LevelControlConverter}
@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class LevelControlConverter extends GenericConverter<LevelControlCluster> {
-
-    private final Logger logger = LoggerFactory.getLogger(LevelControlConverter.class);
 
     public LevelControlConverter(LevelControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
@@ -68,6 +66,7 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
                     new OptionsBitmap(true, true), new OptionsBitmap(true, true));
             handler.sendClusterCommand(endpointNumber, LevelControlCluster.CLUSTER_NAME, levelCommand);
         }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

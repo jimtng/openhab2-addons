@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_BOOLEANSTATE_STATEVALUE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_BOOLEANSTATE_STATEVALUE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_SWITCH;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,7 +29,6 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
@@ -50,10 +51,6 @@ public class BooleanStateConverter extends GenericConverter<BooleanStateCluster>
                 .withType(CHANNEL_BOOLEANSTATE_STATEVALUE).withLabel(formatLabel(CHANNEL_LABEL_BOOLEANSTATE_STATEVALUE))
                 .build();
         return Collections.singletonMap(channel, null);
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
     @Override

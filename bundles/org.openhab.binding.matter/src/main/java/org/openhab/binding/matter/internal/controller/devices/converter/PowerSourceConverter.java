@@ -12,7 +12,11 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_POWER_BATTERYPERCENT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_POWER_CHARGELEVEL;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_POWER_BATTERYPERCENT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_POWER_CHARGELEVEL;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +35,11 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.openhab.core.types.StateDescription;
 import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.openhab.core.types.StateOption;
 import org.openhab.core.types.UnDefType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link PowerSourceConverter}
@@ -47,8 +48,6 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public PowerSourceConverter(PowerSourceCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
@@ -81,10 +80,6 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
             }
         }
         return channels;
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
     @Override

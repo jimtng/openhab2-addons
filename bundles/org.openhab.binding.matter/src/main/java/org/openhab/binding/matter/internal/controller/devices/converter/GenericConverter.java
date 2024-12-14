@@ -15,6 +15,7 @@ package org.openhab.binding.matter.internal.controller.devices.converter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.measure.quantity.Temperature;
 
@@ -36,9 +37,11 @@ import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.openhab.core.types.State;
 import org.openhab.core.types.StateDescription;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * The {@link GenericConverter}
  *
@@ -50,11 +53,14 @@ import org.openhab.core.types.StateDescription;
 @NonNullByDefault
 public abstract class GenericConverter<T extends BaseCluster> implements AttributeListener, EventTriggeredListener {
     private static final BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
 
     protected T cluster;
     protected MatterBaseThingHandler handler;
     protected int endpointNumber;
     protected String labelPrefix;
+    protected ConcurrentHashMap<ChannelTypeUID, State> stateCache = new ConcurrentHashMap<>();
 
     public GenericConverter(T cluster, MatterBaseThingHandler handler, int endpointNumber, String labelPrefix) {
         this.cluster = cluster;
@@ -65,7 +71,11 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
 
     public abstract Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID);
 
-    public abstract void handleCommand(ChannelUID channelUID, Command command);
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        if (command instanceof RefreshType) {
+            stateCache.forEach((channelTypeUID, state) -> handler.updateState(endpointNumber, channelTypeUID, state));
+        }
+    }
 
     @Override
     public void onEvent(AttributeChangedMessage message) {
@@ -85,6 +95,7 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
 
     public final void updateState(ChannelTypeUID channelTypeUID, State state) {
         handler.updateState(endpointNumber, channelTypeUID, state);
+        stateCache.put(channelTypeUID, state);
     }
 
     public final void triggerChannel(ChannelTypeUID channelTypeUID, String event) {

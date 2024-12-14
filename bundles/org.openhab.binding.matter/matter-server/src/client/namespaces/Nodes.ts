@@ -2,11 +2,41 @@ import { CommissioningControllerNodeOptions, PairedNode } from "@project-chip/ma
 import { EndpointInterface } from "@matter/protocol";
 import { NodeCommissioningOptions } from "@project-chip/matter.js";
 import { GeneralCommissioning, OperationalCredentialsCluster } from "@matter/main/clusters";
-import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode, NodeId, FabricIndex } from "@matter/types";
+import { ManualPairingCodeCodec, QrPairingCodeCodec, QrCode, NodeId, FabricIndex, ClusterId } from "@matter/types";
 
 import { Logger } from "@matter/main";
 import { MatterNode } from "../MatterNode";
 const logger = Logger.get("matter");
+
+//List of system clusters on the root endpoint that are safe/useful to support (thanks to the iobroker project for the list)
+const SystemClusters: ClusterId[] = [
+    ClusterId(0x0004), // Groups
+    ClusterId(0x0005), // Scenes    
+    ClusterId(0x001d), // Descriptor
+    ClusterId(0x001e), // Binding
+    ClusterId(0x001f), // Access Control
+    ClusterId(0x002b), // Localization Configuration
+    ClusterId(0x002c), // Time Format Localization
+    ClusterId(0x002d), // Unit Localization
+    ClusterId(0x002e), // Power Source Configuration
+    ClusterId(0x0030), // General Commissioning
+    ClusterId(0x0031), // Network Commissioning
+    ClusterId(0x0032), // Diagnostic Logs
+    ClusterId(0x0033), // General Diagnostics
+    ClusterId(0x0034), // Software Diagnostics
+    ClusterId(0x0035), // Thread Network ClusterId(Diagnostics
+    ClusterId(0x0036), // Wi-Fi Network Diagnostics
+    ClusterId(0x0037), // Ethernet Network Diagnostics
+    ClusterId(0x0038), // Time Synchronization
+    ClusterId(0x0039), // Bridged Device Basic Information
+    ClusterId(0x0040), // Fixed Label
+    ClusterId(0x0041), // User Label
+    ClusterId(0x003c), // Administrator Commissioning
+    ClusterId(0x003e), // Node Operational Credentials
+    ClusterId(0x003f), // Group Key Management
+    ClusterId(0x0046), // ICD Management
+    ClusterId(0x0062), // Scenes Management
+];
 
 /**
  * Methods not marked as private are intended to be exposed to websocket clients
@@ -45,6 +75,10 @@ export class Nodes {
             // Serialize clusters
             for (const cluster of endpoint.getAllClusterClients()) {
                 if (!cluster.id) continue;
+                
+                // Skip system clusters if the endpoint is not the root
+                if (endpoint.number == 0 && !SystemClusters.includes(cluster.id)) continue;
+                
                 const clusterData: any = {
                     id: cluster.id,
                     name: cluster.name

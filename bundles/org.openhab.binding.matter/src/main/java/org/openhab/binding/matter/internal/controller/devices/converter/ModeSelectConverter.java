@@ -12,7 +12,8 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_MODESELECT_MODE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +71,7 @@ public class ModeSelectConverter extends GenericConverter<ModeSelectCluster> {
             ClusterCommand cc = ModeSelectCluster.changeToMode(((DecimalType) command).intValue());
             handler.sendClusterCommand(endpointNumber, ModeSelectCluster.CLUSTER_NAME, cc);
         }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

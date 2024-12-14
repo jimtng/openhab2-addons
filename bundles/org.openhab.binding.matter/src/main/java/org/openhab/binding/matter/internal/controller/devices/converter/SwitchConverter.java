@@ -12,7 +12,23 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_INITIALPRESS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_LONGPRESS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_LONGRELEASE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_MULTIPRESSCOMPLETE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_MULTIPRESSONGOING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_SHORTRELEASE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_SWITCH;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_SWITCH_SWITCHLATECHED;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_INITIALPRESS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_LONGPRESS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_LONGRELEASE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_MULTIPRESSCOMPLETE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_MULTIPRESSONGOING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_SHORTRELEASE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_SWITCH;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_SWITCH_SWITCHLATECHED;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +48,6 @@ import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.thing.type.ChannelKind;
 import org.openhab.core.thing.type.ChannelTypeUID;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.openhab.core.types.StateOption;
@@ -98,11 +113,6 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
         map.put(channel, stateDescriptionMode);
 
         return map;
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        // no commands to handle
     }
 
     @Override

@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_TEMPERATUREMEASURMENT_MEASUREDVALUE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_TEMPERATURE;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,7 +28,6 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 /**
@@ -50,10 +51,6 @@ public class TemperatureMeasurementConverter extends GenericConverter<Temperatur
                 .withType(CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE)
                 .withLabel(formatLabel(CHANNEL_LABEL_TEMPERATUREMEASURMENT_MEASUREDVALUE)).build();
         return Collections.singletonMap(channel, null);
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
     @Override

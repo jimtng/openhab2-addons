@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_WINDOWCOVERING_LIFT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_WINDOWCOVERING_LIFT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_ROLLERSHUTTER;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,8 +34,6 @@ import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link WindowCoveringConverter}
@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class WindowCoveringConverter extends GenericConverter<WindowCoveringCluster> {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public WindowCoveringConverter(WindowCoveringCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
@@ -83,6 +81,7 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
         } else if (command instanceof PercentType percentType) {
             moveCommand(WindowCoveringCluster.goToLiftPercentage(percentType.intValue()));
         }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

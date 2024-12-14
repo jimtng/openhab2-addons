@@ -16,12 +16,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -32,6 +39,9 @@ import org.openhab.core.OpenHAB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 /**
  * @author Dan Cunningham - Initial contribution
  */
@@ -39,8 +49,11 @@ import org.slf4j.LoggerFactory;
 class NodeJSRuntimeManager {
     private final Logger logger = LoggerFactory.getLogger(NodeJSRuntimeManager.class);
 
-    private static final String NODE_VERSION = "v22.0.0";
-    private static final String BASE_URL = "https://nodejs.org/dist/" + NODE_VERSION + "/";
+    private static final String NODE_BASE_VERSION = "v22";
+    private static final String NODE_DEFAULT_VERSION = "v22.12.0";
+    private static final String NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
+
+    private static final String BASE_URL = "https://nodejs.org/dist/";
     private static final String CACHE_DIR = Paths
             .get(OpenHAB.getUserDataFolder(), "cache", "org.openhab.binding.matter", "node_cache").toString();
 
@@ -50,6 +63,24 @@ class NodeJSRuntimeManager {
 
     public NodeJSRuntimeManager() {
         detectPlatformAndArch();
+    }
+
+    
+
+    public String getNodePath() throws IOException {
+        String version = getLatestVersion();
+        String cacheDir = CACHE_DIR + File.separator + platform + "-" + arch + File.separator + version;
+        Path nodePath = findNodeExecutable(cacheDir, version);
+
+        if (nodePath == null) {
+            downloadAndExtract(cacheDir, version);
+            nodePath = findNodeExecutable(cacheDir, version);
+            if (nodePath == null) {
+                throw new IOException("Unable to locate Node.js executable after download and extraction");
+            }
+        }
+
+        return nodePath.toString();
     }
 
     private void detectPlatformAndArch() {
@@ -80,22 +111,34 @@ class NodeJSRuntimeManager {
         }
     }
 
-    public String getNodePath() throws IOException {
-        String cacheDir = CACHE_DIR + File.separator + platform + "-" + arch + File.separator + NODE_VERSION;
-        Path nodePath = findNodeExecutable(cacheDir);
-
-        if (nodePath == null) {
-            downloadAndExtract(cacheDir);
-            nodePath = findNodeExecutable(cacheDir);
-            if (nodePath == null) {
-                throw new IOException("Unable to locate Node.js executable after download and extraction");
+    private String getLatestVersion() {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(NODE_INDEX_URL)).GET().build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            String json = response.body();
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<NodeVersion>>() {
+            }.getType();
+            List<NodeVersion> versions = gson.fromJson(json, listType);
+            if (versions != null) {
+                NodeVersion latest = versions.stream().filter(v -> v.version.startsWith(NODE_BASE_VERSION + "."))
+                        .max(Comparator.comparing(v -> v.version)).orElse(null);
+                if (latest != null) {
+                    return latest.version;
+                } else {
+                    logger.debug("Could not find latest version of Node.js, using default version: {}",
+                            NODE_DEFAULT_VERSION);
+                }
             }
+        } catch (IOException | InterruptedException e) {
+            logger.debug("Could not fetch latest version of Node.js, using default version: {}", NODE_DEFAULT_VERSION,
+                    e);
         }
-
-        return nodePath.toString();
+        return NODE_DEFAULT_VERSION;
     }
-
-    private @Nullable Path findNodeExecutable(String cacheDir) throws IOException {
+    
+    private @Nullable Path findNodeExecutable(String cacheDir, String version) throws IOException {
         Path rootDir = Paths.get(cacheDir);
         if (!Files.exists(rootDir)) {
             return null;
@@ -103,7 +146,7 @@ class NodeJSRuntimeManager {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootDir)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && path.getFileName().toString().startsWith("node-" + NODE_VERSION)) {
+                if (Files.isDirectory(path) && path.getFileName().toString().startsWith("node-" + version)) {
                     Path execPath = path.resolve("bin").resolve(nodeExecutable);
                     if (Files.exists(execPath)) {
                         return execPath;
@@ -120,10 +163,10 @@ class NodeJSRuntimeManager {
         return null;
     }
 
-    private void downloadAndExtract(String cacheDir) throws IOException {
-        String fileName = "node-" + NODE_VERSION + "-" + platform + "-" + arch
+    private void downloadAndExtract(String cacheDir, String version) throws IOException {
+        String fileName = "node-" + version + "-" + platform + "-" + arch
                 + ("win".equals(platform) ? ".zip" : ".tar.gz");
-        String downloadUrl = BASE_URL + fileName;
+        String downloadUrl = BASE_URL + version + "/" + fileName;
 
         Path downloadPath = Paths.get(cacheDir, fileName);
         Files.createDirectories(downloadPath.getParent());
@@ -167,6 +210,15 @@ class NodeJSRuntimeManager {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted while extracting tar file", e);
+        }
+    }
+
+    static class NodeVersion {
+        public String version = "";
+
+        @Override
+        public String toString() {
+            return version;
         }
     }
 }

@@ -126,9 +126,9 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
     public final List<Channel> createChannels(Integer endpointNumber, Map<String, BaseCluster> clusters,
             ChannelGroupUID channelGroupUID) {
         logger.debug("createChannels {}", endpointNumber);
-        // List<Channel> existingChannels = new ArrayList<>(handler.getThing().getChannels());
-        List<Channel> existingChannels = new ArrayList<>();
+        List<Channel> channels = new ArrayList<>();
         String label = "";
+        //each cluster will create its own channels and add to this device's total channels
         clusters.forEach((clusterName, cluster) -> {
             logger.debug("Creating channels for cluster: {}", clusterName);
             GenericConverter<? extends BaseCluster> converter = createConverter(cluster, clusters, label);
@@ -139,17 +139,17 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
                     channelUIDToConverters.put(channel.getUID(), converter);
                     channelUIDToStateDescription.put(channel.getUID(), converterChannels.get(channel));
                     clusterToConverters.put(cluster.id, converter);
-                    boolean hasMatchingUID = existingChannels.stream()
+                    boolean hasMatchingUID = channels.stream()
                             .anyMatch(c -> channel.getUID().equals(c.getUID()));
                     if (!hasMatchingUID) {
-                        existingChannels.add(channel);
+                        channels.add(channel);
                     } else {
                         logger.debug("{} channel already exists: {}", clusterName, channel.getUID());
                     }
                 }
             }
         });
-        return existingChannels;
+        return channels;
     }
 
     public Map<ChannelUID, @Nullable StateDescription> getStateDescriptions() {

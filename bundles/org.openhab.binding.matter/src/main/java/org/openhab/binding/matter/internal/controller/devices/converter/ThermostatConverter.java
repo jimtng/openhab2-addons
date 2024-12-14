@@ -12,7 +12,23 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_LOCALTEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_OCCUPIEDCOOLING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_OCCUPIEDHEATING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_OUTDOORTEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_SYSTEMMODE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDCOOLING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_THERMOSTAT_UNOCCUPIEDHEATING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_LOCALTEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_OCCUPIEDCOOLING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_OCCUPIEDHEATING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_OUTDOORTEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_RUNNINGMODE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_SYSTEMMODE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_UNOCCUPIEDCOOLING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_THERMOSTAT_UNOCCUPIEDHEATING;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_TEMPERATURE;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,11 +47,10 @@ import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.RefreshType;
 import org.openhab.core.types.StateDescription;
 import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.openhab.core.types.StateOption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link ThermostatConverter}
@@ -44,8 +59,6 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
-
-    private final Logger logger = LoggerFactory.getLogger(ThermostatConverter.class);
 
     public ThermostatConverter(ThermostatCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
@@ -189,21 +202,25 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        String id = channelUID.getIdWithoutGroup();
-        if (id.equals(CHANNEL_THERMOSTAT_SYSTEMMODE.getId())) {
-            handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "systemMode", command.toString());
-            return;
+        if (!(command instanceof RefreshType)) {
+            String id = channelUID.getIdWithoutGroup();
+            if (id.equals(CHANNEL_THERMOSTAT_SYSTEMMODE.getId())) {
+                handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "systemMode",
+                        command.toString());
+                return;
+            }
+            if (id.equals(CHANNEL_THERMOSTAT_OCCUPIEDHEATING.getId())) {
+                handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "occupiedHeatingSetpoint",
+                        String.valueOf(temperatureToValue(command)));
+                return;
+            }
+            if (id.equals(CHANNEL_THERMOSTAT_OCCUPIEDCOOLING.getId())) {
+                handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "occupiedCoolingSetpoint",
+                        String.valueOf(temperatureToValue(command)));
+                return;
+            }
         }
-        if (id.equals(CHANNEL_THERMOSTAT_OCCUPIEDHEATING.getId())) {
-            handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "occupiedHeatingSetpoint",
-                    String.valueOf(temperatureToValue(command)));
-            return;
-        }
-        if (id.equals(CHANNEL_THERMOSTAT_OCCUPIEDCOOLING.getId())) {
-            handler.writeAttribute(endpointNumber, ThermostatCluster.CLUSTER_NAME, "occupiedCoolingSetpoint",
-                    String.valueOf(temperatureToValue(command)));
-            return;
-        }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

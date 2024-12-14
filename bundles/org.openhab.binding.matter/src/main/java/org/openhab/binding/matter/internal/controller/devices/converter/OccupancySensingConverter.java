@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_OCCUPANCYSENSING_OCCUPIED;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_OCCUPANCYSENSING_OCCUPIED;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_SWITCH;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,7 +29,6 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.StateDescription;
 
 import com.google.gson.internal.LinkedTreeMap;
@@ -52,10 +53,6 @@ public class OccupancySensingConverter extends GenericConverter<OccupancySensing
                 .withType(CHANNEL_OCCUPANCYSENSING_OCCUPIED)
                 .withLabel(formatLabel(CHANNEL_LABEL_OCCUPANCYSENSING_OCCUPIED)).build();
         return Collections.singletonMap(channel, null);
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
     @Override

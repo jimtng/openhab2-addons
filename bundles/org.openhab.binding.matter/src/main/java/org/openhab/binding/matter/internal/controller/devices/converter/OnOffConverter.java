@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_ONOFF_ONOFF;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ONOFF_ONOFF;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_SWITCH;
 
 import java.util.Collections;
 import java.util.Map;
@@ -56,8 +58,8 @@ public class OnOffConverter extends GenericConverter<OnOffCluster> {
         if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
             handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
-
         }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

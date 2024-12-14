@@ -12,7 +12,15 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COLOR_COLOR;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COLOR_TEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COLOR_TEMPERATURE_ABS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_COLOR_COLOR;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_COLOR_TEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_COLOR_TEMPERATURE_ABS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_COLOR;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_DIMMER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_TEMPERATURE;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -51,8 +59,6 @@ import org.openhab.core.types.StateDescription;
 import org.openhab.core.types.StateDescriptionFragmentBuilder;
 import org.openhab.core.types.UnDefType;
 import org.openhab.core.util.ColorUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link MatterControllerClient}
@@ -63,8 +69,6 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class ColorControlConverter extends GenericConverter<ColorControlCluster> {
-
-    private final Logger logger = LoggerFactory.getLogger(ColorControlConverter.class);
 
     private @Nullable ColorMode lastColorMode;
     private boolean supportsHue = false;
@@ -166,6 +170,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                 handler.sendClusterCommand(endpointNumber, ColorControlCluster.CLUSTER_NAME, tempCommand);
             }
         }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

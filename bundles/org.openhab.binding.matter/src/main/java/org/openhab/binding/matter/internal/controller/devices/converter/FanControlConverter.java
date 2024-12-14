@@ -12,7 +12,12 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_FANCONTROL_MODE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_FANCONTROL_PERCENT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_FANCONTROL_MODE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_FANCONTROL_PERCENT;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_DIMMER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -145,6 +150,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
                         decimalType.toString());
             }
         }
+        super.handleCommand(channelUID, command);
     }
 
     @Override

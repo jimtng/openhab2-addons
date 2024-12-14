@@ -95,13 +95,13 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
             return;
         }
 
-        if (command instanceof RefreshType) {
-            ControllerHandler clusterHandler = controllerHandler();
-            if (clusterHandler != null) {
-                clusterHandler.updateNode(getNodeId());
-            }
-            return;
-        }
+        // if (command instanceof RefreshType) {
+        //     ControllerHandler clusterHandler = controllerHandler();
+        //     if (clusterHandler != null) {
+        //         clusterHandler.updateNode(getNodeId());
+        //     }
+        //     return;
+        // }
         String endpointIdString = channelUID.getGroupId();
         if (endpointIdString != null) {
             Integer endpointId = Integer.valueOf(endpointIdString);
