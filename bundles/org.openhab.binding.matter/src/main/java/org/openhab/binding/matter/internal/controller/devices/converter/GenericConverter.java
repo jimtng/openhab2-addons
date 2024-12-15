@@ -68,10 +68,10 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
         this.handler = handler;
         this.endpointNumber = endpointNumber;
         this.labelPrefix = labelPrefix;
-        updateCluster(cluster);
     }
 
     public abstract Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID);
+
 
     /**
      * Updates all the channel states of a cluster
@@ -95,10 +95,6 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
 
     @Override
     public void onEvent(EventTriggeredMessage message) {
-    }
-
-    public void updateCluster(T cluster) {
-        this.cluster = cluster;
     }
 
     public T getCluster() {

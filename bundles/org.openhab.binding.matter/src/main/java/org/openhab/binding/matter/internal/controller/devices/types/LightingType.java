@@ -69,32 +69,32 @@ public class LightingType extends DeviceType {
         }
     }
 
-    @Override
-    public void updateCluster(BaseCluster cluster) {
-        if (cluster instanceof LevelControlCluster levelControlCluster) {
-            initLevel = GenericConverter.levelToPercent(levelControlCluster.currentLevel);
-            // if the device is off, then don't update channels
-            if (lastOnOff != OnOffType.OFF) {
-                updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, initLevel);
-                if (clusterToConverters
-                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                    colorControlConverter.updateBrightness(initLevel);
-                }
-            }
-        }
-        if (cluster instanceof OnOffCluster onOffCluster) {
-            lastOnOff = OnOffType.from(Boolean.valueOf(onOffCluster.onOff));
-            logger.debug("OnOff {}", lastOnOff);
-            updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
-            updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL,
-                    lastOnOff == OnOffType.OFF ? OnOffType.OFF : initLevel);
-            if (clusterToConverters
-                    .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                colorControlConverter.updateBrightness(lastOnOff == OnOffType.OFF ? new PercentType(0) : initLevel);
-            }
-        }
-        super.updateCluster(cluster);
-    }
+    // @Override
+    // public void updateCluster(BaseCluster cluster) {
+    //     if (cluster instanceof LevelControlCluster levelControlCluster) {
+    //         initLevel = GenericConverter.levelToPercent(levelControlCluster.currentLevel);
+    //         // if the device is off, then don't update channels
+    //         if (lastOnOff != OnOffType.OFF) {
+    //             updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, initLevel);
+    //             if (clusterToConverters
+    //                     .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+    //                 colorControlConverter.updateBrightness(initLevel);
+    //             }
+    //         }
+    //     }
+    //     if (cluster instanceof OnOffCluster onOffCluster) {
+    //         lastOnOff = OnOffType.from(Boolean.valueOf(onOffCluster.onOff));
+    //         logger.debug("OnOff {}", lastOnOff);
+    //         updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
+    //         updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL,
+    //                 lastOnOff == OnOffType.OFF ? OnOffType.OFF : initLevel);
+    //         if (clusterToConverters
+    //                 .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+    //             colorControlConverter.updateBrightness(lastOnOff == OnOffType.OFF ? new PercentType(0) : initLevel);
+    //         }
+    //     }
+    //     super.updateCluster(cluster);
+    // }
 
     @Override
     public void onEvent(AttributeChangedMessage message) {

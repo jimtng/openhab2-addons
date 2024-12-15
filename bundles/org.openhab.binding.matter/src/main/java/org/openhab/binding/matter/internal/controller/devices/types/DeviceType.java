@@ -82,21 +82,21 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
                 .ifPresent(converter -> converter.handleCommand(channelUID, command));
     }
 
-    /**
-     * Update the cluster with new data
-     *
-     * @param cluster
-     */
-    public void updateCluster(BaseCluster cluster) {
-        GenericConverter<? extends BaseCluster> converter = clusterToConverters.get(cluster.id);
-        if (converter != null) {
-            @SuppressWarnings("unchecked")
-            GenericConverter<BaseCluster> specificConverter = (GenericConverter<BaseCluster>) converter;
-            specificConverter.updateCluster(cluster);
-        } else {
-            logger.debug("updateCluster: finished processing for cluster: {}", cluster.id);
-        }
-    }
+    // /**
+    //  * Update the cluster with new data
+    //  *
+    //  * @param cluster
+    //  */
+    // public void updateCluster(BaseCluster cluster) {
+    //     GenericConverter<? extends BaseCluster> converter = clusterToConverters.get(cluster.id);
+    //     if (converter != null) {
+    //         @SuppressWarnings("unchecked")
+    //         GenericConverter<BaseCluster> specificConverter = (GenericConverter<BaseCluster>) converter;
+    //         specificConverter.updateCluster(cluster);
+    //     } else {
+    //         logger.debug("updateCluster: finished processing for cluster: {}", cluster.id);
+    //     }
+    // }
 
     @Override
     public void onEvent(AttributeChangedMessage message) {
@@ -134,6 +134,9 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
             ChannelGroupUID channelGroupUID) {
         logger.debug("createChannels {}", endpointNumber);
         List<Channel> channels = new ArrayList<>();
+        channelUIDToConverters.clear();
+        channelUIDToStateDescription.clear();
+        clusterToConverters.clear();
         String label = "";
         //each cluster will create its own channels and add to this device's total channels
         clusters.forEach((clusterName, cluster) -> {

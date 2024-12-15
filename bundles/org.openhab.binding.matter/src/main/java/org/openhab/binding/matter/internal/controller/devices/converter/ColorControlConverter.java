@@ -90,6 +90,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     public ColorControlConverter(ColorControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
         super(cluster, handler, endpointNumber, labelPrefix);
+        initCluster();
     }
 
     @Override
@@ -221,7 +222,11 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     }
 
     @Override
-    public void updateCluster(ColorControlCluster cluster) {
+    public void refreshState() {
+        updateColor();
+    }
+
+    private void initCluster() {
         lastColorMode = cluster.colorMode;
         supportsHue = cluster.featureMap.hueSaturation;
         lastX = cluster.currentX != null ? cluster.currentX : 0;
@@ -232,15 +237,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         lastColorTemperatureMireds = cluster.colorTemperatureMireds;
         Optional.ofNullable(cluster.colorTempPhysicalMaxMireds).ifPresent(temp -> colorTempPhysicalMaxMireds = temp);
         Optional.ofNullable(cluster.colorTempPhysicalMinMireds).ifPresent(temp -> colorTempPhysicalMinMireds = temp);
-        super.updateCluster(cluster);
     }
 
-    @Override
-    public void refreshState() {
-        updateColor();
-    }
-
-    
 
     // These functions are borrowed from the Zigbee openHAB binding
 
