@@ -12,7 +12,8 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.types;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LEVEL_LEVEL;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_ONOFF_ONOFF;
 
 import java.util.Map;
 
@@ -154,6 +155,8 @@ public class LightingType extends DeviceType {
             @SuppressWarnings("unchecked")
             GenericConverter<BaseCluster> specificConverter = (GenericConverter<BaseCluster>) converter;
             specificConverter.updateState(channelTypeUID, state);
+        } else {
+            logger.debug("No converter found for clusterId: {}", clusterId);
         }
     }
 

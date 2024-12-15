@@ -61,11 +61,11 @@ public class IlluminanceMeasurementConverter extends GenericConverter<Illuminanc
                 updateState(CHANNEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE, new DecimalType((Number) message.value));
                 break;
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(IlluminanceMeasurementCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_ILLUMINANCEMEASURMENT_MEASUREDVALUE, new DecimalType(cluster.maxMeasuredValue));
     }
 }

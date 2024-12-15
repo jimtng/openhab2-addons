@@ -62,11 +62,11 @@ public class BooleanStateConverter extends GenericConverter<BooleanStateCluster>
 
                 }
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(BooleanStateCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_BOOLEANSTATE_STATEVALUE, OnOffType.from(cluster.stateValue));
     }
 }

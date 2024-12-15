@@ -97,11 +97,11 @@ public class WindowCoveringConverter extends GenericConverter<WindowCoveringClus
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(WindowCoveringCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         Integer pos = 0;
         if (cluster.currentPositionLift != null) {
             pos = cluster.currentPositionLiftPercentage;

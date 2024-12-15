@@ -83,11 +83,11 @@ public class ModeSelectConverter extends GenericConverter<ModeSelectCluster> {
                 updateState(CHANNEL_MODESELECT_MODE, new DecimalType(numberValue));
                 break;
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(ModeSelectCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_MODESELECT_MODE, new DecimalType(cluster.currentMode));
     }
 }

@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
@@ -67,9 +68,15 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
         this.handler = handler;
         this.endpointNumber = endpointNumber;
         this.labelPrefix = labelPrefix;
+        updateCluster(cluster);
     }
 
     public abstract Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID);
+
+    /**
+     * Updates all the channel states of a cluster
+     */
+    public abstract void refreshState();
 
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
@@ -79,6 +86,11 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
 
     @Override
     public void onEvent(AttributeChangedMessage message) {
+        try {
+            updateLocalClusterAttribute(message.path.attributeName, message.value);
+        } catch (Exception e) {
+            logger.debug("Could not update local cluster value for attribute {}", message.path.attributeName, e);
+        }
     }
 
     @Override
@@ -164,6 +176,12 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
      */
     public static QuantityType<Temperature> valueToTemperature(int value) {
         return new QuantityType<>(BigDecimal.valueOf(value, 2), SIUnits.CELSIUS);
+    }
+
+    private void updateLocalClusterAttribute( String attributeName, Object newValue) throws Exception {
+        Field field = cluster.getClass().getDeclaredField(attributeName);
+        field.setAccessible(true);
+        field.set(cluster, newValue);
     }
 
     protected String formatLabel(String channelLabel) {

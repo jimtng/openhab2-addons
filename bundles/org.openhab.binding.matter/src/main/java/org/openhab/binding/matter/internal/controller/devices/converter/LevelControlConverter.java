@@ -78,11 +78,11 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
                 updateState(CHANNEL_LEVEL_LEVEL, levelToPercent(numberValue));
                 break;
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(LevelControlCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_LEVEL_LEVEL, levelToPercent(cluster.currentLevel));
     }
 }

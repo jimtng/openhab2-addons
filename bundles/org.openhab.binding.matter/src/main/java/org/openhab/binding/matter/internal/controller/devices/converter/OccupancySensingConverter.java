@@ -67,11 +67,11 @@ public class OccupancySensingConverter extends GenericConverter<OccupancySensing
                     break;
                 }
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(OccupancySensingCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_OCCUPANCYSENSING_OCCUPIED, OnOffType.from(cluster.occupancy.occupied));
     }
 }

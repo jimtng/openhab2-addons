@@ -62,11 +62,11 @@ public class WiFiNetworkDiagnosticsConverter extends GenericConverter<WiFiNetwor
 
                 }
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(WiFiNetworkDiagnosticsCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_WIFINETWORKDIAGNOSTICS_RSSI, new DecimalType(cluster.rssi));
     }
 }

@@ -119,6 +119,13 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
     }
 
     /**
+     * Inform all cluster converters to refresh their channel state
+     */
+    public void refreshState() {
+        channelUIDToConverters.forEach((channelUID, converter) -> converter.refreshState());
+    }
+
+    /**
      * Create openHAB channels for the device type based on the clusters provided
      *
      * @param clusters

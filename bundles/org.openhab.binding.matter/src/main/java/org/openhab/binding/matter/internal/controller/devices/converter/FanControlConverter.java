@@ -166,11 +166,11 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(FanControlCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         if (cluster.fanMode != null) {
             updateState(CHANNEL_FANCONTROL_MODE, new DecimalType(cluster.fanMode.value));
         }

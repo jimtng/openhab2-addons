@@ -31,7 +31,11 @@ import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage
 import org.openhab.binding.matter.internal.config.NodeConfiguration;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
 import org.openhab.binding.matter.internal.util.MatterUIDUtils;
-import org.openhab.core.thing.*;
+import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingTypeUID;
+import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.BridgeHandler;
 import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
@@ -153,14 +157,23 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
 
     public void updateNode(Node node) {
         updateRootProperties(node.rootEndpoint);
-        updateEndpoint(node.rootEndpoint);
+        updateBaseEndpoint(node.rootEndpoint);
+    }
+
+    @Override
+    protected synchronized void updateBaseEndpoint(Endpoint endpoint) {
+        if (getThing().getStatus() != ThingStatus.ONLINE) {
+            logger.debug("Setting Online {}", getNodeId());
+            updateStatus(ThingStatus.ONLINE);
+        }
+        super.updateBaseEndpoint(endpoint);
     }
 
     private void updateBridgeEndpoint(Endpoint endpoint) {
         BridgeEndpointHandler handler = bridgedEndpoints.get(endpoint.number);
         if (handler != null) {
             updateBridgeEndpointMap(endpoint, handler);
-            handler.updateEndpoint(endpoint);
+            handler.updateBaseEndpoint(endpoint);
         } else {
             discoverChildBridge(endpoint);
         }

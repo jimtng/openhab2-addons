@@ -95,11 +95,11 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(PowerSourceCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         if (cluster.batPercentRemaining != null) {
             updateState(CHANNEL_POWER_BATTERYPERCENT, convertToPercentage(cluster.batPercentRemaining));
         }

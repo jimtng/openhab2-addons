@@ -16,7 +16,14 @@ import static org.openhab.binding.matter.internal.MatterBindingConstants.THING_T
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +43,12 @@ import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryHandler;
 import org.openhab.binding.matter.internal.discovery.MatterDiscoveryService;
 import org.openhab.core.OpenHAB;
-import org.openhab.core.thing.*;
+import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.ChannelUID;
+import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
+import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
@@ -332,7 +344,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
      * @param node
      */
     private synchronized void updateNode(Node node) {
-
         NodeHandler handler = linkedNodes.get(node.id);
         if (handler != null) {
             handler.updateNode(node);

@@ -14,7 +14,11 @@ package org.openhab.binding.matter.internal.handler;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -28,7 +32,9 @@ import org.openhab.binding.matter.internal.client.MatterWebsocketClient;
 import org.openhab.binding.matter.internal.client.model.Endpoint;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.ClusterCommand;
-import org.openhab.binding.matter.internal.client.model.cluster.gen.*;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.BasicInformationCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.GeneralDiagnosticsCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.GeneralDiagnosticsCluster.NetworkInterface;
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.client.model.ws.EventTriggeredMessage;
@@ -37,13 +43,24 @@ import org.openhab.binding.matter.internal.controller.devices.types.DeviceType;
 import org.openhab.binding.matter.internal.controller.devices.types.DeviceTypeRegistry;
 import org.openhab.binding.matter.internal.util.MatterLabelUtils;
 import org.openhab.binding.matter.internal.util.MatterUIDUtils;
-import org.openhab.core.thing.*;
+import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelGroupUID;
+import org.openhab.core.thing.ChannelUID;
+import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
+import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.binding.BridgeHandler;
 import org.openhab.core.thing.binding.builder.ThingBuilder;
-import org.openhab.core.thing.type.*;
+import org.openhab.core.thing.type.ChannelGroupDefinition;
+import org.openhab.core.thing.type.ChannelGroupType;
+import org.openhab.core.thing.type.ChannelGroupTypeBuilder;
+import org.openhab.core.thing.type.ChannelGroupTypeUID;
+import org.openhab.core.thing.type.ChannelTypeUID;
+import org.openhab.core.thing.type.ThingTypeBuilder;
 import org.openhab.core.types.Command;
-import org.openhab.core.types.RefreshType;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,13 +112,6 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
             return;
         }
 
-        // if (command instanceof RefreshType) {
-        //     ControllerHandler clusterHandler = controllerHandler();
-        //     if (clusterHandler != null) {
-        //         clusterHandler.updateNode(getNodeId());
-        //     }
-        //     return;
-        // }
         String endpointIdString = channelUID.getGroupId();
         if (endpointIdString != null) {
             Integer endpointId = Integer.valueOf(endpointIdString);
@@ -114,16 +124,17 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
 
     @Override
     public void initialize() {
-        Bridge bridge = getBridge();
-        BridgeHandler handler = bridge == null ? null : bridge.getHandler();
-        if (handler == null) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
-        } else if (handler.getThing().getStatus() != ThingStatus.ONLINE) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
-        } else if (getThing().getStatus() != ThingStatus.ONLINE) {
-            // wait for us to be updated.
-            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
-        }
+        // Bridge bridge = getBridge();
+        // BridgeHandler handler = bridge == null ? null : bridge.getHandler();
+        // if (handler == null) {
+        //     updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
+        // } else if (handler.getThing().getStatus() != ThingStatus.ONLINE) {
+        //     updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+        // } else if (getThing().getStatus() != ThingStatus.ONLINE) {
+        //     // wait for us to be updated.
+        //     updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
+        // }
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
     }
 
     @Override
@@ -131,12 +142,14 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         channelTypeProvider.removeChannelGroupTypesForPrefix(getThing().getThingTypeUID().getId());
     }
 
-    @Override
-    public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
-        if (bridgeStatusInfo.getStatus() != ThingStatus.ONLINE) {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
-        }
-    }
+    // @Override
+    // public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
+    //     if (bridgeStatusInfo.getStatus() != ThingStatus.ONLINE) {
+    //         updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+    //     }
+    // }
+
+    
 
     // making this public
     @Override
@@ -193,7 +206,7 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
      * 
      * @param endpoint
      */
-    protected synchronized void updateEndpoint(Endpoint endpoint) {
+    protected synchronized void updateBaseEndpoint(Endpoint endpoint) {
         List<ChannelGroupType> groupTypes = new ArrayList<>();
         List<ChannelGroupDefinition> groupDefs = new ArrayList<>();
         List<Channel> channels = new ArrayList<>();
@@ -222,10 +235,8 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         thingBuilder.withChannels(channels);
         updateThing(thingBuilder.build());
 
-        if (getThing().getStatus() != ThingStatus.ONLINE) {
-            logger.debug("Setting Online {}", getNodeId());
-            updateStatus(ThingStatus.ONLINE);
-        }
+        //have all clusters send their initial states
+        devices.values().forEach(deviceType -> deviceType.refreshState());
     }
 
     /**
@@ -268,10 +279,6 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
 
         // add channels, which will be used by the calling 'updateEndpoint' function
         channels.addAll(deviceType.createChannels(endpoint.number, clusters, channelGroupUID));
-
-        final DeviceType dt = deviceType;
-        // give the cluster their initial values
-        clusters.forEach((clusterName, cluster) -> dt.updateCluster(cluster));
 
         // add the state descriptions of channels to our custom stateDescriptionProvider
         deviceType.getStateDescriptions().forEach((channelUID, stateDescription) -> {
@@ -367,14 +374,14 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         if (cluster != null && cluster instanceof GeneralDiagnosticsCluster generalCluster) {
             for (NetworkInterface ni : generalCluster.networkInterfaces) {
                 thing.setProperty(Thing.PROPERTY_MAC_ADDRESS, MatterLabelUtils.formatMacAddress(ni.hardwareAddress));
-                if (ni.iPv6Addresses.size() > 0) {
+                if (!ni.iPv6Addresses.isEmpty()) {
                     String newValue = MatterLabelUtils.formatIPv6Address(ni.iPv6Addresses.get(0));
                     String oldValue = thing.setProperty("ipv6Address", newValue);
                     if (oldValue != null && !newValue.equals(oldValue)) {
                         logger.debug("WARNING IPV6 ADDRESS Changed {} to {}", oldValue, newValue);
                     }
                 }
-                if (ni.iPv4Addresses.size() > 0) {
+                if (!ni.iPv4Addresses.isEmpty()) {
                     thing.setProperty("ipv4Address", MatterLabelUtils.formatIPv6Address(ni.iPv4Addresses.get(0)));
                 }
             }

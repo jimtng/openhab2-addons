@@ -61,11 +61,11 @@ public class TemperatureMeasurementConverter extends GenericConverter<Temperatur
                         valueToTemperature(message.value instanceof Number number ? number.intValue() : 0));
                 break;
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(TemperatureMeasurementCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE, valueToTemperature(cluster.measuredValue));
     }
 }

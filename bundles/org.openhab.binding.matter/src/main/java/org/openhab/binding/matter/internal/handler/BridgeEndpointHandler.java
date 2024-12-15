@@ -23,7 +23,11 @@ import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BridgedDeviceBasicInformationCluster;
 import org.openhab.binding.matter.internal.config.EndpointConfiguration;
 import org.openhab.binding.matter.internal.util.MatterUIDUtils;
-import org.openhab.core.thing.*;
+import org.openhab.core.thing.Bridge;
+import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
+import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BridgeHandler;
 
 /**
@@ -72,7 +76,7 @@ public class BridgeEndpointHandler extends MatterBaseThingHandler {
     }
 
     @Override
-    protected void updateEndpoint(Endpoint endpoint) {
+    protected void updateBaseEndpoint(Endpoint endpoint) {
         boolean reachable = true;
         BaseCluster basicInfoObject = endpoint.clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
         if (basicInfoObject != null) {
@@ -89,7 +93,7 @@ public class BridgeEndpointHandler extends MatterBaseThingHandler {
                     "Bridge reports device as not reachable");
         }
         updateRootProperties(endpoint);
-        super.updateEndpoint(endpoint);
+        super.updateBaseEndpoint(endpoint);
     }
 
     public Integer getEndpointId() {

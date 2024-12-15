@@ -255,11 +255,11 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
+        super.onEvent(message);
     }
 
     @Override
-    public void updateCluster(ThermostatCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         if (cluster.localTemperature != null) {
             updateState(CHANNEL_THERMOSTAT_LOCALTEMPERATURE, valueToTemperature(cluster.localTemperature));
         }

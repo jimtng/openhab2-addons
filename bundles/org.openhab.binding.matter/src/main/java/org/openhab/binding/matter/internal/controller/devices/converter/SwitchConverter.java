@@ -124,6 +124,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
                 updateState(CHANNEL_SWITCH_SWITCH, new DecimalType(numberValue));
                 break;
         }
+        super.onEvent(message);
     }
 
     @Override
@@ -136,8 +137,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
     }
 
     @Override
-    public void updateCluster(SwitchCluster cluster) {
-        super.updateCluster(cluster);
+    public void refreshState() {
         updateState(CHANNEL_SWITCH_SWITCH, new DecimalType(cluster.currentPosition));
     }
 }
