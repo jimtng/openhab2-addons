@@ -10,6 +10,11 @@
 			<label>Matter Bridge Configuration.</label>
 			<advanced>false</advanced>
 		</parameter-group>
+		<parameter name="enableBridge" type="boolean" required="false" groupName="bridge">
+			<label>Enable Matter Bridge</label>
+			<description>Enable Matter bridge functionality to expose items to other Matter clients.</description>
+			<default>true</default>
+		</parameter>
 		<parameter name="bridgeName" type="text" required="false" groupName="bridge">
 			<label>Bridge name</label>
 			<description>Name of the Matter bridge that is exposed to clients.</description>

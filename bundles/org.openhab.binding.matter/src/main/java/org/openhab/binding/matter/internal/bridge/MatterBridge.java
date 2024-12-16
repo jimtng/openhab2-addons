@@ -182,7 +182,9 @@ public class MatterBridge implements MatterClientListener {
         // if this returns true, we will wait for @Modified to be called after the config is persisted
         if (!parseInitialConfig(properties)) {
             this.settings = (new Configuration(properties)).as(MatterBridgeSettings.class);
-            connectClient();
+            if(this.settings.enableBridge) {
+                connectClient();
+            }
         }
     }
 
@@ -199,6 +201,9 @@ public class MatterBridge implements MatterClientListener {
         logger.debug("Modified Matter Bridge {}", properties);
         MatterBridgeSettings settings = (new Configuration(properties)).as(MatterBridgeSettings.class);
         boolean restart = false;
+        if (this.settings.enableBridge != settings.enableBridge) {
+            restart = true;
+        }
         if (!this.settings.bridgeName.equals(settings.bridgeName)) {
             restart = true;
         }
@@ -219,7 +224,10 @@ public class MatterBridge implements MatterClientListener {
         settings.resetBridge = false;
 
         this.settings = settings;
-        if (!client.isConnected() || restart) {
+
+        if(!settings.enableBridge) {
+            stopClient();
+        } else if (!client.isConnected() || restart) {
             stopClient();
             scheduler.schedule(this::connectClient, 5, TimeUnit.SECONDS);
         } else {

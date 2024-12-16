@@ -66,19 +66,17 @@ import org.slf4j.LoggerFactory;
 public class ControllerHandler extends BaseBridgeHandler implements MatterClientListener, MatterDiscoveryHandler {
 
     private final Logger logger = LoggerFactory.getLogger(ControllerHandler.class);
+    private final MatterWebsocketService websocketService;
     // Set of nodes we are waiting to connect to
     private Set<BigInteger> outstandingNodeRequests = Collections.synchronizedSet(new HashSet<>());
     // Set of nodes we need to try reconnecting to
     private Set<BigInteger> disconnectedNodes = Collections.synchronizedSet(new HashSet<>());
-    // Nodes that we
+    // Nodes that we have linked to a handler
     private Map<BigInteger, NodeHandler> linkedNodes = Collections.synchronizedMap(new HashMap<>());
-
     private @Nullable MatterDiscoveryService discoveryService;
-    private MatterControllerClient client;
     private @Nullable ScheduledFuture<?> reconnectFuture;
+    private MatterControllerClient client;
     private boolean ready = false;
-    private @Nullable ScheduledFuture<?> checkFuture;
-    private final MatterWebsocketService websocketService;
 
     public ControllerHandler(Bridge bridge, MatterWebsocketService websocketService) {
         super(bridge);
@@ -104,11 +102,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         ready = false;
         client.removeListener(this);
         cancelReconnect();
-        ScheduledFuture<?> checkFuture = this.checkFuture;
-        if (checkFuture != null) {
-            checkFuture.cancel(true);
-        }
-        // nodes.clear();
         outstandingNodeRequests.clear();
         disconnectedNodes.clear();
         linkedNodes.clear();
@@ -162,7 +155,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             }
             return client.pairNode(code);
         } else {
-            return refresh();
+            return syncAllNodes();
         }
     }
 
@@ -180,15 +173,13 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
                 removeNode(message.nodeId);
                 break;
             case DISCONNECTED:
-                updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "Node " + message.state);
                 if (linkedNodes.containsKey(message.nodeId)) {
                     disconnectedNodes.add(message.nodeId);
                 }
-                break;
+                //fall through
             case RECONNECTING:
             case WAITINGFORDEVICEDISCOVERY:
-                updateEndpointStatuses(message.nodeId, ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY,
+                updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Node " + message.state);
                 break;
             default:
@@ -239,52 +230,8 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         linkedNodes.keySet().forEach(nodeId -> updateNode(nodeId));
     }
 
-    private void connect() {
-        logger.debug("connect");
-        if (client.isConnected()) {
-            logger.debug("Client already connected");
-            return;
-        }
-        String folderName = OpenHAB.getUserDataFolder() + File.separator + "matter";
-        File folder = new File(folderName);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        String storagePath = folder.getAbsolutePath();
-        String controllerName = "controller-" + getThing().getUID().getId();
-
-        logger.debug("matter config: {}", storagePath);
-        final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
-        // checkFuture = scheduler.scheduleAtFixedRate(this::checkNodes, 5, 5, TimeUnit.MINUTES);
-        client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
-    }
-
     public MatterControllerClient getClient() {
         return client;
-    }
-
-    private CompletableFuture<Void> refresh() {
-        logger.debug("refresh");
-        if (!ready) {
-            return CompletableFuture.completedFuture(null);
-        }
-
-        return client.getCommissionedNodeIds().thenCompose(nodeIds -> {
-            List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-            for (BigInteger id : nodeIds) {
-                CompletableFuture<Void> updateFuture = updateNode(id);
-                futures.add(updateFuture);
-            }
-
-            // Return a Future that completes when all updateNode futures are complete
-            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-        }).exceptionally(e -> {
-            logger.debug("Error communicating with controller", e);
-            return null;
-        }).whenComplete((nodeIds, e) -> {
-            logger.debug("refresh done");
-        });
     }
 
     protected void removeNode(BigInteger nodeId) {
@@ -298,21 +245,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
         }
     }
 
-    private synchronized void reconnect() {
-        logger.debug("reconnect!");
-        cancelReconnect();
-        this.reconnectFuture = scheduler.schedule(this::connect, 30, TimeUnit.SECONDS);
-    }
-
-    private synchronized void cancelReconnect() {
-        ScheduledFuture<?> reconnectFuture = this.reconnectFuture;
-        if (reconnectFuture != null) {
-            reconnectFuture.cancel(true);
-        }
-        this.reconnectFuture = null;
-    }
-
-    CompletableFuture<Void> updateNode(BigInteger id) {
+    protected CompletableFuture<Void> updateNode(BigInteger id) {
         logger.debug("updateNode BEGIN {}", id);
 
         // If we are already waiting to get this node, return a completed future
@@ -336,6 +269,68 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
                     message != null ? message : "");
             return null;
         }).whenComplete((node, e) -> outstandingNodeRequests.remove(id));
+    }
+
+    private void connect() {
+        logger.debug("connect");
+        if (client.isConnected()) {
+            logger.debug("Client already connected");
+            return;
+        }
+        String folderName = OpenHAB.getUserDataFolder() + File.separator + "matter";
+        File folder = new File(folderName);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        String storagePath = folder.getAbsolutePath();
+        String controllerName = "controller-" + getThing().getUID().getId();
+
+        logger.debug("matter config: {}", storagePath);
+        final ControllerConfiguration config = getConfigAs(ControllerConfiguration.class);
+        client.connect(websocketService, new BigInteger(config.nodeId), controllerName, storagePath);
+    }
+
+    /**
+     * Synchronize all nodes with the controller
+     * 
+     * @return
+     */
+    private CompletableFuture<Void> syncAllNodes() {
+        logger.debug("refresh");
+        if (!ready) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        return client.getCommissionedNodeIds().thenCompose(nodeIds -> {
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+            for (BigInteger id : nodeIds) {
+                CompletableFuture<Void> updateFuture = updateNode(id);
+                futures.add(updateFuture);
+            }
+
+            // Return a Future that completes when all updateNode futures are complete
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        }).exceptionally(e -> {
+            logger.debug("Error communicating with controller", e);
+            return null;
+        }).whenComplete((nodeIds, e) -> {
+            logger.debug("refresh done");
+        });
+    }
+
+    private synchronized void reconnect() {
+        logger.debug("reconnect!");
+        cancelReconnect();
+        this.reconnectFuture = scheduler.schedule(this::connect, 30, TimeUnit.SECONDS);
+    }
+
+    private synchronized void cancelReconnect() {
+        ScheduledFuture<?> reconnectFuture = this.reconnectFuture;
+        if (reconnectFuture != null) {
+            reconnectFuture.cancel(true);
+        }
+        this.reconnectFuture = null;
     }
 
     /**
@@ -379,30 +374,6 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
             ThingUID bridgeUID = getThing().getUID();
             ThingUID thingUID = new ThingUID(THING_TYPE_NODE, bridgeUID, node.id.toString());
             discoveryService.discoverNodeDevice(thingUID, bridgeUID, node);
-        }
-    }
-
-    /**
-     * I'm not sure if this is necessary anymore, need to check if matter.js constantly scans for nodes for us
-     */
-    private void checkNodes() {
-        if (!disconnectedNodes.isEmpty()) {
-            client.getCommissionedNodeIds().thenAccept(nodeIds -> {
-                // check to make sure a disconnected node is actually known by the controller.
-                // if its not, then we can never connect to it again.
-                Set<BigInteger> disconnectedNodesCopy = Set.copyOf(disconnectedNodes);
-                disconnectedNodesCopy.forEach(nodeId -> {
-                    if (nodeIds.contains(nodeId)) {
-                        updateNode(nodeId);
-                    } else {
-                        disconnectedNodes.remove(nodeId);
-                    }
-                });
-            }).exceptionally(e -> {
-                logger.debug("Error communicating with controller", e);
-                return null;
-            });
-
         }
     }
 }

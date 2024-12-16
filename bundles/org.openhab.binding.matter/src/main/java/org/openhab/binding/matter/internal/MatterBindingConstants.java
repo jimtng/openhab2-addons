@@ -28,19 +28,12 @@ public class MatterBindingConstants {
     public static final String BINDING_ID = "matter";
 
     // List of all Thing Type UIDs
-    // public static final ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
     public static final ThingTypeUID THING_TYPE_CONTROLLER = new ThingTypeUID(BINDING_ID, "controller");
     public static final ThingTypeUID THING_TYPE_NODE = new ThingTypeUID(BINDING_ID, "node");
 
     // Most endpoints are represented as channel groups on Nodes, bridges for now can be represented as standalone
     // endpoint things
     public static final ThingTypeUID THING_TYPE_BRIDGE_ENDPOINT = new ThingTypeUID(BINDING_ID, "bridge-endpoint");
-
-    // public static final ThingTypeUID THING_TYPE_ENDPOINT = new ThingTypeUID(BINDING_ID, "endpoint");
-
-    // List of all Channel ids
-    public static final String CHANNEL_PAIR_CODE = "pair_code";
-    public static final String CHANNEL_COMMAND = "command";
 
     // This was borrowed from the zigbee binding as Matter uses the same cluster API model
     // List of Channel UIDs

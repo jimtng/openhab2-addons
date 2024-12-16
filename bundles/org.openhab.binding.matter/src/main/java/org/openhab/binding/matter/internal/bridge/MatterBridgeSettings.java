@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public class MatterBridgeSettings {
+    public boolean enableBridge = true;
     public String bridgeName = "openHAB";
     public int port = 5540;
     public int passcode = 20202021;

@@ -124,7 +124,6 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
 
     @Override
     public void initialize() {
-        // our bridge will update our endpoint which changes our status
         updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
     }
 
@@ -226,8 +225,8 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
             BridgeHandler handler = bridge.getHandler();
             if (handler instanceof ControllerHandler controllerHandler) {
                 return controllerHandler;
-            } else if (handler instanceof MatterBaseThingHandler h) {
-                bridge = h.getBridge();
+            } else if (handler instanceof MatterBaseThingHandler matterBaseThingHandler) {
+                bridge = matterBaseThingHandler.getBridge();
             }
 
         }
