@@ -76,28 +76,6 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
         this.endpointNumber = endpointNumber;
     }
 
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.debug("Handling command for channel: {}", channelUID);
-        Optional.ofNullable(channelUIDToConverters.get(channelUID))
-                .ifPresent(converter -> converter.handleCommand(channelUID, command));
-    }
-
-    // /**
-    //  * Update the cluster with new data
-    //  *
-    //  * @param cluster
-    //  */
-    // public void updateCluster(BaseCluster cluster) {
-    //     GenericConverter<? extends BaseCluster> converter = clusterToConverters.get(cluster.id);
-    //     if (converter != null) {
-    //         @SuppressWarnings("unchecked")
-    //         GenericConverter<BaseCluster> specificConverter = (GenericConverter<BaseCluster>) converter;
-    //         specificConverter.updateCluster(cluster);
-    //     } else {
-    //         logger.debug("updateCluster: finished processing for cluster: {}", cluster.id);
-    //     }
-    // }
-
     @Override
     public void onEvent(AttributeChangedMessage message) {
         GenericConverter<? extends BaseCluster> converter = clusterToConverters.get(message.path.clusterId);
@@ -116,6 +94,12 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
         } else {
             logger.debug("onEvent: No converter found for cluster: {}", message.path.clusterId);
         }
+    }
+
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        logger.debug("Handling command for channel: {}", channelUID);
+        Optional.ofNullable(channelUIDToConverters.get(channelUID))
+                .ifPresent(converter -> converter.handleCommand(channelUID, command));
     }
 
     /**

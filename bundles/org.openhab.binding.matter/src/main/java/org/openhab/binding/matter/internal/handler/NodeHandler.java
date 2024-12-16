@@ -155,11 +155,6 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         }
     }
 
-    public void updateNode(Node node) {
-        updateRootProperties(node.rootEndpoint);
-        updateBaseEndpoint(node.rootEndpoint);
-    }
-
     @Override
     protected synchronized void updateBaseEndpoint(Endpoint endpoint) {
         if (getThing().getStatus() != ThingStatus.ONLINE) {
@@ -169,6 +164,11 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         super.updateBaseEndpoint(endpoint);
     }
 
+    public void updateNode(Node node) {
+        updateRootProperties(node.rootEndpoint);
+        updateBaseEndpoint(node.rootEndpoint);
+    }
+    
     private void updateBridgeEndpoint(Endpoint endpoint) {
         BridgeEndpointHandler handler = bridgedEndpoints.get(endpoint.number);
         if (handler != null) {

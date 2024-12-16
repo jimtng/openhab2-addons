@@ -124,32 +124,14 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
 
     @Override
     public void initialize() {
-        // Bridge bridge = getBridge();
-        // BridgeHandler handler = bridge == null ? null : bridge.getHandler();
-        // if (handler == null) {
-        //     updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
-        // } else if (handler.getThing().getStatus() != ThingStatus.ONLINE) {
-        //     updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
-        // } else if (getThing().getStatus() != ThingStatus.ONLINE) {
-        //     // wait for us to be updated.
-        //     updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
-        // }
+        // our bridge will update our endpoint which changes our status
         updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NOT_YET_READY, "Waiting for data");
     }
 
     @Override
     public void dispose() {
         channelTypeProvider.removeChannelGroupTypesForPrefix(getThing().getThingTypeUID().getId());
-    }
-
-    // @Override
-    // public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
-    //     if (bridgeStatusInfo.getStatus() != ThingStatus.ONLINE) {
-    //         updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
-    //     }
-    // }
-
-    
+    }    
 
     // making this public
     @Override
@@ -201,7 +183,90 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         super.triggerChannel(channelUID, event);
     }
 
-    /**
+    public void setEndpointStatus(ThingStatus status, ThingStatusDetail detail, String description) {
+        logger.debug("setEndpointStatus {} {} {} {}", status, detail, description, getNodeId());
+        updateStatus(status, detail, description);
+    }
+
+    public void sendClusterCommand(Integer endpointId, String clusterName, ClusterCommand command) {
+        MatterControllerClient client = getClient();
+        if (client != null) {
+            client.clusterCommand(getNodeId(), endpointId, clusterName, command);
+        }
+    }
+
+    public void writeAttribute(Integer endpointId, String clusterName, String attributeName, String value) {
+        MatterControllerClient ws = getClient();
+        if (ws != null) {
+            ws.clusterWriteAttribute(getNodeId(), endpointId, clusterName, attributeName, value);
+        }
+    }
+
+    public CompletableFuture<String> readAttribute(Integer endpointId, String clusterName, String attributeName) {
+        MatterControllerClient ws = getClient();
+        if (ws != null) {
+            return ws.clusterReadAttribute(getNodeId(), endpointId, clusterName, attributeName);
+        }
+        throw new RuntimeException("Client is null");
+    }
+
+    public @Nullable MatterControllerClient getClient() {
+        if (cachedClient == null) {
+            ControllerHandler c = controllerHandler();
+            if (c != null) {
+                cachedClient = c.getClient();
+            }
+        }
+        return cachedClient;
+    }
+
+    protected @Nullable ControllerHandler controllerHandler() {
+        Bridge bridge = getBridge();
+        while (bridge != null) {
+            BridgeHandler handler = bridge.getHandler();
+            if (handler instanceof ControllerHandler controllerHandler) {
+                return controllerHandler;
+            } else if (handler instanceof MatterBaseThingHandler h) {
+                bridge = h.getBridge();
+            }
+
+        }
+        return null;
+    }
+
+    protected void updateRootProperties(Endpoint root) {
+        BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
+        if (cluster != null && cluster instanceof BasicInformationCluster basicCluster) {
+            thing.setProperty(Thing.PROPERTY_SERIAL_NUMBER, basicCluster.serialNumber);
+            thing.setProperty(Thing.PROPERTY_FIRMWARE_VERSION, basicCluster.softwareVersionString);
+            thing.setProperty(Thing.PROPERTY_VENDOR, basicCluster.vendorName);
+            thing.setProperty(Thing.PROPERTY_MODEL_ID, basicCluster.productName);
+            thing.setProperty(Thing.PROPERTY_HARDWARE_VERSION, basicCluster.hardwareVersionString);
+        } else {
+            cluster = root.clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
+            if (cluster != null && cluster instanceof BridgedDeviceBasicInformationCluster basicCluster) {
+                thing.setProperty(Thing.PROPERTY_SERIAL_NUMBER, basicCluster.serialNumber);
+                thing.setProperty(Thing.PROPERTY_FIRMWARE_VERSION, basicCluster.softwareVersionString);
+                thing.setProperty(Thing.PROPERTY_VENDOR, basicCluster.vendorName);
+                thing.setProperty(Thing.PROPERTY_MODEL_ID, basicCluster.productName);
+                thing.setProperty(Thing.PROPERTY_HARDWARE_VERSION, basicCluster.hardwareVersionString);
+            }
+        }
+        cluster = root.clusters.get(GeneralDiagnosticsCluster.CLUSTER_NAME);
+        if (cluster != null && cluster instanceof GeneralDiagnosticsCluster generalCluster) {
+            for (NetworkInterface ni : generalCluster.networkInterfaces) {
+                thing.setProperty(Thing.PROPERTY_MAC_ADDRESS, MatterLabelUtils.formatMacAddress(ni.hardwareAddress));
+                if (!ni.iPv6Addresses.isEmpty()) {
+                    thing.setProperty("ipv6Address", MatterLabelUtils.formatIPv6Address(ni.iPv6Addresses.get(0)));
+                }
+                if (!ni.iPv4Addresses.isEmpty()) {
+                    thing.setProperty("ipv4Address", MatterLabelUtils.formatIPv4Address(ni.iPv4Addresses.get(0)));
+                }
+            }
+        }
+    }
+
+     /**
      * Main Processing of Matter endpoints. This will create an Channel Group per endpoint
      * 
      * @param endpoint
@@ -299,93 +364,5 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         });
         // add any children recursively (endpoints can have child endpoints)
         endpoint.children.forEach(e -> updateEndpointInternal(e, groupTypes, groupDefs, channels));
-    }
-
-    public void setEndpointStatus(ThingStatus status, ThingStatusDetail detail, String description) {
-        logger.debug("setEndpointStatus {} {} {} {}", status, detail, description, getNodeId());
-        updateStatus(status, detail, description);
-    }
-
-    public void sendClusterCommand(Integer endpointId, String clusterName, ClusterCommand command) {
-        MatterControllerClient client = getClient();
-        if (client != null) {
-            client.clusterCommand(getNodeId(), endpointId, clusterName, command);
-        }
-    }
-
-    public void writeAttribute(Integer endpointId, String clusterName, String attributeName, String value) {
-        MatterControllerClient ws = getClient();
-        if (ws != null) {
-            ws.clusterWriteAttribute(getNodeId(), endpointId, clusterName, attributeName, value);
-        }
-    }
-
-    public CompletableFuture<String> readAttribute(Integer endpointId, String clusterName, String attributeName) {
-        MatterControllerClient ws = getClient();
-        if (ws != null) {
-            return ws.clusterReadAttribute(getNodeId(), endpointId, clusterName, attributeName);
-        }
-        throw new RuntimeException("Client is null");
-    }
-
-    protected @Nullable ControllerHandler controllerHandler() {
-        Bridge bridge = getBridge();
-        while (bridge != null) {
-            BridgeHandler handler = bridge.getHandler();
-            if (handler instanceof ControllerHandler controllerHandler) {
-                return controllerHandler;
-            } else if (handler instanceof MatterBaseThingHandler h) {
-                bridge = h.getBridge();
-            }
-
-        }
-        return null;
-    }
-
-    public @Nullable MatterControllerClient getClient() {
-        if (cachedClient == null) {
-            ControllerHandler c = controllerHandler();
-            if (c != null) {
-                cachedClient = c.getClient();
-            }
-        }
-        return cachedClient;
-    }
-
-    protected void updateRootProperties(Endpoint root) {
-        BaseCluster cluster = root.clusters.get(BasicInformationCluster.CLUSTER_NAME);
-        if (cluster != null && cluster instanceof BasicInformationCluster basicCluster) {
-            thing.setProperty(Thing.PROPERTY_SERIAL_NUMBER, basicCluster.serialNumber);
-            thing.setProperty(Thing.PROPERTY_FIRMWARE_VERSION, basicCluster.softwareVersionString);
-            thing.setProperty(Thing.PROPERTY_VENDOR, basicCluster.vendorName);
-            thing.setProperty(Thing.PROPERTY_MODEL_ID, basicCluster.productName);
-            thing.setProperty(Thing.PROPERTY_HARDWARE_VERSION, basicCluster.hardwareVersionString);
-        } else {
-            cluster = root.clusters.get(BridgedDeviceBasicInformationCluster.CLUSTER_NAME);
-            if (cluster != null && cluster instanceof BridgedDeviceBasicInformationCluster basicCluster) {
-                thing.setProperty(Thing.PROPERTY_SERIAL_NUMBER, basicCluster.serialNumber);
-                thing.setProperty(Thing.PROPERTY_FIRMWARE_VERSION, basicCluster.softwareVersionString);
-                thing.setProperty(Thing.PROPERTY_VENDOR, basicCluster.vendorName);
-                thing.setProperty(Thing.PROPERTY_MODEL_ID, basicCluster.productName);
-                thing.setProperty(Thing.PROPERTY_HARDWARE_VERSION, basicCluster.hardwareVersionString);
-            }
-        }
-        cluster = root.clusters.get(GeneralDiagnosticsCluster.CLUSTER_NAME);
-        if (cluster != null && cluster instanceof GeneralDiagnosticsCluster generalCluster) {
-            for (NetworkInterface ni : generalCluster.networkInterfaces) {
-                thing.setProperty(Thing.PROPERTY_MAC_ADDRESS, MatterLabelUtils.formatMacAddress(ni.hardwareAddress));
-                if (!ni.iPv6Addresses.isEmpty()) {
-                    String newValue = MatterLabelUtils.formatIPv6Address(ni.iPv6Addresses.get(0));
-                    String oldValue = thing.setProperty("ipv6Address", newValue);
-                    if (oldValue != null && !newValue.equals(oldValue)) {
-                        logger.debug("WARNING IPV6 ADDRESS Changed {} to {}", oldValue, newValue);
-                    }
-                }
-                if (!ni.iPv4Addresses.isEmpty()) {
-                    thing.setProperty("ipv4Address", MatterLabelUtils.formatIPv6Address(ni.iPv4Addresses.get(0)));
-                }
-            }
-
-        }
     }
 }
