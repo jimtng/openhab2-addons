@@ -59,7 +59,8 @@ public class LightingType extends DeviceType {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.debug("Handling command for channel: {}", channelUID);
-        // we want OnOff commands to always use OnOff cluster (not levelcontrol)
+        // we want openHAB OnOff commands to always use OnOffCluster if its available (and not LevelControlCluster or
+        // ColorControlCluster)
         if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
             handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
@@ -100,22 +101,33 @@ public class LightingType extends DeviceType {
     }
 
     @Override
+    public void refreshState() {
+        super.refreshState();
+        // if the device is off, levels are 0 in openHAB, but in matter levels are detached from onOff
+        if (allClusters.get(OnOffCluster.CLUSTER_NAME) instanceof OnOffCluster onOffCluster) {
+            lastOnOff = OnOffType.from(onOffCluster.onOff);
+            if (lastOnOff == OnOffType.OFF) {
+                // this could use some improvement doing this after we already refreshed channels, ie: how to initially
+                // tie state between clusters
+                updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, lastOnOff);
+                updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
+                if (clusterToConverters
+                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
+                    colorControlConverter.updateOnOff(lastOnOff);
+                }
+            }
+        }
+        //do we need to do the same for levelControl and Color?
+    }
+
+    @Override
     protected @Nullable GenericConverter<? extends BaseCluster> createConverter(BaseCluster cluster,
             Map<String, BaseCluster> allClusters, String labelPrefix) {
         logger.debug("checking converter for cluster: {}", cluster.getClass().getSimpleName());
-        if (cluster instanceof OnOffCluster) {
-            // don't add a switch to dimmable devices or color devices
-            if (!isSwitch()) {
-                return null;
-            }
-
-        }
-        if (cluster instanceof LevelControlCluster) {
-            // don't add a dimmer to only switchable devices or color devices (as openHAB Color types already support
-            // dimming)
-            if (isSwitch() || isColor()) {
-                return null;
-            }
+        // Skip creating certain converters that this DeviceType will coordinate
+        if ((cluster instanceof OnOffCluster && !isSwitch())
+                || (cluster instanceof LevelControlCluster && (isSwitch() || isColor()))) {
+            return null;
         }
 
         return super.createConverter(cluster, allClusters, labelPrefix);

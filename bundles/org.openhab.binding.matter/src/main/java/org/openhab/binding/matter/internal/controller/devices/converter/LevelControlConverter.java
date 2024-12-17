@@ -47,7 +47,7 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
             String labelPrefix) {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
-
+    
     @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_LEVEL_LEVEL.getId()), ITEM_TYPE_DIMMER)

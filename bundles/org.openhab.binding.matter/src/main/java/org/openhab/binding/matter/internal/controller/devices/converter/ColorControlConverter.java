@@ -143,10 +143,6 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         } else if (command instanceof OnOffType onOffType) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
             handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
-            // ClusterCommand levelCommand = LevelControlCluster.moveToLevelWithOnOff(
-            // percentToLevel(onOffType == OnOffType.OFF ? new PercentType(0) : lastHSB.getBrightness()), 0,
-            // new OptionsBitmap(true, true), new OptionsBitmap(true, true));
-            // handler.sendClusterCommand(LevelControlCluster.CLUSTER_NAME, levelCommand);
         } else if (command instanceof PercentType percentType) {
             if (channelUID.getIdWithoutGroup().equals(CHANNEL_COLOR_TEMPERATURE.getId())) {
                 ClusterCommand tempCommand = ColorControlCluster

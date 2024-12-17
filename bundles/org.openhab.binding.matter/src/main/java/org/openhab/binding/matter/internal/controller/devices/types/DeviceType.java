@@ -67,8 +67,8 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
 
     protected Map<ChannelUID, GenericConverter<? extends BaseCluster>> channelUIDToConverters = new HashMap<>();
     protected Map<ChannelUID, @Nullable StateDescription> channelUIDToStateDescription = new HashMap<>();
-
     protected Map<Integer, GenericConverter<? extends BaseCluster>> clusterToConverters = new HashMap<>();
+    protected Map<String, BaseCluster> allClusters = new HashMap<>();
 
     public DeviceType(Integer deviceType, MatterBaseThingHandler handler, Integer endpointNumber) {
         this.deviceType = deviceType;
@@ -117,6 +117,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
     public final List<Channel> createChannels(Integer endpointNumber, Map<String, BaseCluster> clusters,
             ChannelGroupUID channelGroupUID) {
         logger.debug("createChannels {}", endpointNumber);
+        allClusters = clusters;
         List<Channel> channels = new ArrayList<>();
         channelUIDToConverters.clear();
         channelUIDToStateDescription.clear();
