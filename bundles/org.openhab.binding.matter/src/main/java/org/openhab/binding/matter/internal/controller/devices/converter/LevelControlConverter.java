@@ -82,7 +82,11 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
     }
 
     @Override
-    public void refreshState() {
-        updateState(CHANNEL_LEVEL_LEVEL, levelToPercent(cluster.currentLevel));
+    public void initState() {
+        initState(true);
+    }
+
+    public void initState(boolean onOff) {
+        updateState(CHANNEL_LEVEL_LEVEL, onOff ? levelToPercent(cluster.currentLevel) : OnOffType.OFF);
     }
 }

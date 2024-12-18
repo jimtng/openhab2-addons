@@ -66,7 +66,7 @@ public class BooleanStateConverter extends GenericConverter<BooleanStateCluster>
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_BOOLEANSTATE_STATEVALUE, OnOffType.from(cluster.stateValue));
     }
 }

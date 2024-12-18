@@ -259,7 +259,7 @@ public class ThermostatConverter extends GenericConverter<ThermostatCluster> {
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         if (cluster.localTemperature != null) {
             updateState(CHANNEL_THERMOSTAT_LOCALTEMPERATURE, valueToTemperature(cluster.localTemperature));
         }

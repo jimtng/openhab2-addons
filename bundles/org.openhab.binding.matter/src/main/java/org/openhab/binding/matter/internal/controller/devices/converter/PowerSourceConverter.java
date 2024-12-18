@@ -99,7 +99,7 @@ public class PowerSourceConverter extends GenericConverter<PowerSourceCluster> {
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         if (cluster.batPercentRemaining != null) {
             updateState(CHANNEL_POWER_BATTERYPERCENT, convertToPercentage(cluster.batPercentRemaining));
         }

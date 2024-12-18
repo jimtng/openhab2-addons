@@ -105,8 +105,8 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
     /**
      * Inform all cluster converters to refresh their channel state
      */
-    public void refreshState() {
-        channelUIDToConverters.forEach((channelUID, converter) -> converter.refreshState());
+    public void initState() {
+        channelUIDToConverters.forEach((channelUID, converter) -> converter.initState());
     }
 
     /**

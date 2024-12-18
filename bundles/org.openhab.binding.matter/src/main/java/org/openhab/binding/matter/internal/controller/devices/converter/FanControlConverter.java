@@ -170,7 +170,7 @@ public class FanControlConverter extends GenericConverter<FanControlCluster> {
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         if (cluster.fanMode != null) {
             updateState(CHANNEL_FANCONTROL_MODE, new DecimalType(cluster.fanMode.value));
         }

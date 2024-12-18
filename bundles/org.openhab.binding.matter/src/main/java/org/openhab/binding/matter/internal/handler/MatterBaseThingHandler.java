@@ -300,7 +300,7 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
         updateThing(thingBuilder.build());
 
         //have all clusters send their initial states
-        devices.values().forEach(deviceType -> deviceType.refreshState());
+        devices.values().forEach(deviceType -> deviceType.initState());
     }
 
     /**

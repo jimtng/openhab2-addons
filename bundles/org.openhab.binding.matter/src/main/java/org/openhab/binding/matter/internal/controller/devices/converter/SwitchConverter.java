@@ -137,7 +137,7 @@ public class SwitchConverter extends GenericConverter<SwitchCluster> {
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_SWITCH_SWITCH, new DecimalType(cluster.currentPosition));
     }
 }

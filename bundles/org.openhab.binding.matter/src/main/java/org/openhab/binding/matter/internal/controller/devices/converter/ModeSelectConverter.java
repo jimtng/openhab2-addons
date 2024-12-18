@@ -87,7 +87,7 @@ public class ModeSelectConverter extends GenericConverter<ModeSelectCluster> {
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_MODESELECT_MODE, new DecimalType(cluster.currentMode));
     }
 }

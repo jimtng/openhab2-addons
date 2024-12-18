@@ -65,7 +65,7 @@ public class TemperatureMeasurementConverter extends GenericConverter<Temperatur
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_TEMPERATUREMEASURMENT_MEASUREDVALUE, valueToTemperature(cluster.measuredValue));
     }
 }

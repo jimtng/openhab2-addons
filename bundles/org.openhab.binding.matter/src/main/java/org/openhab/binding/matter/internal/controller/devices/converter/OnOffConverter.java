@@ -73,7 +73,7 @@ public class OnOffConverter extends GenericConverter<OnOffCluster> {
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_ONOFF_ONOFF, OnOffType.from(Boolean.valueOf(cluster.onOff)));
     }
 }

@@ -76,7 +76,7 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
     /**
      * Updates all the channel states of a cluster
      */
-    public abstract void refreshState();
+    public abstract void initState();
 
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
@@ -174,10 +174,16 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
         return new QuantityType<>(BigDecimal.valueOf(value, 2), SIUnits.CELSIUS);
     }
 
-    private void updateLocalClusterAttribute( String attributeName, Object newValue) throws Exception {
+    private void updateLocalClusterAttribute(String attributeName, Object newValue) throws Exception {
+        Object fieldValue = null;
+        if(newValue instanceof Number number) {
+            fieldValue = number.intValue();
+        } else {
+            fieldValue = newValue;  
+        }
         Field field = cluster.getClass().getDeclaredField(attributeName);
         field.setAccessible(true);
-        field.set(cluster, newValue);
+        field.set(cluster, fieldValue);
     }
 
     protected String formatLabel(String channelLabel) {

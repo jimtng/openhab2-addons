@@ -66,7 +66,7 @@ public class WiFiNetworkDiagnosticsConverter extends GenericConverter<WiFiNetwor
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_WIFINETWORKDIAGNOSTICS_RSSI, new DecimalType(cluster.rssi));
     }
 }

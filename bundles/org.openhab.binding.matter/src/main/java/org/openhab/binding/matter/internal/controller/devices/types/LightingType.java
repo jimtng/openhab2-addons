@@ -28,6 +28,7 @@ import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.controller.devices.converter.ColorControlConverter;
 import org.openhab.binding.matter.internal.controller.devices.converter.GenericConverter;
+import org.openhab.binding.matter.internal.controller.devices.converter.LevelControlConverter;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
@@ -50,7 +51,8 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class LightingType extends DeviceType {
     private final Logger logger = LoggerFactory.getLogger(LightingType.class);
-    private OnOffType lastOnOff = OnOffType.OFF;
+    private OnOffType lastOnOff = OnOffType.ON;
+    private int lastLevel = 0;
 
     public LightingType(Integer deviceType, MatterBaseThingHandler handler, Integer endpointNumber) {
         super(deviceType, handler, endpointNumber);
@@ -75,6 +77,7 @@ public class LightingType extends DeviceType {
         switch (message.path.attributeName) {
             case "currentLevel":
                 logger.debug("currentLevel lastOnOff {}", lastOnOff);
+                lastLevel = ((Double) message.value).intValue();
                 PercentType level = GenericConverter.levelToPercent(((Double) message.value).intValue());
                 // if the device is off, we don't care about level
                 if (lastOnOff != OnOffType.OFF) {
@@ -101,23 +104,24 @@ public class LightingType extends DeviceType {
     }
 
     @Override
-    public void refreshState() {
-        super.refreshState();
-        // if the device is off, levels are 0 in openHAB, but in matter levels are detached from onOff
+    public void initState() {
         if (allClusters.get(OnOffCluster.CLUSTER_NAME) instanceof OnOffCluster onOffCluster) {
             lastOnOff = OnOffType.from(onOffCluster.onOff);
-            if (lastOnOff == OnOffType.OFF) {
-                // this could use some improvement doing this after we already refreshed channels, ie: how to initially
-                // tie state between clusters
-                updateChannel(LevelControlCluster.CLUSTER_ID, CHANNEL_LEVEL_LEVEL, lastOnOff);
-                updateChannel(OnOffCluster.CLUSTER_ID, CHANNEL_ONOFF_ONOFF, lastOnOff);
-                if (clusterToConverters
-                        .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                    colorControlConverter.updateOnOff(lastOnOff);
-                }
-            }
         }
-        //do we need to do the same for levelControl and Color?
+
+        if (allClusters.get(LevelControlCluster.CLUSTER_NAME) instanceof LevelControlCluster levelControlCluster) {
+            lastLevel = levelControlCluster.currentLevel;
+        }
+
+        channelUIDToConverters.forEach((channelUID, converter) -> {
+            if (converter instanceof LevelControlConverter levelControlConverter) {
+                levelControlConverter.initState(lastOnOff == OnOffType.ON);
+            } else if (converter instanceof ColorControlConverter colorControlConverter) {
+                colorControlConverter.initState(lastOnOff == OnOffType.ON, lastLevel);
+            } else {
+                converter.initState();
+            }
+        });
     }
 
     @Override

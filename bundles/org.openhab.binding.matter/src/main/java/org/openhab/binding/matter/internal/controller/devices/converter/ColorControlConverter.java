@@ -72,6 +72,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
 
     private @Nullable ColorMode lastColorMode;
     private boolean supportsHue = false;
+    private boolean lastOnOff = true;
     private int lastHue = -1;
     private int lastSaturation = -1;
     private @Nullable ScheduledFuture<?> colorUpdateTimer = null;
@@ -90,7 +91,6 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     public ColorControlConverter(ColorControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
         super(cluster, handler, endpointNumber, labelPrefix);
-        initCluster();
     }
 
     @Override
@@ -218,12 +218,14 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
     }
 
     @Override
-    public void refreshState() {
-        updateColor();
+    public void initState() {
+        initState(true, 100);
     }
 
-    private void initCluster() {
+    public void initState(boolean onOff, int brightness) {
+        lastHSB = new HSBType(lastHSB.getHue(), lastHSB.getSaturation(), new PercentType(brightness));
         lastColorMode = cluster.colorMode;
+        lastOnOff = onOff;
         supportsHue = cluster.featureMap.hueSaturation;
         lastX = cluster.currentX != null ? cluster.currentX : 0;
         lastY = cluster.currentY != null ? cluster.currentY : 0;
@@ -233,16 +235,17 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         lastColorTemperatureMireds = cluster.colorTemperatureMireds;
         Optional.ofNullable(cluster.colorTempPhysicalMaxMireds).ifPresent(temp -> colorTempPhysicalMaxMireds = temp);
         Optional.ofNullable(cluster.colorTempPhysicalMinMireds).ifPresent(temp -> colorTempPhysicalMinMireds = temp);
+        updateColor();
     }
-
 
     // These functions are borrowed from the Zigbee openHAB binding
 
     // TODO make sure this is called by updates to level control if associated with color control????
 
     public void updateOnOff(OnOffType onOffType) {
+        lastOnOff = onOffType == OnOffType.ON;
         HSBType hsb = new HSBType(lastHSB.getHue(), lastHSB.getSaturation(),
-                onOffType == OnOffType.ON ? lastHSB.getBrightness() : new PercentType(0));
+                lastOnOff ? lastHSB.getBrightness() : new PercentType(0));
         updateState(CHANNEL_COLOR_COLOR, hsb);
     }
 
@@ -254,23 +257,6 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         updateState(CHANNEL_COLOR_COLOR, newHSB);
     }
 
-    private void updateColorHSB(DecimalType hue, PercentType saturation) {
-        // Extra temp variable to avoid thread sync concurrency issues on lastHSB
-        HSBType oldHSB = lastHSB;
-        HSBType newHSB = new HSBType(hue, saturation, oldHSB.getBrightness());
-        lastHSB = newHSB;
-        updateState(CHANNEL_COLOR_COLOR, newHSB);
-    }
-
-    private void updateColorXY(PercentType x, PercentType y) {
-        try {
-            HSBType color = ColorUtil.xyToHsb(new double[] { x.floatValue() / 100.0f, y.floatValue() / 100.0f });
-            updateColorHSB(color.getHue(), color.getSaturation());
-        } catch (IllegalArgumentException e) {
-            updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
-        }
-    }
-
     private void updateColorHSB() {
         float hueValue = lastHue * 360.0f / 254.0f;
         float saturationValue = lastSaturation * 100.0f / 254.0f;
@@ -280,6 +266,19 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         if (supportsColorTemperature) {
             updateState(CHANNEL_COLOR_TEMPERATURE, UnDefType.UNDEF);
             updateState(CHANNEL_COLOR_TEMPERATURE_ABS, UnDefType.UNDEF);
+        }
+    }
+
+    private void updateColorHSB(DecimalType hue, PercentType saturation) {
+        // Extra temp variable to avoid thread sync concurrency issues on lastHSB
+        HSBType oldHSB = lastHSB;
+        HSBType newHSB = new HSBType(hue, saturation, oldHSB.getBrightness());
+        lastHSB = newHSB;
+        logger.debug("Updating HSB {}", newHSB);
+        if (!lastOnOff) {
+            updateState(CHANNEL_COLOR_COLOR, new HSBType(newHSB.getHue(), newHSB.getSaturation(), new PercentType(0)));
+        } else {
+            updateState(CHANNEL_COLOR_COLOR, newHSB);
         }
     }
 
@@ -295,13 +294,24 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
         }
     }
 
+    private void updateColorXY(PercentType x, PercentType y) {
+        try {
+            HSBType color = ColorUtil.xyToHsb(new double[] { x.floatValue() / 100.0f, y.floatValue() / 100.0f });
+            updateColorHSB(color.getHue(), color.getSaturation());
+            logger.debug("Updating XY to HSB {}", color);
+        } catch (IllegalArgumentException e) {
+            logger.debug("Error converting XY to HSB: {}", e.getMessage());
+            updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
+        }
+    }
+
     private void updateColorTemperature() {
         Integer mirek = lastColorTemperatureMireds;
+        logger.debug("Updating color temperature {}", mirek);
         if (mirek != null) {
             if (mirek == 0) {
                 updateState(CHANNEL_COLOR_TEMPERATURE, UnDefType.UNDEF);
                 updateState(CHANNEL_COLOR_TEMPERATURE_ABS, UnDefType.UNDEF);
-                updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
             } else {
                 updateState(CHANNEL_COLOR_TEMPERATURE, miredsToPercenType(mirek));
                 updateState(CHANNEL_COLOR_TEMPERATURE_ABS, QuantityType.valueOf(Double.valueOf(mirek), Units.MIRED));
@@ -309,6 +319,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                     HSBType color = ColorUtil.xyToHsb(ColorUtil.kelvinToXY(1000000.0 / mirek));
                     updateColorHSB(color.getHue(), color.getSaturation());
                 } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+                    logger.debug("Error converting color temperature to XY: {}", e.getMessage());
                     updateState(CHANNEL_COLOR_COLOR, UnDefType.UNDEF);
                 }
             }
@@ -328,13 +339,19 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                     }
                     break;
                 case COLOR_TEMPERATURE_MIREDS:
-                    if (supportsColorTemperature) {
+                    if (useColorTemperature()) {
                         updateColorTemperature();
+                    } else {
+                        updateColorXY();
                     }
                     break;
             }
         }
         colorChanged = false;
+    }
+
+    private boolean useColorTemperature() {
+        return supportsColorTemperature && lastColorTemperatureMireds != null && lastColorTemperatureMireds > 0;
     }
 
     private void changeColorHueSaturation(HSBType color) {

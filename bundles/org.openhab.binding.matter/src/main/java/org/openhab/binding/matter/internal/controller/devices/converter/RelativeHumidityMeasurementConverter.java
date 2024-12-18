@@ -69,7 +69,7 @@ public class RelativeHumidityMeasurementConverter extends GenericConverter<Relat
     }
 
     @Override
-    public void refreshState() {
+    public void initState() {
         updateState(CHANNEL_HUMIDITYMEASURMENT_MEASUREDVALUE, humidityToPercent(cluster.measuredValue));
     }
 
