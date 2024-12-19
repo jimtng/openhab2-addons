@@ -43,6 +43,8 @@ import org.openhab.core.types.StateDescription;
 @NonNullByDefault
 public class LevelControlConverter extends GenericConverter<LevelControlCluster> {
 
+    private PercentType lastLevel = new PercentType(0);
+    
     public LevelControlConverter(LevelControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
         super(cluster, handler, endpointNumber, labelPrefix);
@@ -74,8 +76,9 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
         switch (message.path.attributeName) {
             case "currentLevel":
                 Integer numberValue = message.value instanceof Number number ? number.intValue() : 0;
-                logger.debug("currentLevel {}", message.value);
-                updateState(CHANNEL_LEVEL_LEVEL, levelToPercent(numberValue));
+                lastLevel = levelToPercent(numberValue);
+                logger.debug("currentLevel {}", lastLevel);
+                updateState(CHANNEL_LEVEL_LEVEL, lastLevel);
                 break;
         }
         super.onEvent(message);
@@ -83,10 +86,17 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
 
     @Override
     public void initState() {
+        //default to on when not used as part of the lighting type
         initState(true);
     }
 
     public void initState(boolean onOff) {
-        updateState(CHANNEL_LEVEL_LEVEL, onOff ? levelToPercent(cluster.currentLevel) : OnOffType.OFF);
+        lastLevel = levelToPercent(cluster.currentLevel);
+        updateState(CHANNEL_LEVEL_LEVEL, onOff ? lastLevel : OnOffType.OFF);
+    }
+
+    //called by LightingType on OnOffCluster Changes
+    public void updateOnOff(OnOffType onOff) {
+        updateState(CHANNEL_LEVEL_LEVEL, onOff == OnOffType.ON ? lastLevel : OnOffType.OFF);
     }
 }

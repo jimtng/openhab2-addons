@@ -12,7 +12,15 @@
  */
 package org.openhab.binding.matter.internal.controller.devices.converter;
 
-import static org.openhab.binding.matter.internal.MatterBindingConstants.*;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COLOR_COLOR;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COLOR_TEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_COLOR_TEMPERATURE_ABS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_COLOR_COLOR;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_COLOR_TEMPERATURE;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.CHANNEL_LABEL_COLOR_TEMPERATURE_ABS;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_COLOR;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_DIMMER;
+import static org.openhab.binding.matter.internal.MatterBindingConstants.ITEM_TYPE_NUMBER_TEMPERATURE;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -36,7 +44,11 @@ import org.openhab.binding.matter.internal.client.model.cluster.gen.OnOffCluster
 import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessage;
 import org.openhab.binding.matter.internal.controller.MatterControllerClient;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
-import org.openhab.core.library.types.*;
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelGroupUID;
