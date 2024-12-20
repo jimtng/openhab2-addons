@@ -26,6 +26,7 @@ import org.openhab.binding.matter.internal.client.model.ws.AttributeChangedMessa
 import org.openhab.binding.matter.internal.controller.devices.converter.ColorControlConverter;
 import org.openhab.binding.matter.internal.controller.devices.converter.GenericConverter;
 import org.openhab.binding.matter.internal.controller.devices.converter.LevelControlConverter;
+import org.openhab.binding.matter.internal.controller.devices.converter.OnOffConverter;
 import org.openhab.binding.matter.internal.handler.MatterBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
@@ -46,10 +47,6 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class LightingType extends DeviceType {
     private final Logger logger = LoggerFactory.getLogger(LightingType.class);
-    // default to on, as we assume level controls are only relevant when the device is on, and let matter tell us
-    // otherwise
-    private OnOffType lastOnOff = OnOffType.ON;
-    private PercentType lastLevel = new PercentType(0);
 
     public LightingType(Integer deviceType, MatterBaseThingHandler handler, Integer endpointNumber) {
         super(deviceType, handler, endpointNumber);
@@ -72,31 +69,18 @@ public class LightingType extends DeviceType {
     public void onEvent(AttributeChangedMessage message) {
         logger.debug("OnEvent: {} with value {}", message.path.attributeName, message.value);
         switch (message.path.attributeName) {
-            case "currentLevel":
-                logger.debug("currentLevel lastOnOff {}", lastOnOff);
-                lastLevel = GenericConverter.levelToPercent(((Double) message.value).intValue());
-                // if the device is off, we don't care about level
-                if (lastOnOff != OnOffType.OFF) {
-                    if (clusterToConverters.get(
-                            LevelControlCluster.CLUSTER_ID) instanceof LevelControlConverter levelControlConverter) {
-                        levelControlConverter.onEvent(message);
-                    }
-                    if (clusterToConverters.get(
-                            ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                        colorControlConverter.updateBrightness(lastLevel);
-                    }
-                }
-                return;
             case "onOff":
-                lastOnOff = OnOffType.from((Boolean) message.value);
-                logger.debug("onOff lastOnOff {}", lastOnOff);
+            case "currentLevel":
                 if (clusterToConverters
                         .get(LevelControlCluster.CLUSTER_ID) instanceof LevelControlConverter levelControlConverter) {
-                    levelControlConverter.updateOnOff(lastOnOff);
+                    levelControlConverter.onEvent(message);
                 }
                 if (clusterToConverters
                         .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
-                    colorControlConverter.updateOnOff(lastOnOff);
+                    colorControlConverter.onEvent(message);
+                }
+                if (clusterToConverters.get(OnOffCluster.CLUSTER_ID) instanceof OnOffConverter onOffCluster) {
+                    onOffCluster.onEvent(message);
                 }
                 return;
         }
@@ -106,6 +90,9 @@ public class LightingType extends DeviceType {
 
     @Override
     public void initState() {
+        // default to on, and let matter tell otherwise
+        OnOffType lastOnOff = OnOffType.ON;
+        PercentType lastLevel = new PercentType(0);
         if (allClusters.get(OnOffCluster.CLUSTER_NAME) instanceof OnOffCluster onOffCluster) {
             lastOnOff = OnOffType.from(onOffCluster.onOff);
         }
@@ -114,11 +101,14 @@ public class LightingType extends DeviceType {
             lastLevel = GenericConverter.levelToPercent(levelControlCluster.currentLevel);
         }
 
+        final OnOffType finalLastOnOff = lastOnOff;
+        final PercentType finalLastLevel = lastLevel;
+
         channelUIDToConverters.forEach((channelUID, converter) -> {
             if (converter instanceof LevelControlConverter levelControlConverter) {
-                levelControlConverter.initState(lastOnOff == OnOffType.ON);
+                levelControlConverter.initState(finalLastOnOff == OnOffType.ON);
             } else if (converter instanceof ColorControlConverter colorControlConverter) {
-                colorControlConverter.initState(lastOnOff == OnOffType.ON, lastLevel.intValue());
+                colorControlConverter.initState(finalLastOnOff == OnOffType.ON, finalLastLevel.intValue());
             } else {
                 converter.initState();
             }

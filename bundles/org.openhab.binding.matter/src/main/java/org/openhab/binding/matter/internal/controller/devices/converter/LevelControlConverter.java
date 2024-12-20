@@ -80,6 +80,10 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
                 logger.debug("currentLevel {}", lastLevel);
                 updateState(CHANNEL_LEVEL_LEVEL, lastLevel);
                 break;
+            case "onOff":
+                logger.debug("onOff {}", message.value);
+                updateOnOff((OnOffType) message.value);
+                break;
         }
         super.onEvent(message);
     }

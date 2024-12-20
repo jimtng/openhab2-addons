@@ -201,6 +201,12 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
             case "enhancedCurrentHue":
             case "enhancedColorMode":
                 break;
+            case "currentLevel":
+                updateBrightness(levelToPercent(numberValue));
+                break;
+            case "onOff":
+                updateOnOff(OnOffType.from(numberValue != 0));
+                break;
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
         }
@@ -236,16 +242,14 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
 
     // These functions are borrowed from the Zigbee openHAB binding
 
-    // TODO make sure this is called by updates to level control if associated with color control????
-
-    public void updateOnOff(OnOffType onOffType) {
+    private void updateOnOff(OnOffType onOffType) {
         lastOnOff = onOffType == OnOffType.ON;
         HSBType hsb = new HSBType(lastHSB.getHue(), lastHSB.getSaturation(),
                 lastOnOff ? lastHSB.getBrightness() : new PercentType(0));
         updateState(CHANNEL_COLOR_COLOR, hsb);
     }
 
-    public void updateBrightness(PercentType brightness) {
+    private void updateBrightness(PercentType brightness) {
         // Extra temp variable to avoid thread sync concurrency issues on lastHSB
         HSBType oldHSB = lastHSB;
         HSBType newHSB = new HSBType(oldHSB.getHue(), oldHSB.getSaturation(), brightness);

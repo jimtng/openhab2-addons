@@ -86,11 +86,7 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
 
     @Override
     public void onEvent(AttributeChangedMessage message) {
-        try {
-            updateLocalClusterAttribute(message.path.attributeName, message.value);
-        } catch (Exception e) {
-            logger.debug("Could not update local cluster value for attribute {}", message.path.attributeName, e);
-        }
+        updateLocalClusterAttribute(message.path.attributeName, message.value);
     }
 
     @Override
@@ -174,16 +170,20 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
         return new QuantityType<>(BigDecimal.valueOf(value, 2), SIUnits.CELSIUS);
     }
 
-    private void updateLocalClusterAttribute(String attributeName, Object newValue) throws Exception {
+    private void updateLocalClusterAttribute(String attributeName, Object newValue) {
         Object fieldValue = null;
-        if(newValue instanceof Number number) {
-            fieldValue = number.intValue();
-        } else {
-            fieldValue = newValue;  
+        try {
+            if (newValue instanceof Number number) {
+                fieldValue = number.intValue();
+            } else {
+                fieldValue = newValue;
+            }
+            Field field = cluster.getClass().getDeclaredField(attributeName);
+            field.setAccessible(true);
+            field.set(cluster, fieldValue);
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            //its likely this is not a field in the cluster, so just ignore
         }
-        Field field = cluster.getClass().getDeclaredField(attributeName);
-        field.setAccessible(true);
-        field.set(cluster, fieldValue);
     }
 
     protected String formatLabel(String channelLabel) {
