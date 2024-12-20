@@ -68,6 +68,8 @@ import org.slf4j.LoggerFactory;
 /**
  * The {@link MatterBaseThingHandler} is responsible for handling commands, which are
  * sent to one of the channels.
+ * 
+ * This class is the base class for all Matter device types. It is responsible for creating the channels and channel groups for each Node or Bridge Endpoint.
  *
  * @author Dan Cunningham - Initial contribution
  */
@@ -266,7 +268,7 @@ public abstract class MatterBaseThingHandler extends BaseThingHandler
     }
 
      /**
-     * Main Processing of Matter endpoints. This will create an Channel Group per endpoint
+     * Main Processing of Matter endpoints. This will create a Channel Group per endpoint
      * 
      * @param endpoint
      */
