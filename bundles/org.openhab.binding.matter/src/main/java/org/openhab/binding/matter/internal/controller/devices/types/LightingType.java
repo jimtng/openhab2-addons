@@ -70,11 +70,10 @@ public class LightingType extends DeviceType {
         logger.debug("OnEvent: {} with value {}", message.path.attributeName, message.value);
         switch (message.path.attributeName) {
             case "onOff":
+            case "currentLevel":
                 if (clusterToConverters.get(OnOffCluster.CLUSTER_ID) instanceof OnOffConverter onOffCluster) {
                     onOffCluster.onEvent(message);
                 }
-            //fall through
-            case "currentLevel":
                 if (clusterToConverters
                         .get(LevelControlCluster.CLUSTER_ID) instanceof LevelControlConverter levelControlConverter) {
                     levelControlConverter.onEvent(message);
