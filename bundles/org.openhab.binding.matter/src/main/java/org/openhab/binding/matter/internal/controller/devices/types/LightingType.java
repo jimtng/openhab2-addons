@@ -55,12 +55,12 @@ public class LightingType extends DeviceType {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.debug("Handling command for channel: {}", channelUID);
-        // we want openHAB OnOff commands to always use OnOffCluster if its available (and not LevelControlCluster or
-        // ColorControlCluster)
-        if (command instanceof OnOffType onOffType) {
+        // For dimmer and color lights handling a OnOff type, we send a onOff cluster command as we don't include an OnOff converter
+        if (command instanceof OnOffType onOffType && !clusterToConverters.containsKey(OnOffCluster.CLUSTER_ID)) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
             handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);
         } else {
+            // will process onOff if onOffConverter is present and all other commands to the appropriate converter
             super.handleCommand(channelUID, command);
         }
     }
@@ -70,6 +70,10 @@ public class LightingType extends DeviceType {
         logger.debug("OnEvent: {} with value {}", message.path.attributeName, message.value);
         switch (message.path.attributeName) {
             case "onOff":
+                if (clusterToConverters.get(OnOffCluster.CLUSTER_ID) instanceof OnOffConverter onOffCluster) {
+                    onOffCluster.onEvent(message);
+                }
+            //fall through
             case "currentLevel":
                 if (clusterToConverters
                         .get(LevelControlCluster.CLUSTER_ID) instanceof LevelControlConverter levelControlConverter) {
@@ -78,9 +82,6 @@ public class LightingType extends DeviceType {
                 if (clusterToConverters
                         .get(ColorControlCluster.CLUSTER_ID) instanceof ColorControlConverter colorControlConverter) {
                     colorControlConverter.onEvent(message);
-                }
-                if (clusterToConverters.get(OnOffCluster.CLUSTER_ID) instanceof OnOffConverter onOffCluster) {
-                    onOffCluster.onEvent(message);
                 }
                 return;
         }

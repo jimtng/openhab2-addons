@@ -82,7 +82,8 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
                 break;
             case "onOff":
                 logger.debug("onOff {}", message.value);
-                updateOnOff((OnOffType) message.value);
+                updateState(CHANNEL_LEVEL_LEVEL, OnOffType.from((Boolean) message.value));
+
                 break;
         }
         super.onEvent(message);
@@ -97,10 +98,5 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
     public void initState(boolean onOff) {
         lastLevel = levelToPercent(cluster.currentLevel);
         updateState(CHANNEL_LEVEL_LEVEL, onOff ? lastLevel : OnOffType.OFF);
-    }
-
-    //called by LightingType on OnOffCluster Changes
-    public void updateOnOff(OnOffType onOff) {
-        updateState(CHANNEL_LEVEL_LEVEL, onOff == OnOffType.ON ? lastLevel : OnOffType.OFF);
     }
 }
