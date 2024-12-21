@@ -8,13 +8,15 @@ import { Logger } from "@matter/main";
 import { MatterNode } from "../MatterNode";
 const logger = Logger.get("matter");
 
-//List of system clusters on the root endpoint that are safe/useful to support (thanks to the iobroker project for the list)
+//List of system clusters on the root endpoint that are safe/useful to support (thanks to the iobroker project for the initial list)
 const SystemClusters: ClusterId[] = [
     ClusterId(0x0004), // Groups
     ClusterId(0x0005), // Scenes    
     ClusterId(0x001d), // Descriptor
     ClusterId(0x001e), // Binding
     ClusterId(0x001f), // Access Control
+    ClusterId(0x0028), // Basic Information
+    ClusterId(0x002a), // OTA Software Update Requester
     ClusterId(0x002b), // Localization Configuration
     ClusterId(0x002c), // Time Format Localization
     ClusterId(0x002d), // Unit Localization

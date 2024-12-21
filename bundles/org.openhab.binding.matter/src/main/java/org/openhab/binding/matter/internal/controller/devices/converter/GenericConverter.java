@@ -53,10 +53,9 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public abstract class GenericConverter<T extends BaseCluster> implements AttributeListener, EventTriggeredListener {
-    private static final BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-
+    
+    private static final BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
     protected T cluster;
     protected MatterBaseThingHandler handler;
     protected int endpointNumber;
