@@ -138,7 +138,7 @@ public class MatterBindingConstants {
 
     public static final String CHANNEL_LABEL_WIFINETWORKDIAGNOSTICS_RSSI = "Signal Strength";
     public static final ChannelTypeUID CHANNEL_WIFINETWORKDIAGNOSTICS_RSSI = new ChannelTypeUID(
-            "matter:wififnetworkdiagnostics-rssi");
+            "matter:wifinetworkdiagnostics-rssi");
 
     public static final String CHANNEL_LABEL_SWITCH_SWITCH = "Switch";
     public static final ChannelTypeUID CHANNEL_SWITCH_SWITCH = new ChannelTypeUID("matter:switch-switch");
