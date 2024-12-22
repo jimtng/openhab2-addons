@@ -150,6 +150,8 @@ public class WindowCoveringDevice extends GenericDevice {
         if (localPercent >= 0) {
             try {
                 setEndpointState("windowCovering", "currentPositionLiftPercent100ths", localPercent * 100).get();
+                setEndpointState("windowCovering", "currentPositionLiftPercent", localPercent).get();
+
             } catch (InterruptedException | ExecutionException e) {
                 logger.debug("Could not set state", e);
                 return;

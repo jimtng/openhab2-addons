@@ -205,7 +205,7 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
                 updateBrightness(levelToPercent(numberValue));
                 break;
             case "onOff":
-                updateOnOff(OnOffType.from(numberValue != 0));
+                updateOnOff((Boolean) message.value);
                 break;
             default:
                 logger.debug("Unknown attribute {}", message.path.attributeName);
@@ -242,8 +242,8 @@ public class ColorControlConverter extends GenericConverter<ColorControlCluster>
 
     // These functions are borrowed from the Zigbee openHAB binding
 
-    private void updateOnOff(OnOffType onOffType) {
-        lastOnOff = onOffType == OnOffType.ON;
+    private void updateOnOff(boolean onOff) {
+        lastOnOff = onOff;
         HSBType hsb = new HSBType(lastHSB.getHue(), lastHSB.getSaturation(),
                 lastOnOff ? lastHSB.getBrightness() : new PercentType(0));
         updateState(CHANNEL_COLOR_COLOR, hsb);
