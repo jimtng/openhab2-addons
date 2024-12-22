@@ -82,14 +82,18 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final int BUFFER_SIZE = 1048576 * 2; // 2 Mb
+
     private final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool("matter.MatterWebsocketClient");
+
     protected final Gson gson = new GsonBuilder().registerTypeAdapter(Node.class, new NodeDeserializer())
             .registerTypeAdapter(BigInteger.class, new BigIntegerSerializer())
             .registerTypeHierarchyAdapter(BaseCluster.MatterEnum.class, new MatterEnumDeserializer()).create();
+
     private final WebSocketClient client = new WebSocketClient();
     private final ConcurrentHashMap<String, CompletableFuture<JsonElement>> pendingRequests = new ConcurrentHashMap<>();
     private final CopyOnWriteArrayList<MatterClientListener> clientListeners = new CopyOnWriteArrayList<>();
+
     @Nullable
     private Session session;
     @Nullable
@@ -127,47 +131,6 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
         wss.addProcessListener(this);
     }
 
-    @Override
-    public void onNodeExit(int exitCode) {
-    }
-
-    @Override
-    public void onNodeReady(int port) {
-        logger.debug("onNodeReady port {}", port);
-        if (isConnected()) {
-            logger.debug("Already connected, aborting !");
-            return;
-        }
-        try {
-            connectWebsocket("localhost", port);
-        } catch (Exception e) {
-            disconnect();
-            logger.error("Could not connect", e);
-            for (MatterClientListener listener : clientListeners) {
-                String msg = e.getLocalizedMessage();
-                listener.onDisconnect(msg != null ? msg : "Exception connecting");
-            }
-        }
-    }
-
-    private void connectWebsocket(String host, int port) throws Exception {
-        String dest = "ws://" + host + ":" + port;
-        Map<String, String> connectionParameters = this.connectionParameters;
-        if (connectionParameters != null) {
-            dest += "?" + connectionParameters.entrySet().stream()
-                    .map((Map.Entry<String, String> entry) -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)
-                            + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&"));
-        }
-
-        logger.debug("Connecting {}", dest);
-        WebSocketClient client = new WebSocketClient();
-        client.setMaxIdleTimeout(Long.MAX_VALUE);
-        client.start();
-        URI uri = new URI(dest);
-        client.connect(this, uri, new ClientUpgradeRequest()).get();
-    }
-
     public void disconnect() {
         Session session = this.session;
         try {
@@ -199,22 +162,39 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
         clientListeners.remove(listener);
     }
 
-    protected CompletableFuture<JsonElement> sendMessage(String namespace, String functionName,
-            @Nullable Object args[]) {
-        CompletableFuture<JsonElement> responseFuture = new CompletableFuture<>();
+    public boolean isConnected() {
+        return session != null && session.isOpen();
+    }
 
-        Session session = this.session;
-        if (session == null) {
-            logger.debug("Could not send {} {} : no valid session", namespace, functionName);
-            return responseFuture;
+    public CompletableFuture<String> genericCommand(String namespace, String functionName,
+            @Nullable Object... objects) {
+        CompletableFuture<JsonElement> future = sendMessage(namespace, functionName,
+                objects == null ? new Object[0] : objects);
+        return future.thenApply(obj -> obj == null ? "" : obj.toString());
+    }
+
+    
+    @Override
+    public void onNodeExit(int exitCode) {
+    }
+
+    @Override
+    public void onNodeReady(int port) {
+        logger.debug("onNodeReady port {}", port);
+        if (isConnected()) {
+            logger.debug("Already connected, aborting !");
+            return;
         }
-        String requestId = UUID.randomUUID().toString();
-        pendingRequests.put(requestId, responseFuture);
-        Request message = new Request(requestId, namespace, functionName, args);
-        String jsonMessage = gson.toJson(message);
-        logger.debug("sendMessage: {}", jsonMessage);
-        session.getRemote().sendStringByFuture(jsonMessage);
-        return responseFuture;
+        try {
+            connectWebsocket("localhost", port);
+        } catch (Exception e) {
+            disconnect();
+            logger.error("Could not connect", e);
+            for (MatterClientListener listener : clientListeners) {
+                String msg = e.getLocalizedMessage();
+                listener.onDisconnect(msg != null ? msg : "Exception connecting");
+            }
+        }
     }
 
     @Override
@@ -369,15 +349,40 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
         logger.debug("onWebSocketBinary data, not supported");
     }
 
-    public boolean isConnected() {
-        return session != null && session.isOpen();
+    protected CompletableFuture<JsonElement> sendMessage(String namespace, String functionName,
+            @Nullable Object args[]) {
+        CompletableFuture<JsonElement> responseFuture = new CompletableFuture<>();
+
+        Session session = this.session;
+        if (session == null) {
+            logger.debug("Could not send {} {} : no valid session", namespace, functionName);
+            return responseFuture;
+        }
+        String requestId = UUID.randomUUID().toString();
+        pendingRequests.put(requestId, responseFuture);
+        Request message = new Request(requestId, namespace, functionName, args);
+        String jsonMessage = gson.toJson(message);
+        logger.debug("sendMessage: {}", jsonMessage);
+        session.getRemote().sendStringByFuture(jsonMessage);
+        return responseFuture;
     }
 
-    public CompletableFuture<String> genericCommand(String namespace, String functionName,
-            @Nullable Object... objects) {
-        CompletableFuture<JsonElement> future = sendMessage(namespace, functionName,
-                objects == null ? new Object[0] : objects);
-        return future.thenApply(obj -> obj == null ? "" : obj.toString());
+    private void connectWebsocket(String host, int port) throws Exception {
+        String dest = "ws://" + host + ":" + port;
+        Map<String, String> connectionParameters = this.connectionParameters;
+        if (connectionParameters != null) {
+            dest += "?" + connectionParameters.entrySet().stream()
+                    .map((Map.Entry<String, String> entry) -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)
+                            + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+                    .collect(Collectors.joining("&"));
+        }
+
+        logger.debug("Connecting {}", dest);
+        WebSocketClient client = new WebSocketClient();
+        client.setMaxIdleTimeout(Long.MAX_VALUE);
+        client.start();
+        URI uri = new URI(dest);
+        client.connect(this, uri, new ClientUpgradeRequest()).get();
     }
 
     class NodeDeserializer implements JsonDeserializer<Node> {

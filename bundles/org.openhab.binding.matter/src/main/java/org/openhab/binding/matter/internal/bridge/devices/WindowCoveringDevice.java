@@ -14,18 +14,31 @@ package org.openhab.binding.matter.internal.bridge.devices;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.bridge.MatterBridgeClient;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.WindowCoveringCluster;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.GroupItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.Metadata;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.items.DimmerItem;
 import org.openhab.core.library.items.RollershutterItem;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.items.SwitchItem;
-import org.openhab.core.library.types.*;
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.OpenClosedType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.StopMoveType;
+import org.openhab.core.library.types.StringType;
+import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.State;
 
 import com.google.gson.Gson;
@@ -97,7 +110,7 @@ public class WindowCoveringDevice extends GenericDevice {
                         rollerShutterItem.send(percentType);
                     }
                 } else if (primaryItem instanceof SwitchItem switchItem) {
-                    String value = open ? "ON" : "OFF";
+                    String value = open ? "OFF" : "ON";
                     if (primaryItemMetadata != null) {
                         value = primaryItemMetadata.getConfiguration().getOrDefault(key, value).toString();
                     }
@@ -153,9 +166,9 @@ public class WindowCoveringDevice extends GenericDevice {
         if (state instanceof PercentType percentType) {
             localPercent = percentType.intValue();
         } else if (state instanceof OpenClosedType openClosedType) {
-            localPercent = openClosedType == OpenClosedType.OPEN ? 100 : 0;
+            localPercent = openClosedType == OpenClosedType.OPEN ? 0 : 100;
         } else if (state instanceof OnOffType onOffType) {
-            localPercent = onOffType == OnOffType.ON ? 0 : 100;
+            localPercent = onOffType == OnOffType.ON ? 100 : 0;
         } else if (state instanceof StringType stringType) {
             Metadata primaryItemMetadata = this.primaryItemMetadata;
             if (primaryItemMetadata != null) {
