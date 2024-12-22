@@ -67,52 +67,6 @@ export class MatterNode {
         } else {
             throw new Error("No controller initialized");
         }
-
-
-
-
-        // this.storage = new StorageBackendJsonFile(this.storageLocation);
-        // logger.info(`Storage location: ${this.storageLocation} (Directory)`);
-        // this.storageManager = new StorageManager(this.storage);
-        // await this.storageManager.initialize();
-        // this.storageContext = this.storageManager.createContext("Node");
-
-
-        // if (this.storageManager === undefined) {
-        //     throw new Error("StorageManager not initialized"); // Should never happen
-        // }
-        // if (this.matterController !== undefined) {
-        //     return;
-        // }
-        // logger.info(`matter.js shell controller started for node ${this.nodeNum}`);
-
-        // /**
-        //  * Create Matter Server and Controller Node
-        //  *
-        //  * To allow the device to be announced, found, paired and operated we need a MatterServer instance and add a
-        //  * CommissioningController to it and add the just created device instance to it.
-        //  * The Controller node defines the port where the server listens for the UDP packages of the Matter protocol
-        //  * and initializes deice specific certificates and such.
-        //  *
-        //  * The below logic also adds command handlers for commands of clusters that normally are handled internally
-        //  * like testEventTrigger (General Diagnostic Cluster) that can be implemented with the logic when these commands
-        //  * are called.
-        //  */
-
-        // this.matterController = new MatterServer(this.storageManager, { mdnsInterface: this.netInterface });
-        // this.commissioningController = new CommissioningController({
-        //     autoConnect: false,
-        // });
-        // await this.matterController.addCommissioningController(this.commissioningController);
-
-        /**
-         * Start the Matter Server
-         *
-         * After everything was plugged together we can start the server. When not delayed announcement is set for the
-         * CommissioningServer node then this command also starts the announcement of the device into the network.
-         */
-
-        //await this.matterController.start();
     }
 
     async getNode(nodeId: number | string | NodeId, connectOptions?: CommissioningControllerNodeOptions) {
