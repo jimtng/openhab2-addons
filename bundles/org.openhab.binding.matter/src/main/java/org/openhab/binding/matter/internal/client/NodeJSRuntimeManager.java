@@ -12,10 +12,12 @@
  */
 package org.openhab.binding.matter.internal.client;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
@@ -51,6 +53,8 @@ class NodeJSRuntimeManager {
 
     private static final String NODE_BASE_VERSION = "v22";
     private static final String NODE_DEFAULT_VERSION = "v22.12.0";
+    private static final String NODE_MIN_VERSION = "v18.0.0";
+
     private static final String NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
 
     private static final String BASE_URL = "https://nodejs.org/dist/";
@@ -65,9 +69,15 @@ class NodeJSRuntimeManager {
         detectPlatformAndArch();
     }
 
-    
 
     public String getNodePath() throws IOException {
+        // Check if system installed node is at least the minimum required version
+        if (checkSystemInstalledVersion(NODE_MIN_VERSION)) {
+            logger.debug("Using system installed node");
+            return nodeExecutable;
+        }
+        
+        //Download the latest version of Node.js of not already installed
         String version = getLatestVersion();
         String cacheDir = CACHE_DIR + File.separator + platform + "-" + arch + File.separator + version;
         Path nodePath = findNodeExecutable(cacheDir, version);
@@ -211,6 +221,41 @@ class NodeJSRuntimeManager {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted while extracting tar file", e);
         }
+    }
+
+   private boolean checkSystemInstalledVersion(String requiredVersion) {
+        try {
+            Process process = new ProcessBuilder(nodeExecutable, "--version").start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String versionLine = reader.readLine();
+                if (versionLine == null || !versionLine.startsWith("v")) {
+                    logger.debug("unexpected node output {}", versionLine);
+                    return false;
+                }
+                logger.debug("node found {}", versionLine);
+                String currentVersion = versionLine.substring(1); // Remove the leading 'v'
+                return compareVersions(currentVersion, requiredVersion) >= 0;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    private int compareVersions(String version1, String version2) {
+        String[] parts1 = version1.split("\\.");
+        String[] parts2 = version2.split("\\.");
+
+        int length = Math.max(parts1.length, parts2.length);
+        for (int i = 0; i < length; i++) {
+            int v1 = i < parts1.length ? Integer.parseInt(parts1[i]) : 0;
+            int v2 = i < parts2.length ? Integer.parseInt(parts2[i]) : 0;
+
+            if (v1 != v2) {
+                return Integer.compare(v1, v2);
+            }
+        }
+        return 0;
     }
 
     static class NodeVersion {
