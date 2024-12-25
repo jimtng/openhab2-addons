@@ -243,6 +243,12 @@ class NodeJSRuntimeManager {
 
 
     private int compareVersions(String version1, String version2) {
+        if (version1.indexOf("v") == 0) {
+            version1 = version1.substring(1);
+        }
+        if (version2.indexOf("v") == 0) {
+            version2 = version2.substring(1);
+        }
         String[] parts1 = version1.split("\\.");
         String[] parts2 = version2.split("\\.");
 
