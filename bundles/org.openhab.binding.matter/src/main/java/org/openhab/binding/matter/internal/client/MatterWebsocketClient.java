@@ -173,7 +173,6 @@ public class MatterWebsocketClient implements WebSocketListener, MatterWebsocket
         return future.thenApply(obj -> obj == null ? "" : obj.toString());
     }
 
-    
     @Override
     public void onNodeExit(int exitCode) {
     }

@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.matter.internal.client.model.cluster.BaseCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.BooleanStateCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.ColorControlCluster;
+import org.openhab.binding.matter.internal.client.model.cluster.gen.DoorLockCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.FanControlCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.IlluminanceMeasurementCluster;
 import org.openhab.binding.matter.internal.client.model.cluster.gen.LevelControlCluster;
@@ -68,6 +69,8 @@ public class ConverterRegistry {
         ConverterRegistry.registerConverter(BooleanStateCluster.CLUSTER_ID, BooleanStateConverter.class);
         ConverterRegistry.registerConverter(WiFiNetworkDiagnosticsCluster.CLUSTER_ID,
                 WiFiNetworkDiagnosticsConverter.class);
+        ConverterRegistry.registerConverter(DoorLockCluster.CLUSTER_ID,
+                DoorLockConverter.class);
     }
 
     public static void registerConverter(Integer clusterId,

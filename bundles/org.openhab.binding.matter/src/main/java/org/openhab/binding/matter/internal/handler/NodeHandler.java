@@ -168,7 +168,7 @@ public class NodeHandler extends MatterBaseThingHandler implements BridgeHandler
         updateRootProperties(node.rootEndpoint);
         updateBaseEndpoint(node.rootEndpoint);
     }
-    
+
     private void updateBridgeEndpoint(Endpoint endpoint) {
         BridgeEndpointHandler handler = bridgedEndpoints.get(endpoint.number);
         if (handler != null) {

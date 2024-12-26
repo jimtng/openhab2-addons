@@ -427,6 +427,15 @@
 		<state readOnly="true" pattern="%d %unit%"></state>
 	</channel-type>
 
+	<!-- Door Lock Channel -->
+	<channel-type id="doorlock-lockstate">
+		<item-type>Switch</item-type>
+		<label>Door Lock State</label>
+		<description>Locks and unlocks the door and maintains the lock state</description>
+		<category>Door</category>
+		<autoUpdatePolicy>veto</autoUpdatePolicy>
+	</channel-type>
+
 	<channel-type id="switch-switchlatched">
 		<kind>trigger</kind>
 		<label>Switch Latched Trigger Channel</label>

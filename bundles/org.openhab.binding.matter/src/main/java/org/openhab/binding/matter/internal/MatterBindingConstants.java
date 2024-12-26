@@ -103,7 +103,7 @@ public class MatterBindingConstants {
             "matter:thermostat-coolingdemand");
 
     public static final String CHANNEL_LABEL_DOORLOCK_STATE = "Door Lock State";
-    public static final ChannelTypeUID CHANNEL_DOORLOCK_STATE = new ChannelTypeUID("matter:door-state");
+    public static final ChannelTypeUID CHANNEL_DOORLOCK_STATE = new ChannelTypeUID("matter:doorlock-lockstate");
 
     public static final String CHANNEL_LABEL_WINDOWCOVERING_LIFT = "Window Covering Lift";
     public static final ChannelTypeUID CHANNEL_WINDOWCOVERING_LIFT = new ChannelTypeUID("matter:windowcovering-lift");

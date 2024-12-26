@@ -69,15 +69,14 @@ class NodeJSRuntimeManager {
         detectPlatformAndArch();
     }
 
-
     public String getNodePath() throws IOException {
         // Check if system installed node is at least the minimum required version
         if (checkSystemInstalledVersion(NODE_MIN_VERSION)) {
             logger.debug("Using system installed node");
             return nodeExecutable;
         }
-        
-        //Download the latest version of Node.js of not already installed
+
+        // Download the latest version of Node.js of not already installed
         String version = getLatestVersion();
         String cacheDir = CACHE_DIR + File.separator + platform + "-" + arch + File.separator + version;
         Path nodePath = findNodeExecutable(cacheDir, version);
@@ -147,7 +146,7 @@ class NodeJSRuntimeManager {
         }
         return NODE_DEFAULT_VERSION;
     }
-    
+
     private @Nullable Path findNodeExecutable(String cacheDir, String version) throws IOException {
         Path rootDir = Paths.get(cacheDir);
         if (!Files.exists(rootDir)) {
@@ -223,7 +222,7 @@ class NodeJSRuntimeManager {
         }
     }
 
-   private boolean checkSystemInstalledVersion(String requiredVersion) {
+    private boolean checkSystemInstalledVersion(String requiredVersion) {
         try {
             Process process = new ProcessBuilder(nodeExecutable, "--version").start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -240,7 +239,6 @@ class NodeJSRuntimeManager {
             return false;
         }
     }
-
 
     private int compareVersions(String version1, String version2) {
         if (version1.indexOf("v") == 0) {

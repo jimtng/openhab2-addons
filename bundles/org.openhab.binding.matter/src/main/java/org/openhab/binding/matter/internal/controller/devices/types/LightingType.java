@@ -55,7 +55,8 @@ public class LightingType extends DeviceType {
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.debug("Handling command for channel: {}", channelUID);
-        // For dimmer and color lights handling a OnOff type, we send a onOff cluster command as we don't include an OnOff converter
+        // For dimmer and color lights handling a OnOff type, we send a onOff cluster command as we don't include an
+        // OnOff converter
         if (command instanceof OnOffType onOffType && !clusterToConverters.containsKey(OnOffCluster.CLUSTER_ID)) {
             ClusterCommand onOffCommand = onOffType == OnOffType.ON ? OnOffCluster.on() : OnOffCluster.off();
             handler.sendClusterCommand(endpointNumber, OnOffCluster.CLUSTER_NAME, onOffCommand);

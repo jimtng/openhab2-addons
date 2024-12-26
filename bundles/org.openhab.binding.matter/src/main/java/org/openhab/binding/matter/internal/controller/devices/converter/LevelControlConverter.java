@@ -44,12 +44,12 @@ import org.openhab.core.types.StateDescription;
 public class LevelControlConverter extends GenericConverter<LevelControlCluster> {
 
     private PercentType lastLevel = new PercentType(0);
-    
+
     public LevelControlConverter(LevelControlCluster cluster, MatterBaseThingHandler handler, int endpointNumber,
             String labelPrefix) {
         super(cluster, handler, endpointNumber, labelPrefix);
     }
-    
+
     @Override
     public Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID) {
         Channel channel = ChannelBuilder.create(new ChannelUID(thingUID, CHANNEL_LEVEL_LEVEL.getId()), ITEM_TYPE_DIMMER)
@@ -90,7 +90,7 @@ public class LevelControlConverter extends GenericConverter<LevelControlCluster>
 
     @Override
     public void initState() {
-        //default to on when not used as part of the lighting type
+        // default to on when not used as part of the lighting type
         initState(true);
     }
 

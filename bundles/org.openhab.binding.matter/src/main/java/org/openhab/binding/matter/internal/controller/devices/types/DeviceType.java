@@ -123,7 +123,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
         channelUIDToStateDescription.clear();
         clusterToConverters.clear();
         String label = "";
-        //each cluster will create its own channels and add to this device's total channels
+        // each cluster will create its own channels and add to this device's total channels
         clusters.forEach((clusterName, cluster) -> {
             logger.debug("Creating channels for cluster: {}", clusterName);
             GenericConverter<? extends BaseCluster> converter = createConverter(cluster, clusters, label);
@@ -134,8 +134,7 @@ public abstract class DeviceType implements AttributeListener, EventTriggeredLis
                     channelUIDToConverters.put(channel.getUID(), converter);
                     channelUIDToStateDescription.put(channel.getUID(), converterChannels.get(channel));
                     clusterToConverters.put(cluster.id, converter);
-                    boolean hasMatchingUID = channels.stream()
-                            .anyMatch(c -> channel.getUID().equals(c.getUID()));
+                    boolean hasMatchingUID = channels.stream().anyMatch(c -> channel.getUID().equals(c.getUID()));
                     if (!hasMatchingUID) {
                         channels.add(channel);
                     } else {

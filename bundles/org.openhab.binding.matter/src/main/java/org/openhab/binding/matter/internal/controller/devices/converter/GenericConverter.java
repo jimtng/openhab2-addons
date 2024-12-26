@@ -43,6 +43,7 @@ import org.openhab.core.types.State;
 import org.openhab.core.types.StateDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
  * The {@link GenericConverter}
  *
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public abstract class GenericConverter<T extends BaseCluster> implements AttributeListener, EventTriggeredListener {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     private static final BigDecimal TEMPERATURE_MULTIPLIER = new BigDecimal(100);
     protected T cluster;
     protected MatterBaseThingHandler handler;
@@ -70,7 +71,6 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
     }
 
     public abstract Map<Channel, @Nullable StateDescription> createChannels(ChannelGroupUID thingUID);
-
 
     /**
      * Updates all the channel states of a cluster
@@ -181,7 +181,7 @@ public abstract class GenericConverter<T extends BaseCluster> implements Attribu
             field.setAccessible(true);
             field.set(cluster, fieldValue);
         } catch (NoSuchFieldException | IllegalAccessException ignored) {
-            //its likely this is not a field in the cluster, so just ignore
+            // its likely this is not a field in the cluster, so just ignore
         }
     }
 

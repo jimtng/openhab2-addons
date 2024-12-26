@@ -176,7 +176,7 @@ public class ControllerHandler extends BaseBridgeHandler implements MatterClient
                 if (linkedNodes.containsKey(message.nodeId)) {
                     disconnectedNodes.add(message.nodeId);
                 }
-                //fall through
+                // fall through
             case RECONNECTING:
             case WAITINGFORDEVICEDISCOVERY:
                 updateEndpointStatuses(message.nodeId, ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,

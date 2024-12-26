@@ -182,7 +182,7 @@ public class MatterBridge implements MatterClientListener {
         // if this returns true, we will wait for @Modified to be called after the config is persisted
         if (!parseInitialConfig(properties)) {
             this.settings = (new Configuration(properties)).as(MatterBridgeSettings.class);
-            if(this.settings.enableBridge) {
+            if (this.settings.enableBridge) {
                 connectClient();
             }
         }
@@ -225,7 +225,7 @@ public class MatterBridge implements MatterClientListener {
 
         this.settings = settings;
 
-        if(!settings.enableBridge) {
+        if (!settings.enableBridge) {
             stopClient();
         } else if (!client.isConnected() || restart) {
             stopClient();
