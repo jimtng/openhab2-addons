@@ -102,8 +102,8 @@
                             "hardwareVersionString": "1",
                             "softwareVersion": 10010011,
                             "softwareVersionString": "1.1.11-c85ba1e-dirty",
-                            "serialNumber": "189da3a6ec2b4a23b0b8f51906000ea7",
-                            "uniqueId": "7CDC678D0FD61FEC",
+                            "serialNumber": "xxx",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -176,13 +176,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "1111111122222222",
+                                    "networkId": "xxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "1111111122222222",
+                            "lastNetworkId": "xxx",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
@@ -234,9 +234,9 @@
                                         "00000000"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe80000000000000701ee1c311a9c57d",
-                                        "fd396f1810a407d969da17d77d38121c",
-                                        "fd04e621ef1f0001b937a3067895a890"
+                                        "xxx",
+                                        "xxx",
+                                        "xxx"
                                     ],
                                     "type": 4
                                 }
@@ -329,8 +329,8 @@
                             "routingRole": 4,
                             "networkName": "OpenThread-ESP32",
                             "panId": 4660,
-                            "extendedPanId": "1229782938533634594",
-                            "meshLocalPrefix": "40fd396f1810a407d9",
+                            "extendedPanId": "xxx",
+                            "meshLocalPrefix": "xxx",
                             "neighborTable": [],
                             "routeTable": [
                                 {

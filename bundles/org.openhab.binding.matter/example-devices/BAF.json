@@ -62,7 +62,7 @@
                                     "privilege": 5,
                                     "authMode": 2,
                                     "subjects": [
-                                        "10008520543529035347"
+                                        ""
                                     ],
                                     "targets": null,
                                     "fabricIndex": 3
@@ -179,13 +179,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "313533302d494f54",
+                                    "networkId": "",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "313533302d494f54",
+                            "lastNetworkId": "",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 30,
@@ -232,12 +232,12 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "8c4b1454cd90",
+                                    "hardwareAddress": "",
                                     "iPv4Addresses": [
-                                        "c0a81e76"
+                                        ""
                                     ],
                                     "iPv6Addresses": [
-                                        "fe800000000000008e4b14fffe54cd90"
+                                        ""
                                     ],
                                     "type": 1
                                 },
@@ -246,9 +246,9 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "000000000000",
+                                    "hardwareAddress": "",
                                     "iPv4Addresses": [
-                                        "c0a80401"
+                                        ""
                                     ],
                                     "iPv6Addresses": [],
                                     "type": 1

@@ -151,9 +151,9 @@
                             "partNumber": "1001",
                             "productUrl": "Test Product URL",
                             "productLabel": "Smart Night Light-W",
-                            "serialNumber": "3RM01-4262-02857",
+                            "serialNumber": "xxx",
                             "localConfigDisabled": false,
-                            "uniqueId": "1227F93C0A22A015",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -320,13 +320,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "6f737369706f776572",
+                                    "networkId": "xxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 12,
-                            "lastNetworkId": "6f737369706f776572",
+                            "lastNetworkId": "xxx",
                             "lastConnectErrorValue": 0,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
@@ -392,9 +392,9 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "28bbed32141f",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a80243"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [],
                                     "type": 1
@@ -459,7 +459,7 @@
                         "WiFiNetworkDiagnostics": {
                             "id": 54,
                             "name": "WiFiNetworkDiagnostics",
-                            "bssid": "3c3712f2ac77",
+                            "bssid": "xxx",
                             "securityType": 4,
                             "wiFiVersion": null,
                             "channelNumber": 6,

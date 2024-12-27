@@ -100,7 +100,7 @@
                             "softwareVersion": 0,
                             "softwareVersionString": "v1.0",
                             "productLabel": "WiZ LED Strip",
-                            "uniqueId": "18d426447ef3cdda982d7d19b84182b3",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -173,13 +173,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "6d616e6f2d64652e64696f73",
+                                    "networkId": "xxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "6d616e6f2d64652e64696f73",
+                            "lastNetworkId": "xxx",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 30,
@@ -226,13 +226,13 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "cc408529da6e",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a82fe9"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe80000000000000ce4085fffe29da6e",
-                                        "200300c89f032b00ce4085fffe29da6e"
+                                        "xxx",
+                                        "xxx"
                                     ],
                                     "type": 1
                                 }
@@ -288,13 +288,6 @@
                         "OperationalCredentials": {
                             "id": 62,
                             "name": "OperationalCredentials",
-                            "nocs": [
-                                {
-                                    "noc": "153001010224020137032414001826044abfe82c2605caf5954137062415012711fafb4a5780760e4c182407012408013009410447100e0b89615fdba0744c7dcaa731214541d656eeb2a06f66d1b238791ff8e7d8c958002ea5239f2e6fdd16cad50d550f40ffd83b53fc40deb830640d908276370a350128011824020136030402040118300414d5922715221054d4f0d538fff7ae46339f97374a300514e96f41a137ffe4361944eee4dc5430c9ea90673718300b405fc833b9d898d3ed7f3ed04cbb3593936d26fc5972633819d7eef807fa3dd42cae738387edea039c801fae2574db2230f131cc1ebccb6556d9cc9ce0b594cd4c18",
-                                    "icac": null,
-                                    "fabricIndex": 3
-                                }
-                            ],
                             "supportedFabrics": 5,
                             "commissionedFabrics": 3,
                             "currentFabricIndex": 3,
@@ -366,7 +359,7 @@
                         "WiFiNetworkDiagnostics": {
                             "id": 54,
                             "name": "WiFiNetworkDiagnostics",
-                            "bssid": "485d3560f3c0",
+                            "bssid": "xxx",
                             "securityType": 0,
                             "wiFiVersion": 3,
                             "channelNumber": 13,

@@ -62,7 +62,7 @@
                                     "privilege": 5,
                                     "authMode": 2,
                                     "subjects": [
-                                        "18098693022946290589"
+                                        ""
                                     ],
                                     "targets": null,
                                     "fabricIndex": 40
@@ -103,9 +103,9 @@
                             "hardwareVersionString": "1",
                             "softwareVersion": 65792,
                             "softwareVersionString": "1.1.0",
-                            "serialNumber": "ecb5fafffea4b16d",
+                            "serialNumber": "",
                             "reachable": true,
-                            "uniqueId": "3e624ed6c7cd4f3e8991a1d7b6182d16",
+                            "uniqueId": "",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 65535
@@ -179,7 +179,7 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "65746830",
+                                    "networkId": "",
                                     "connected": true
                                 }
                             ],
@@ -237,13 +237,13 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "ecb5faa4b16d",
+                                    "hardwareAddress": "",
                                     "iPv4Addresses": [
-                                        "c0a85b91"
+                                        ""
                                     ],
                                     "iPv6Addresses": [
-                                        "26008801df000160eeb5fafffea4b16d",
-                                        "fe80000000000000eeb5fafffea4b16d"
+                                        "",
+                                        ""
                                     ],
                                     "type": 0
                                 },
@@ -252,7 +252,7 @@
                                     "isOperational": false,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "00037f1120ce",
+                                    "hardwareAddress": "",
                                     "iPv4Addresses": [],
                                     "iPv6Addresses": [],
                                     "type": 2
@@ -264,7 +264,7 @@
                                     "offPremiseServicesReachableIPv6": null,
                                     "hardwareAddress": "000000000000",
                                     "iPv4Addresses": [
-                                        "7f000001"
+                                        ""
                                     ],
                                     "iPv6Addresses": [
                                         "00000000000000000000000000000001"
@@ -578,7 +578,7 @@
                             "softwareVersionString": "67.101.2",
                             "productLabel": "Hue color lamp",
                             "reachable": false,
-                            "uniqueId": "3d68cd3ec4654a678c097a30d602a381",
+                            "uniqueId": "xxx",
                             "clusterRevision": 1,
                             "featureMap": {},
                             "attributeList": [
@@ -903,7 +903,7 @@
                             "softwareVersionString": "67.116.3",
                             "productLabel": "Hue color lamp",
                             "reachable": true,
-                            "uniqueId": "576f414887074b2ba94c66e4658981c2",
+                            "uniqueId": "yyyyy",
                             "clusterRevision": 1,
                             "featureMap": {},
                             "attributeList": [

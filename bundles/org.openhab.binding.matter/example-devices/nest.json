@@ -97,7 +97,7 @@
                             "hardwareVersionString": "6.8",
                             "softwareVersion": 2100,
                             "softwareVersionString": "2.1",
-                            "uniqueId": "5F7F32FB9BD9ED3C454322872972B9AA",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -168,16 +168,16 @@
                             "name": "GeneralDiagnostics",
                             "networkInterfaces": [
                                 {
-                                    "name": "ddnet-matter",
+                                    "name": "xxx",
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": true,
                                     "offPremiseServicesReachableIPv6": false,
-                                    "hardwareAddress": "3c3174dd78d5",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a85b90"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe800000000000003e3174fffedd78d5"
+                                        "xxx"
                                     ],
                                     "type": 1
                                 }

@@ -108,8 +108,8 @@
                             "hardwareVersionString": "1.0",
                             "softwareVersion": 131365,
                             "softwareVersionString": "2.1.25",
-                            "serialNumber": "1000_0035_47FB",
-                            "uniqueId": "E16A6DFA9DCEFE14",
+                            "serialNumber": "xxx",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -271,13 +271,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "64646e65742d6d6174746572",
+                                    "networkId": "xxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "64646e65742d6d6174746572",
+                            "lastNetworkId": "xxx",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
@@ -343,12 +343,12 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "0007a63db0d9",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a85bc5"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe800000000000000207a6fffe3db0d9"
+                                        "xxx"
                                     ],
                                     "type": 1
                                 }

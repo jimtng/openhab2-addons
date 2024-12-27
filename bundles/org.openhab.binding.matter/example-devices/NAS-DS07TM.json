@@ -124,10 +124,10 @@
                             "partNumber": "NAS-DS07W10",
                             "productUrl": "",
                             "productLabel": "",
-                            "serialNumber": "100160819003D0",
+                            "serialNumber": "xxx",
                             "localConfigDisabled": false,
                             "reachable": true,
-                            "uniqueId": "3c2ef5fffe182835",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -245,13 +245,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "9f4e6f6f1b64b3fe",
+                                    "networkId": "xxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "9f4e6f6f1b64b3fe",
+                            "lastNetworkId": "xxx",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
@@ -321,7 +321,7 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "10bd0120837a0508",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [],
                                     "iPv6Addresses": [],
                                     "type": 4
@@ -451,11 +451,11 @@
                             "routingRole": 2,
                             "networkName": "AMZN-Thread-efb1",
                             "panId": 61361,
-                            "extendedPanId": "11479235023205610494",
-                            "meshLocalPrefix": "40fddead00beef0000",
+                            "extendedPanId": "xxx",
+                            "meshLocalPrefix": "xxx",
                             "neighborTable": [
                                 {
-                                    "extAddress": "164520292524685897",
+                                    "extAddress": "xxx",
                                     "age": 109,
                                     "rloc16": 34816,
                                     "linkFrameCounter": 7862,
@@ -473,7 +473,7 @@
                             ],
                             "routeTable": [
                                 {
-                                    "extAddress": "164520292524685897",
+                                    "extAddress": "xxx",
                                     "rloc16": 34816,
                                     "routerId": 34,
                                     "nextHop": 0,

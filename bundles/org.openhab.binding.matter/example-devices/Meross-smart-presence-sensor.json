@@ -166,10 +166,10 @@
                             "partNumber": "",
                             "productUrl": "",
                             "productLabel": "",
-                            "serialNumber": "662002240803189",
+                            "serialNumber": "xxx",
                             "localConfigDisabled": false,
                             "reachable": true,
-                            "uniqueId": "A20F3FF0E19CFC79",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -253,13 +253,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "4361726e65744d657368",
+                                    "networkId": "xxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "4361726e65744d657368",
+                            "lastNetworkId": "xxx",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
@@ -306,12 +306,12 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "c4e7ae096b00",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a8019c"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe80000000000000c6e7aefffe096b00"
+                                        "xxx"
                                     ],
                                     "type": 1
                                 }
@@ -344,7 +344,7 @@
                         "WiFiNetworkDiagnostics": {
                             "id": 54,
                             "name": "WiFiNetworkDiagnostics",
-                            "bssid": "1484736de0e1",
+                            "bssid": "xxx",
                             "securityType": 0,
                             "wiFiVersion": 3,
                             "channelNumber": 11,

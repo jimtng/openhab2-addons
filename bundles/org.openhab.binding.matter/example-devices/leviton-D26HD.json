@@ -108,8 +108,8 @@
                             "hardwareVersionString": "1.0",
                             "softwareVersion": 131365,
                             "softwareVersionString": "2.1.25",
-                            "serialNumber": "1000_0034_E611",
-                            "uniqueId": "37ECE80589145E91",
+                            "serialNumber": "xxxx",
+                            "uniqueId": "xxxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -271,13 +271,13 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "64646e65742d6d6174746572",
+                                    "networkId": "xxxx",
                                     "connected": true
                                 }
                             ],
                             "interfaceEnabled": true,
                             "lastNetworkingStatus": 0,
-                            "lastNetworkId": "64646e65742d6d6174746572",
+                            "lastNetworkId": "xxxx",
                             "lastConnectErrorValue": null,
                             "scanMaxTimeSeconds": 10,
                             "connectMaxTimeSeconds": 20,
@@ -343,12 +343,12 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "0007a63d4f41",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a85b8d"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe800000000000000207a6fffe3d4f41"
+                                        "xxx"
                                     ],
                                     "type": 1
                                 }
@@ -662,7 +662,7 @@
                         "WiFiNetworkDiagnostics": {
                             "id": 54,
                             "name": "WiFiNetworkDiagnostics",
-                            "bssid": "9e05d63bfb61",
+                            "bssid": "",
                             "securityType": 4,
                             "wiFiVersion": 3,
                             "channelNumber": 1,

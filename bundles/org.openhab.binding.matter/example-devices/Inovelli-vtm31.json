@@ -125,10 +125,10 @@
                             "partNumber": "850007431228",
                             "productUrl": "https://inovelli.com/products/thread-matter-white-series-smart-2-1-on-off-dimmer-switch",
                             "productLabel": "White Series Smart 2-1 Switch",
-                            "serialNumber": "494C885351DBB386",
+                            "serialNumber": "",
                             "localConfigDisabled": false,
                             "reachable": true,
-                            "uniqueId": "e95d097c252537ec39560939462d2e0d",
+                            "uniqueId": "",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -349,11 +349,11 @@
                             "routingRole": 4,
                             "networkName": "OpenThread-ESP32",
                             "panId": 4660,
-                            "extendedPanId": "1229782938533634594",
-                            "meshLocalPrefix": "40fd396f1810a407d9",
+                            "extendedPanId": "1234",
+                            "meshLocalPrefix": "1234",
                             "neighborTable": [
                                 {
-                                    "extAddress": "8223258197556315517",
+                                    "extAddress": "1234",
                                     "age": 1,
                                     "rloc16": 53248,
                                     "linkFrameCounter": 15136,
@@ -383,7 +383,7 @@
                                     "linkEstablished": false
                                 },
                                 {
-                                    "extAddress": "8223258197556315517",
+                                    "extAddress": "1234",
                                     "rloc16": 53248,
                                     "routerId": 52,
                                     "nextHop": 0,

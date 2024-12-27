@@ -103,8 +103,8 @@
                             "hardwareVersionString": "3.0",
                             "softwareVersion": 65536,
                             "softwareVersionString": "1.0.0",
-                            "serialNumber": "D8448905C044",
-                            "uniqueId": "671E79886B1F8ABD",
+                            "serialNumber": "xx",
+                            "uniqueId": "xx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 3
@@ -202,7 +202,7 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "576966695f53616c6f6e00000000000000000000000000000000000000000000",
+                                    "networkId": "xxx",
                                     "connected": false
                                 }
                             ],
@@ -255,12 +255,12 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "d8448905c044",
+                                    "hardwareAddress": "xx",
                                     "iPv4Addresses": [
-                                        "c0a80125"
+                                        "xx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fe80000000000000da4489fffe05c044"
+                                        "xxx"
                                     ],
                                     "type": 1
                                 }

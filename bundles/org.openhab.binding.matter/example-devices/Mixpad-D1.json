@@ -110,9 +110,9 @@
                             "manufacturingDate": "20230426",
                             "productUrl": "https://www.orvibo.com",
                             "productLabel": "Mixpad D1",
-                            "serialNumber": "H101201041001715",
+                            "serialNumber": "xxx",
                             "localConfigDisabled": false,
-                            "uniqueId": "6085379C7206D4E5",
+                            "uniqueId": "xxx",
                             "capabilityMinima": {
                                 "caseSessionsPerFabric": 3,
                                 "subscriptionsPerFabric": 65535
@@ -254,7 +254,7 @@
                             "maxNetworks": 1,
                             "networks": [
                                 {
-                                    "networkId": "456e63727970746564446f75636865626167",
+                                    "networkId": "xxx",
                                     "connected": false
                                 }
                             ],
@@ -326,7 +326,7 @@
                                     "isOperational": false,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "e201c74f62db",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [],
                                     "iPv6Addresses": [],
                                     "type": 1
@@ -336,13 +336,13 @@
                                     "isOperational": true,
                                     "offPremiseServicesReachableIPv4": null,
                                     "offPremiseServicesReachableIPv6": null,
-                                    "hardwareAddress": "e001c74f62db",
+                                    "hardwareAddress": "xxx",
                                     "iPv4Addresses": [
-                                        "c0a87b5b"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
-                                        "fdada1f70b465ae9d3ff52452c2bd1a6",
-                                        "fe8000000000000027da7777ed32cf83"
+                                        "xxx",
+                                        "xxx"
                                     ],
                                     "type": 1
                                 },
@@ -353,7 +353,7 @@
                                     "offPremiseServicesReachableIPv6": null,
                                     "hardwareAddress": "000000000000",
                                     "iPv4Addresses": [
-                                        "7f000001"
+                                        "xxx"
                                     ],
                                     "iPv6Addresses": [
                                         "00000000000000000000000000000001"
