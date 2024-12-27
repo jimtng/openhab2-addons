@@ -53,6 +53,7 @@ export class MatterNode {
                 id,
             },
             autoConnect: false,
+            adminFabricLabel:  "openHAB: "+ this.controllerName,
         });
         await this.commissioningController.initializeControllerStore();
 
