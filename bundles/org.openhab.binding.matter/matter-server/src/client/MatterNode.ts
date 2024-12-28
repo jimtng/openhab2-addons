@@ -40,10 +40,13 @@ export class MatterNode {
 
     async initialize() {
         const outputDir = this.storageLocation;
-        const id = `${this.controllerName}-${this.nodeNum}`
-
+        const id = `${this.controllerName}-${this.nodeNum.toString()}`
+        const fabricLabel = `openHAB: ${this.controllerName}`;
+        
         logger.info(`Storage location: ${outputDir} (Directory)`);
         this.#environment.vars.set('storage.path', outputDir)
+    
+        //TODO we may need to choose which network interface to use
         if (this.netInterface !== undefined) {
             this.#environment.vars.set("mdns.networkinterface", this.netInterface);
         }
@@ -53,13 +56,22 @@ export class MatterNode {
                 id,
             },
             autoConnect: false,
-            adminFabricLabel:  "openHAB: "+ this.controllerName,
+            adminFabricLabel: fabricLabel,
         });
         await this.commissioningController.initializeControllerStore();
 
-        const controllerStore = this.#environment.get(ControllerStore);
-
+        const controllerStore = this.#environment.get(ControllerStore);        
+        // TODO: Implement resetStorage
+        // if (resetStorage) {
+        //     await controllerStore.erase();
+        // }
         this.storageContext = controllerStore.storage.createContext("Node");
+
+        if (await this.Store.has("ControllerFabricLabel")) {
+            await this.commissioningController.updateFabricLabel(
+                await this.Store.get<string>("ControllerFabricLabel",fabricLabel),
+            );
+        }
 
         if (this.matterController !== undefined) {
             await this.matterController.start();
@@ -74,7 +86,6 @@ export class MatterNode {
         if (this.commissioningController === undefined) {
             throw new Error("CommissioningController not initialized");
         }
-        logger.debug(`converting ${nodeId} to ${BigInt(nodeId)}`)
         const node = await this.commissioningController.connectNode(NodeId(BigInt(nodeId)), connectOptions)
         if (node === undefined) {
             throw new Error(`Node ${nodeId} not connected`);
