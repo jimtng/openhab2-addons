@@ -670,10 +670,12 @@ public class StateFilterProfileTest {
 
     public static Stream<Arguments> testFunctions() {
         NumberItem powerItem = new NumberItem("Number:Power", "powerItem", UNIT_PROVIDER);
+        NumberItem temperatureItem = new NumberItem("Number:Temperature", "temperatureItem", UNIT_PROVIDER);
         NumberItem decimalItem = new NumberItem("decimalItem");
         List<Number> numbers = List.of(1, 2, 3, 4, 5);
         List<Number> negatives = List.of(-1, -2, -3, -4, -5);
         List<QuantityType> quantities = numbers.stream().map(n -> new QuantityType(n, Units.WATT)).toList();
+        List<QuantityType> celsiusQuantities = numbers.stream().map(n -> new QuantityType(n, SIUnits.CELSIUS)).toList();
         List<DecimalType> decimals = numbers.stream().map(DecimalType::new).toList();
         List<DecimalType> negativeDecimals = negatives.stream().map(DecimalType::new).toList();
 
@@ -689,6 +691,14 @@ public class StateFilterProfileTest {
                 Arguments.of(decimalItem, "1 <= $DELTA", decimals, DecimalType.valueOf("6"), true), //
                 Arguments.of(decimalItem, "$DELTA >= 1", decimals, DecimalType.valueOf("10"), true), //
                 Arguments.of(decimalItem, "$DELTA >= 1", decimals, DecimalType.valueOf("5.5"), false), //
+
+                // Test for the use of relative unit in DELTA checks
+                Arguments.of(temperatureItem, "$DELTA > 0.2 °F", celsiusQuantities, QuantityType.valueOf("5.1 °C"),
+                        false), //
+                Arguments.of(temperatureItem, "0.2 °F < $DELTA", celsiusQuantities, QuantityType.valueOf("5.1 °C"),
+                        false), //
+                Arguments.of(temperatureItem, "$DELTA < 2 °F", celsiusQuantities, QuantityType.valueOf("6 °C"), true), //
+                Arguments.of(temperatureItem, "2 °F > $DELTA", celsiusQuantities, QuantityType.valueOf("6 °C"), true), //
 
                 Arguments.of(decimalItem, "$DELTA_PERCENT >= 10", decimals, DecimalType.valueOf("4.6"), false), //
                 Arguments.of(decimalItem, "$DELTA_PERCENT >= 10", decimals, DecimalType.valueOf("4.5"), true), //
